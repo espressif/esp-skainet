@@ -31,6 +31,7 @@ static const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 static const esp_mn_iface_t *multinet = &MULTINET_MODEL;
 model_iface_data_t *model_data_mn = NULL;
 
+struct RingBuf *aec_rb = NULL;
 struct RingBuf *rec_rb = NULL;
 
 void wakenetTask(void *arg)
@@ -79,12 +80,14 @@ void wakenetTask(void *arg)
 void app_main()
 {
     codec_init();
+    aec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     rec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
 
     model_iface_data_t *model_data = wakenet->create(model_coeff_getter, DET_MODE_90);
     model_data_mn = multinet->create(&MULTINET_COEFF, 6000);
 
     xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 0);
     xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, (void*)model_data, 5, NULL, 0);
 
     printf("-----------awaits to be waken up-----------\n");

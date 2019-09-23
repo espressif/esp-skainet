@@ -1,11 +1,13 @@
-// #pragma once
+/* 
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-
-/**
- * @brief Microphone source (read from the I2S codec on a LyraT board) task fuction
- *
- * @param arg Pointer to an src_cfg_t struct
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
 */
-#define UART_RECORD 0
+#ifndef _RECSRC_H_
+#define _RECSRC_H_
 void recsrcTask(void *arg);
-void agc_task(void *parameters);
+void agcTask(void *arg);
+#endif
+
