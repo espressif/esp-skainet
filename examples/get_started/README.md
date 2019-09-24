@@ -1,4 +1,4 @@
-# Get Started Guide for ESP-Skainet
+# Get Started Guide for ESP-Skainet [[中文]](./README_cn.md)
 
 Currently, Espressif's ESP32-based speech command recognition model [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md) supports up to **100** Chinese speech commands (We will add supports for English speech commands in the next release of [esp-sr](../README.md)). 
 
@@ -6,7 +6,7 @@ This example demonstrates the basic process of recognizing Chinese speech comman
 
 ![speech-commands-recognition-system](../../img/speechs_commands_workflow.png)  
 
-For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide]().
+For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
  
 # 1. Quick Start
 

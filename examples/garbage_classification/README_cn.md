@@ -1,46 +1,47 @@
-# Garbage Sorting example [[中文]](./README_cn.md)
+# 垃圾分类例程 [[English]](./README.md)
 
-(See the [README.md](../README.md) file in the upper level 'examples' directory for more information about examples.)
+（参考在上一级的 `examples` 目录下的 [README.md](../README.md) 文件来获取更多信息。）
 
-In this example, we have configured four command IDs to represent:
+在这个示例中，我们配置了 4 个命令词 ID：
 
-* 湿垃圾 (Household Food Waste)
-* 干垃圾 (Residual Waste)
-* 可回收垃圾 (Recyclable Waste)
-* 有害垃圾 (Hazardous Waste)
-
-And we have configured 45 kinds of garbages with their corresponding command IDs in `menuconfig`.
+* 湿垃圾
+* 干垃圾
+* 可回收垃圾
+* 有害垃圾
  
-## How to use this example
+我们已经通过 `menuconfig` 配置了 45 类常见的垃圾名称。
+ 
+## 如何使用例程
 
 ### Hardware Required
+### 硬件需求
 
-This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
+这个示例能够在 ESP32-LyraT-Mini 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
 
 
-### Configure the project
+### 配置工程
 
-* Go to `make menuconfig`.
+* 进入 `make menuconfig`
 
-* Set the serial port number under `Serial Flasher Options`.
+* 通过 `Serial Flasher Options`设置串口信息
 
-* Add or modify the garbage name, such as “wei sheng zhi” (toilet paper).
+* 添加或更改垃圾名称
 
-### Build and Flash
+### 编译和烧写
 
-Build the project and flash it to the board, then run the monitor tool to view the output via serial port:
+编译并烧写，然后运行终端监控查看打印：
 
 ```
 make -j4 flash monitor
 ```
 
-(To exit the serial monitor, type ``Ctrl-]``.)
+(退出窗口，请键入 ``Ctrl-]``.)
 
-See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) for full steps to configure and use ESP-IDF to build projects.
+参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.
 
-## Example Output
+## 例程输出
 
-There is the console output for this example:
+以下是例程的上电打印输出:
 
 ```
 Quantized wakeNet5: wakeNet5_v1_hilexin_5_0.95_0.90, mode:0
@@ -97,17 +98,18 @@ chunk_num = 200
 -----------awaits to be waken up-----------
 
 ```
-Then, say “Hi Lexin" ([Ləsɪ:n]) to wake up the board, which then wakes up and prints the following log:
+
+然后，说“ “Hi Lexin" ([Ləsɪ:n]) ” 来唤醒开发板，唤醒后会打印：
 
 ```
 hilexin DETECTED.
 -----------LISTENING-----------
 ```
-During the meantime, the led on the board will remian on until the board enters the next Waiting-for-Wakeup Status.
+同时，板子上的 LED 灯会亮起，直到进入下一次等待唤醒状态。
 
-Then, the board enters the Listening status, waiting for garbage name.  
+然后，板子会进入侦听状态，等到用户说出垃圾的名称。
 
-Now, you can give one speech command, for example, “卫生纸” (toilet paper),
+比如，用户说出：“卫生纸”，
 
 ```
 -----------LISTENING-----------
@@ -118,6 +120,4 @@ Commands ID: 0
 
 ```
 
-The speaker will play the type of the garbage identified.
-
-
+喇叭会播放对应的垃圾分类种类。

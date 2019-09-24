@@ -1,4 +1,4 @@
-# ESP-Skainet
+# ESP-Skainet [[中文]](./README_cn.md)
 
 ESP-Skainet is Espressif's intelligent voice assistant, which currently supports the Wake Word Engine and Speech Commands Recognition.
 
@@ -28,9 +28,6 @@ Currently, Espressif **MultiNet** supports up to 100 Chinese speech commands, su
 
 We will add supports for English commands in the next release.
 
-## Action Function
-
-When the voice stream is processed through wake word detection and speech commands recognition, the system will return a command ID. At this time, users can customize the Action Function according to the return Command ID, such as play music, control lights...
 
 # Quick Start with ESP-Skainet
 
@@ -56,9 +53,10 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 If you have cloned this project without the `--recursive` option, please go to the `esp-skainet` directory and run the `git submodule update --init`  command before anything else.
 
 ### ESP-IDF
-For details on how to set up the ESP-IDF, please refer to [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html)
 
 In this case, we take [ESP-IDF v3.2](https://github.com/espressif/esp-idf/releases/v3.2) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF.
+
+For details on how to set up the ESP-IDF, please refer to [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html)
  
 # Components
 

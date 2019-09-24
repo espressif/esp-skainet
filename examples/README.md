@@ -1,4 +1,4 @@
-# Examples
+# Examples [[中文]](./README_cn.md)
 
 This directory contains a range of examples in ESP-Skainet projects. These examples exist to demonstrate the functionality of ESP-Skainet and to provide the source codes that can be copied and adapted to during the development of your projects.
 
