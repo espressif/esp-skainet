@@ -4,8 +4,6 @@
 #
 
 PROJECT_NAME := garbage_classification
+EXTRA_COMPONENT_DIRS += ../../components/
 
-SOLUTION_PATH ?= $(abspath $(shell pwd))/../..
-
-include $(SOLUTION_PATH)/components/component_conf.mk
 include $(IDF_PATH)/make/project.mk
