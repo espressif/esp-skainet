@@ -3,7 +3,6 @@ set(COMPONENT_SRCDIRS
     ./MediaHal/Codec
     ./SystemSal
     ./i2c_bus
-    ./src
     )
 
 set(COMPONENT_ADD_INCLUDEDIRS 
@@ -12,7 +11,6 @@ set(COMPONENT_ADD_INCLUDEDIRS
     ./MediaHal/
     ./SystemSal
     ./i2c_bus
-    ./src
     ./userconfig
     )
 

@@ -61,9 +61,9 @@ i2s_config_t i2s_config = {
 #else
     .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX,
 #endif
-    .sample_rate = 48000,
+    .sample_rate = 16000,
     .bits_per_sample = SUPPOERTED_BITS,
-    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
 #if I2S_DAC_EN == 1
     .communication_format = I2S_COMM_FORMAT_I2S_MSB,
 #else
@@ -209,12 +209,19 @@ int MediaHalInit(void *config)
 #ifdef CONFIG_USE_ES7243
     i2s_config.sample_rate = 16000;
     i2s_config.use_apll = 0;
+    i2s_config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;
     ret = i2s_driver_install(I2S_NUM_1, &i2s_config, 0, NULL);
     if (ret < 0) {
         ESP_LOGE(HAL_TAG, "I2S_NUM_1 install failed");
         return -1;
     }
     ret |= i2s_set_pin(I2S_NUM_1, &i2s1_pin);
+#endif
+#ifdef ENABLE_MCLK_GPIO0
+    if (I2S_NUM == 0) {
+        SET_PERI_REG_BITS(PIN_CTRL, CLK_OUT1, 0, CLK_OUT1_S);
+    }
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
 #endif
 
 #if I2S_DAC_EN == 1

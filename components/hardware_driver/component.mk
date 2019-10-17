@@ -3,14 +3,12 @@ COMPONENT_ADD_INCLUDEDIRS := MediaHal \
                              MediaHal/Codec \
                              SystemSal \
                              i2c_bus \
-                             userconfig \
-                             src \
+                             userconfig
 
 COMPONENT_SRCDIRS :=  MediaHal \
                       MediaHal/Codec \
                       SystemSal \
-                      i2c_bus \
-                      src \
+                      i2c_bus
                  
 
 

@@ -28,6 +28,9 @@ Currently, Espressif **MultiNet** supports up to 100 Chinese speech commands, su
 
 We will add supports for English commands in the next release.
 
+## Acoustic Algorithm
+
+Now, ESP-Skainet integrates AEC (Acoustic Echo Cancellation), AGC (automatic_gain_control), NS (Noise Suppression), VAD (Voice Activity Detection) and Beamforming algorithm.
 
 # Quick Start with ESP-Skainet
 

@@ -28,6 +28,9 @@ ESP-Skainet 的功能支持如下所示：
 
 英文命令词定义将在下一版提供支持。 
 
+## 声学算法
+
+目前 ESP-Skainet 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和语音定向增强 Beamforming 算法。
 
 # 快速开始
 

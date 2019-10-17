@@ -16,8 +16,9 @@
 ### Hardware Required
 ### 硬件需求
 
-这个示例能够在 ESP32-LyraT-Mini 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
+- 这个示例能够在 ESP32-LyraT-Mini 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
 
+- 一只音箱
 
 ### 配置工程
 

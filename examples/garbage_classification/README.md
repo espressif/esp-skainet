@@ -15,8 +15,9 @@ And we have configured 45 kinds of garbages with their corresponding command IDs
 
 ### Hardware Required
 
-This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
+- This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
 
+- A Speaker
 
 ### Configure the project
 

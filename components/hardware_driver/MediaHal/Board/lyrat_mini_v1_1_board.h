@@ -35,7 +35,7 @@ extern "C" {
 #define ENABLE_AUXIN_DETECT
 #define ENABLE_KEYWORD_DETECT
 #define ENABLE_ADC_BUTTON
-
+#define ENABLE_MCLK_GPIO0
 /* SD card related */
 #define SD_CARD_INTR_GPIO           34
 #define SD_CARD_INTR_SEL            GPIO_SEL_34
