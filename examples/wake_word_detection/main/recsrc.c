@@ -35,14 +35,19 @@ void recsrcTask(void *arg)
     void *aec_handle = aec_create(16000, AEC_FRAME_LENGTH_MS, AEC_FILTER_LENGTH);
 
     while (1) {
-        i2s_read(I2S_NUM_1, rsp_in, 2 * AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
-
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+        i2s_read(I2S_NUM_0, rsp_in, 2 *AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
+        for (int i = 0; i < AEC_FRAME_BYTES / 2; i++) {
+            aec_out[i] = (rsp_in[2 * i] + rsp_in[2 * i + 1]) /2 ;
+        }
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
+        i2s_read(I2S_NUM_1, rsp_in, 2 *AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
         for (int i = 0; i < AEC_FRAME_BYTES / 2; i++) {
             aec_rec[i] = rsp_in[2 * i];
             aec_ref[i] = rsp_in[2 * i + 1];
         }
         aec_process(aec_handle, aec_rec, aec_ref, aec_out);
-
+#endif
         rb_write(aec_rb, aec_out, AEC_FRAME_BYTES, portMAX_DELAY);
     }
 }

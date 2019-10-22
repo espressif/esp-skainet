@@ -63,7 +63,11 @@ i2s_config_t i2s_config = {
 #endif
     .sample_rate = 16000,
     .bits_per_sample = SUPPOERTED_BITS,
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+#else
     .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+#endif
 #if I2S_DAC_EN == 1
     .communication_format = I2S_COMM_FORMAT_I2S_MSB,
 #else
@@ -127,7 +131,7 @@ struct media_hal MediaHalConfig = {
     .codec_stop = Es8388Stop,
     .codec_config_fmt = Es8388ConfigFmt,
     .codec_set_bit = Es8388SetBitsPerSample,
-    .codec_set_adc_input = Es8388ConfigAdcInput,
+    .codec_set_adc_input = Es8374ConfigAdcInput,
     .codec_set_vol = Es8388SetVoiceVolume,
     .codec_get_vol = Es8388GetVoiceVolume,
     .codec_set_mute = Es8388SetVoiceMute,
@@ -182,7 +186,6 @@ struct media_hal MediaHalConfig = {
     .codec_set_mute = Es8311SetVoiceMute,
     .codec_get_mute = Es8311GetVoiceMute,
 #endif
-
 };
 
 int MediaHalInit(void *config)
@@ -251,11 +254,12 @@ int MediaHalInit(void *config)
     memset(&io_conf, 0, sizeof(io_conf));
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = ((1ULL << GPIO_PA_EN));
+    io_conf.pin_bit_mask = ((1ULL<<GPIO_PA_EN));
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
     gpio_set_level(GPIO_PA_EN, 1);
+
     ret |= MediaHalConfig.codec_set_vol(I2S_OUT_VOL_DEFAULT);
     ESP_LOGI(HAL_TAG, "I2S_OUT_VOL_DEFAULT[%d]", I2S_OUT_VOL_DEFAULT);
     MediaHalConfig.sMediaHalState = MEDIA_HAL_STATE_INIT;
@@ -541,4 +545,33 @@ int MediaHalGetState(MediaHalState *state)
         return 0;
     }
     return -1;
+}
+
+void codec_init(void)
+{
+    int ret = 0;
+#if (defined CONFIG_CODEC_CHIP_IS_ES8388)
+    Es8388Config  Es8388Conf =  AUDIO_CODEC_ES8388_DEFAULT();
+    ret = MediaHalInit(&Es8388Conf);
+    if (ret) {
+        ESP_LOGE(HAL_TAG, "MediaHal init failed, line:%d", __LINE__);
+    }
+    ESP_LOGI(HAL_TAG, "CONFIG_CODEC_CHIP_IS_ES8388");
+#elif (defined CONFIG_CODEC_CHIP_IS_ES8374)
+    Es8374Config  Es8374Conf =  AUDIO_CODEC_ES8374_DEFAULT();
+    ret = MediaHalInit(&Es8374Conf);
+    if (ret) {
+        ESP_LOGI(HAL_TAG, "MediaHal init failed, line:%d", __LINE__);
+    }
+    ESP_LOGI(HAL_TAG, "CONFIG_CODEC_CHIP_IS_ES8374");
+
+#elif (defined CONFIG_CODEC_CHIP_IS_ES8311)
+    Es8311Config  es8311Cfg =  AUDIO_CODEC_ES8311_DEFAULT();
+    ret = MediaHalInit(&es8311Cfg);
+    if (ret) {
+        ESP_LOGI(HAL_TAG, "MediaHal init failed, line:%d", __LINE__);
+    }
+    ESP_LOGI(HAL_TAG, "CONFIG_CODEC_CHIP_IS_ES8311");
+
+#endif
 }

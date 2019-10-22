@@ -1,5 +1,4 @@
 set(COMPONENT_SRCS
-    codec_init.c
     main.c
     recsrc.c
     )

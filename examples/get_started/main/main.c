@@ -15,12 +15,12 @@
 #include "esp_system.h"
 #include "sdkconfig.h"
 
+#include "MediaHal.h"
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
 #include "recsrc.h"
-#include "codec_init.h"
 #include "ringbuf.h"
 #include "speech_commands_action.h"
 

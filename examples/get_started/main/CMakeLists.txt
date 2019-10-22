@@ -1,5 +1,4 @@
 set(COMPONENT_SRCS
-    codec_init.c
     main.c
     recsrc.c
     speech_commands_action.c

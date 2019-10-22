@@ -20,7 +20,7 @@
 
 typedef struct {
     char* name;
-    const uint8_t* data;
+    const uint16_t* data;
     int length;
 } dac_audio_item_t;
 
@@ -47,10 +47,21 @@ void led_off(int gpio)
     gpio_set_level(gpio, false);
 }
 
-esp_err_t iot_dac_audio_play(const uint8_t* data, int length, TickType_t ticks_to_wait)
+esp_err_t iot_dac_audio_play(const uint16_t* data, int length, TickType_t ticks_to_wait)
 {
     size_t bytes_write = 0;
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+    uint16_t *data_out = malloc(length*2);
+    for (int i = 0; i < length/2; i++) {
+        data_out[2*i] = data[i];
+        data_out[2 *i + 1] = data[i];
+    }
+    i2s_write(0, (const char*) data_out, length*2, &bytes_write, ticks_to_wait);
+    free(data_out);
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     i2s_write(0, (const char*) data, length, &bytes_write, ticks_to_wait);
+#endif
+    
     return ESP_OK;
 }
 dac_audio_item_t playlist[] = {

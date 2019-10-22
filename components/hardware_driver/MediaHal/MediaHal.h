@@ -252,4 +252,6 @@ int MediaHalPaPwr(int en);
  */
 int MediaHalGetState(MediaHalState *state);
 
+void codec_init(void);
+
 #endif  //__MEDIA_HAL_H__

@@ -15,12 +15,12 @@
 #include "esp_system.h"
 #include "sdkconfig.h"
 
+#include "MediaHal.h"
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
 #include "recsrc.h"
-#include "codec_init.h"
 #include "ringbuf.h"
 #include "speech_commands_action.h"
 
@@ -33,7 +33,12 @@ model_iface_data_t *model_data_mn = NULL;
 
 struct RingBuf *aec_rb = NULL;
 struct RingBuf *rec_rb = NULL;
-#define MINI_LED_GPIO 22
+
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+#define LED_GPIO 22
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
+#define LED_GPIO 22
+#endif
 
 void wakenetTask(void *arg)
 {
@@ -57,7 +62,7 @@ void wakenetTask(void *arg)
                 printf("%.2f: %s DETECTED.\n", (float)ms / 1000.0, wakenet->get_word_name(model_data, r));
                 detect_flag = 1;
                 printf("-----------------LISTENING-----------------\n\n");
-                led_on(MINI_LED_GPIO);
+                led_on(LED_GPIO);
             }
         } else {
             mn_chunks++;
@@ -72,7 +77,7 @@ void wakenetTask(void *arg)
                     printf("can not recognize any speech commands\n");
                 }
                 printf("\n-----------awaits to be waken up-----------\n");
-                led_off(MINI_LED_GPIO);
+                led_off(LED_GPIO);
             }
         }
         chunks++;
@@ -83,7 +88,7 @@ void wakenetTask(void *arg)
 void app_main()
 {
     codec_init();
-    led_init(MINI_LED_GPIO);
+    led_init(LED_GPIO);
     aec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     rec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
 

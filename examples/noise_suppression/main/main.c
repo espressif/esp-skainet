@@ -19,7 +19,7 @@
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 
-#include "codec_init.h"
+#include "MediaHal.h"
 #include "esp_ns.h"
 
 #define DEFAULT_VREF    1100
@@ -42,24 +42,55 @@ void noise_suppression(void *arg)
     ns_handle_t ns_inst = arg;
 
     while (1) {
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+        i2s_read(I2S_NUM_0, ns_in, 2 * NS_FRAME_BYTES, &bytes_read, portMAX_DELAY);
+        for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
+            ns_in_mono[i] = (ns_in[2 * i] + ns_in[2 * i + 1]) / 2 ;
+        }
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
         i2s_read(I2S_NUM_1, ns_in, 2 * NS_FRAME_BYTES, &bytes_read, portMAX_DELAY);
 
         for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
             ns_in_mono[i] = ns_in[2 * i];
         }
+#endif
         ns_process(ns_inst, ns_in_mono, ns_out);
+
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+        uint16_t *data_out = malloc(NS_FRAME_BYTES * 2);
+        if (use_ns) {
+            for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
+                data_out[2 * i] = ns_out[i];
+                data_out[2 * i + 1] = ns_out[i];
+            }
+        } else {
+            for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
+                data_out[2 * i] = ns_in_mono[i];
+                data_out[2 * i + 1] = ns_in_mono[i];
+            }
+        }
+
+        i2s_write(I2S_NUM_0, (const char*) data_out, NS_FRAME_BYTES * 2, &bytes_write, portMAX_DELAY);
+        free(data_out);
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
         if (use_ns)
             i2s_write(I2S_NUM_0, (const char*) ns_out, NS_FRAME_BYTES, &bytes_write, portMAX_DELAY);
         else
             i2s_write(I2S_NUM_0, (const char*) ns_in_mono, NS_FRAME_BYTES, &bytes_write, portMAX_DELAY);
+#endif
     }
     vTaskDelete(NULL);
 }
 
 void button_Task(void * arg)
 {
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+    int min_vol = 120;
+    int max_vol = 160;
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     int min_vol = 1800;
     int max_vol = 2020;
+#endif
     int last_trigger_time = 0;
     int trigger_time = 0;
     adc1_config_width(ADC_WIDTH_12Bit);
