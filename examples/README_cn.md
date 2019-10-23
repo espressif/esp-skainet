@@ -16,7 +16,7 @@
 
 - noise_suppression
 
- 在此示例中，展示了如何使用声学算法中的噪声抑制 NS(Noise Suppression)算法。示例将麦克风采集的声音经过降噪处理，得到 16KHz，16bit，单声道的音频数据，并且立即将降噪后的数据输出，因此当用户在 LyraT_Mini 开发板的 AUDIO_OUT 接口上插入耳机时，可以听到处理的声音。用户可以通过通过按下 LyraT_Mini 开发板上的 "Mode" 按键来选择降噪是否打开。
+ 在此示例中，展示了如何使用声学算法中的噪声抑制 NS(Noise Suppression)算法。示例将麦克风采集的声音经过降噪处理，得到 16KHz，16bit，单声道的音频数据，并且立即将降噪后的数据输出，因此当用户在 LyraT_Mini 开发板的 AUDIO_OUT 接口或者 ESP32-LyraT V4.3 开发板上的 PHONEJACK 上插入耳机时，可以听到处理的声音。用户可以通过通过按下 LyraT_Mini 开发板或 ESP32-LyraT V4.3 开发板上的 "Mode" 按键来选择降噪是否打开。
 
 # 使用示例
 

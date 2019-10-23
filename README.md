@@ -36,7 +36,7 @@ Now, ESP-Skainet integrates AEC (Acoustic Echo Cancellation), AGC (automatic_gai
 
 ## Hardware Preparation
 
-To run ESP-Skainet, you need to have an ESP32 development board which integrates an audio input module and at least **4 MB** of external SPI RAM. We use [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) in examples.
+To run ESP-Skainet, you need to have an ESP32 development board which integrates an audio input module and at least **4 MB** of external SPI RAM. We use [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html) in examples.
 
 On how to configure ESP32 module for your applications, please refer to the README.md of each example.
 
@@ -67,7 +67,7 @@ A component is the main framework of the SDK, with some drivers and algorithm in
 
 ## hardware_driver
 
-The hardware_driver component contains drivers for the ESP32-LyraT-Mini board.
+The hardware_driver component contains drivers for the ESP32-LyraT-Mini board and ESP32-LyraT V4.3 board.
 
 ## esp-sr
 

@@ -36,7 +36,7 @@ ESP-Skainet 的功能支持如下所示：
 
 ## 硬件准备
 
-为了运行 ESP-Skainet，您需要一块集成了音频输入模块和至少** 4 MB **的外部 SPI RAM ESP32 开发板，我们在示例中使用 [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html)
+为了运行 ESP-Skainet，您需要一块集成了音频输入模块和至少** 4 MB **的外部 SPI RAM ESP32 开发板，我们在示例中使用 [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-LyraT V4.3](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
 
 关于针对应用的具体配置，请参考每个示例中的 README.md.
 
@@ -68,7 +68,7 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 
 ## hardware_driver
 
-hardware_driver 组件包含了 ESP32-LyraT-Mini 开发板的驱动。
+hardware_driver 组件包含了 ESP32-LyraT-Mini 开发板和 ESP32-LyraT V4.3 开发板的驱动。
 
 
 ## esp-sr

@@ -2,23 +2,23 @@
 
 Currently, Espressif's ESP32-based speech command recognition model [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md) supports up to **100** Chinese speech commands (We will add supports for English speech commands in the next release of [esp-sr](../README.md)). 
 
-This example demonstrates the basic process of recognizing Chinese speech commands with ESP32-LyraT-Mini. Please also see a flow diagram below.
+This example demonstrates the basic process of recognizing Chinese speech commands with ESP32-LyraT-Mini or ESP32-LyraT V4.3. Please also see a flow diagram below.
 
 ![speech-commands-recognition-system](../../img/speechs_commands_workflow.png)  
 
-For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
+For more information about ESP32-LyraT-Mini or ESP32-LyraT V4.3, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html).
  
 # 1. Quick Start
 
 ### 1.1 Hardware Configuration
 
-  Navigate to `Audio Media HAL`, and configure the following parameters as instructed.  
-  - `Audio hardware board`: select `ESP32-Lyrat Mini V1.1`;  
-  - `Audio codec chip`: select `CODEC IS ES8311`;  
-  - `use external adc`: select `use es7243`;
-  - `Audio DSP chip`: select `No DSP chip`.
+  If use ESP32-Lyrat Mini V1.1, Navigate to `Audio Media HAL`, and configure the following parameters as instructed.  
+  `Audio hardware board`: select `ESP32-Lyrat Mini V1.1`;  
 
   ![speech-commands-recognition-system](../../img/specch_commands_config1.png)  
+
+  If use ESP32-LyraT V4.3, Navigate to `Audio Media HAL`, and configure the following parameters as instructed.  
+  `Audio hardware board`: select `ESP32-LyraT V4.3`;    
 
 ### 1.2 Software Configuration
 
@@ -139,11 +139,11 @@ The board can only stay in the Listening status for up to six seconds. After tha
 # 2. Workflow Walkthrough
 ### 2.1 Hardware Initialization
 
-You don't need any special-purpose boards to run the **WakeNet** and **MultiNet** examples. Currently, Espressif has launched several audio boards and one of them is ESP32-LyraT-Mini, which is what we use in this example.
+You don't need any special-purpose boards to run the **WakeNet** and **MultiNet** examples. Currently, Espressif has launched several audio boards. Such as ESP32-LyraT-Mini and ESP32-LyraT V4.3, which is what we use in this example.
 
-For details on the initialization of the ESP32-LyraT-Mini board, please see codes in `components/hardware_driver`.
+For details on the initialization of the ESP32-LyraT-Mini board or ESP32-LyraT V4.3 board, please see codes in `components/hardware_driver`.
  
-If you want to choose other development boards other than ESP32-LyraT-Mini, please go to [esp-adf](https://github.com/espressif/esp-adf), which is Espressif's development framework for building audio applications based on ESP32 products, for more detailed information on hardware drivers.
+If you want to choose other development boards, please go to [esp-adf](https://github.com/espressif/esp-adf), which is Espressif's development framework for building audio applications based on ESP32 products, for more detailed information on hardware drivers.
 
 ### 2.2 Wake-up by Wake Word
 

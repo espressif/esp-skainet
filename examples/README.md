@@ -17,7 +17,7 @@ The following two examples are currently available:
 
 - noise_suppression
 
- This example shows how to use the Noise Suppression (NS) algorithm. The example takes the audio data collected by the microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data. So when the user inserts the earphone on the AUDIO_OUT interface of the LyraT_Mini development board, the user can hear the processed sound. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board.
+ This example shows how to use the Noise Suppression (NS) algorithm. The example takes the audio data collected by the microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data. So when the user inserts the earphone on the AUDIO_OUT interface of the LyraT_Mini development board or the PHONEJACK interface of the ESP32-LyraT V4.3 board, the user can hear the processed sound. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-LyraT V4.3 board.
 
 # Using Examples
 

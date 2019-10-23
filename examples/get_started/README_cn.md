@@ -2,23 +2,24 @@
 
 目前，基于乐鑫 ESP32 的语音命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README_cn.md) 支持 100 个以内的中文自定义命令词，英文命令词识别会在下一版发布。
 
-这个示例展示了使用 ESP32-LyraT-Mini 进行中文语音命令词识别的基本流程。请参考以下流程：
+这个示例展示了使用 ESP32-LyraT-Mini 或 ESP32-LyraT V4.3 进行中文语音命令词识别的基本流程。请参考以下流程：
 
 ![speech-commands-recognition-system](../../img/speechs_commands_workflow.png)  
 
-获取更多关于 ESP32-LyraT-Mini 的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
+获取更多关于 ESP32-LyraT-Mini 或者 ESP32-LyraT V4.3 的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
 
 # 1. 快速开始
 
 ### 1.1 硬件配置
 
-  进入 `Audio Media HAL`，按照指示配置以下参数：
-  - `Audio hardware board`: 选择 `ESP32-Lyrat Mini V1.1`;  
-  - `Audio codec chip`: 选择 `CODEC IS ES8311`;  
-  - `use external adc`: 选择 `use es7243`;
-  - `Audio DSP chip`: 选择 `No DSP chip`.
+  如果使用 ESP32-Lyrat Mini V1.1 开发板，进入 `Audio Media HAL`，按照指示配置以下参数：  
+  `Audio hardware board`: 选择 `ESP32-Lyrat Mini V1.1`;  
 
   ![speech-commands-recognition-system](../../img/specch_commands_config1.png)  
+
+  如果使用 ESP32-LyraT V4.3 开发板，进入 `Audio Media HAL`，按照指示配置以下参数：  
+  `Audio hardware board`: 选择 `ESP32-LyraT V4.3`;  
+  
 
 ### 1.2 软件配置
 
@@ -137,9 +138,9 @@ hilexin DETECTED.
 
 ### 2.1 硬件初始化
 
-用户不需要任何特殊用途的开发板即可运行** WakeNet **和** MultiNet **示例。 目前，乐鑫已经发布了数种音频开发板，其中之一是ESP32-LyraT-Mini，这是我们在本示例中使用的开发板。
+用户不需要任何特殊用途的开发板即可运行** WakeNet **和** MultiNet **示例。 目前，乐鑫已经发布了数种音频开发板，其中 ESP32-LyraT-Mini 和 ESP32-LyraT V4.3 是我们在本示例中使用的开发板。 
 
-关于 ESP32-LyraT-Mini 开发板的初始化，请参考 `components/hardware_driver` 的代码。
+关于 ESP32-LyraT-Mini 开发板和 ESP32-LyraT V4.3 开发板的初始化，请参考 `components/hardware_driver` 的代码。
 
 如果用户选择其他的开发板，请参考 [esp-adf](https://github.com/espressif/esp-adf)， ESP-ADF 可以提供更多关于硬件驱动和应用搭建的细节。
 
