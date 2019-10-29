@@ -455,12 +455,7 @@ int EsConfigDacOutput(int output)
  */
 int Es8388ConfigAdcInput(AdcInput input)
 {
-    int res;
-    uint8_t reg = 0;
-    res = Es8388ReadReg(ES8388_ADCCONTROL2, &reg);
-    reg = reg & 0x0f;
-    res |= Es8388WriteReg(ES8388_ADDR, ES8388_ADCCONTROL2, reg | input);
-    return res;
+    return 0;
 }
 
 /**
