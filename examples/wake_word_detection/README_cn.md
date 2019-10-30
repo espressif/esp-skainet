@@ -43,5 +43,6 @@ WakeNet5X3_v2_hilexin_5_0.97_0.90
 
 唤醒后打印(time: wake word DETECTED.)：
 
+```
 1.00s: hilexin DERECTED.
-
+```

@@ -38,7 +38,9 @@ void recsrcTask(void *arg)
 #ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
         i2s_read(I2S_NUM_0, rsp_in, 2 *AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
         for (int i = 0; i < AEC_FRAME_BYTES / 2; i++) {
-            aec_out[i] = (rsp_in[2 * i] + rsp_in[2 * i + 1]) /2 ;
+            // According to test results, get better speech recognition performance 
+            // when MIC gain is expanded four times for lyrat v4.3.
+            aec_out[i] = (rsp_in[2 * i] + rsp_in[2 * i + 1]) *2 ;
         }
 #elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
         i2s_read(I2S_NUM_1, rsp_in, 2 *AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
