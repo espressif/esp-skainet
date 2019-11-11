@@ -58,11 +58,14 @@ void wakenetTask(void *arg)
         if (detect_flag == 0) {
             int r = wakenet->detect(model_data, buffer);
             if (r) {
+                wake_up_action();
                 float ms = (chunks * audio_chunksize * 1000.0) / frequency;
                 printf("%.2f: %s DETECTED.\n", (float)ms / 1000.0, wakenet->get_word_name(model_data, r));
                 detect_flag = 1;
                 printf("-----------------LISTENING-----------------\n\n");
                 led_on(LED_GPIO);
+                rb_reset(aec_rb);
+                rb_reset(rec_rb);
             }
         } else {
             mn_chunks++;
@@ -78,6 +81,8 @@ void wakenetTask(void *arg)
                 }
                 printf("\n-----------awaits to be waken up-----------\n");
                 led_off(LED_GPIO);
+                rb_reset(aec_rb);
+                rb_reset(rec_rb);
             }
         }
         chunks++;

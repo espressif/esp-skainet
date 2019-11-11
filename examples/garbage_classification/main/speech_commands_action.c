@@ -16,6 +16,7 @@
 #include "household_food.h"
 #include "hazardous.h"
 #include "recyclable.h"
+#include "wake_up_prompt_tone.h"
 #include "speech_commands_action.h"
 
 typedef struct {
@@ -61,14 +62,16 @@ esp_err_t iot_dac_audio_play(const uint16_t* data, int length, TickType_t ticks_
 #elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     i2s_write(0, (const char*) data, length, &bytes_write, ticks_to_wait);
 #endif
-    
+    i2s_zero_dma_buffer(I2S_NUM_0);
     return ESP_OK;
 }
+
 dac_audio_item_t playlist[] = {
     {"residual", residual, sizeof(residual)},
     {"household_food", household_food, sizeof(household_food)},
     {"hazardous", hazardous, sizeof(hazardous)},
     {"recyclable", recyclable, sizeof(recyclable)},
+    {"wake_up_prompt_tone", wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
 };
 
 void speech_commands_action(int command_id)
@@ -94,4 +97,8 @@ void speech_commands_action(int command_id)
     default:
         break;
     }
+}
+void wake_up_action(void)
+{
+    iot_dac_audio_play(playlist[4].data, playlist[4].length, portMAX_DELAY);
 }

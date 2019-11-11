@@ -15,4 +15,6 @@ void led_on(int gpio);
 void led_off(int gpio);
 
 void speech_commands_action(int command_id);
+
+void wake_up_action(void);
 #endif
