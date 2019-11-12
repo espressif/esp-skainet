@@ -24,9 +24,7 @@ Currently, Espressif has not only provided an official wake word "Hi, Lexin" to 
 
 Espressif's speech command recognition model [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md) is specially designed to provide a flexible offline speech command recognition model. With this model, you can easily add your own speech commands, eliminating the need to train model again.
 
-Currently, Espressif **MultiNet** supports up to 100 Chinese speech commands, such as “打开空调” (Turn on the air conditioner) and “打开卧室灯” (Turn on the bedroom light). 
-
-We will add supports for English commands in the next release.
+Currently, Espressif **MultiNet** supports up to 100 Chinese or English speech commands, such as “打开空调” (Turn on the air conditioner) and “打开卧室灯” (Turn on the bedroom light). 
 
 ## Acoustic Algorithm
 

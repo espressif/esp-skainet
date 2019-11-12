@@ -100,9 +100,9 @@ void app_main()
     model_iface_data_t *model_data = wakenet->create(model_coeff_getter, DET_MODE_90);
     model_data_mn = multinet->create(&MULTINET_COEFF, 6000);
 
-    xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 0);
-    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 0);
-    xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, (void*)model_data, 5, NULL, 0);
+    xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 1);
+    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 1);
+    xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, (void*)model_data, 5, NULL, 1);
 
     printf("-----------awaits to be waken up-----------\n");
 }

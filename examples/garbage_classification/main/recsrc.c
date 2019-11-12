@@ -60,7 +60,7 @@ void agcTask(void *arg)
     int16_t *agc_out = malloc(AGC_FRAME_BYTES);
 
     void *agc_handle = esp_agc_open(3, 16000);
-    set_agc_config(agc_handle, 15, 1, -3);
+    set_agc_config(agc_handle, 15, 1, 3);
 
     int _err_step = 1;
     if (0 == (agc_in && _err_step ++ && agc_out && _err_step ++ && agc_handle && _err_step ++)) {

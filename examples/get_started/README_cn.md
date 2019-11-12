@@ -1,8 +1,8 @@
 # ESP-Skainet 使用指南 [[English]](./README.md)
 
-目前，基于乐鑫 ESP32 的语音命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README_cn.md) 支持 100 个以内的中文自定义命令词，英文命令词识别会在下一版发布。
+目前，基于乐鑫 ESP32 的语音命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README_cn.md) 支持 100 个以内的中文或英文自定义命令词。
 
-这个示例展示了使用 ESP32-LyraT-Mini 或 ESP32-LyraT V4.3 进行中文语音命令词识别的基本流程。请参考以下流程：
+这个示例展示了使用 ESP32-LyraT-Mini 或 ESP32-LyraT V4.3 进行语音命令词识别的基本流程。请参考以下流程：
 
 ![speech-commands-recognition-system](../../img/speechs_commands_workflow.png)  
 
@@ -23,13 +23,13 @@
 
 ### 1.2 软件配置
 
-  进入 `Component config` -> `ESP Speech Recognition`，按照指示配置以下参数： 
+  进入 `ESP Speech Recognition`，按照指示配置以下参数： 
   - `Wake word engine`: 选择 `WakeNet 5 (quantized)`;
   - `Wake word name`: 选择 `hilexin (WakeNet5)`;
   - `speech commands recognition model to us`: 选择 `MultiNet 1 (quantized)`;
-  - `langugae`: 选择 `chinese (MultiNet1)`;
+  - `langugae`: 选择 `chinese (MultiNet1)`，如果使用英文命令词识别，请选择 `english (MultiNet1)`;
   - `The number of speech commands`-> The number of speech commands ID;
-  - `Add speech commands`-> Add the speech commands in pinyin.
+  - `Add speech commands`-> Add the speech commands.
 
   ![speech-commands-recognition-system](../../img/specch_commands_config2.png)  
 
@@ -37,8 +37,17 @@
 
 ### 1.3 添加自定义命令词
 
-目前，MultiNet 模型中已经预定义了四个命令词。用户可以通过 `menuconfig -> Component config -> ESP Speech Recognition -> Add speech commands` and `The number of speech commands`来定义自己的语音命令词和语音命令的数目。注意，在填充命令词时应该使用拼音，并且每个字的拼音拼写间要间隔一个空格。比如“打开空调”，应该填入 "da kai kong tiao".
+目前，MultiNet 模型中已经预定义了一些命令词。用户可以通过 `menuconfig -> Component config -> ESP Speech Recognition -> Add speech commands` and `The number of speech commands`来定义自己的语音命令词和语音命令的数目。
 
+#### 1.3.1 中文命令词识别
+
+在填充命令词时应该使用拼音，并且每个字的拼音拼写间要间隔一个空格。比如“打开空调”，应该填入 "da kai kong tiao".
+
+#### 1.3.2 英文命令词识别
+
+在填充命令词时应该使用特定音标，请使用 skainet 根目录 `tools` 目录下的 `general_label_EN/general_label_en.py` 脚本生成命令词对应的音标，具体使用方法请参考 [音标生成方法](../../tools/general_label_EN/README.md) .
+
+**注意：**
 - 一个语音命令 ID 可以对应多条语音指令短语；
 - 最多支持 100 个语音命令 ID 或者命令短语；
 - 同一个语音命令 ID 对应的多条语音指令短语之间要使用“,”隔开
@@ -73,7 +82,7 @@ void speech_commands_action(int command_id)
 
 ### 1.5 编译和运行
 
-运行 `make flash monitor` 来编译烧写该示例，并且检查以下输出打印：
+当我们选择使用中文命令词识别，运行 `make flash monitor` 来编译烧写该示例，并且检查以下输出打印：
 
 ```
 Quantized wakeNet5: wakeNet5_v1_hilexin_5_0.95_0.90, mode:0

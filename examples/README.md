@@ -8,10 +8,14 @@ The following two examples are currently available:
 
 - get_started
 
+  > Support English and Chinese
+
   This example is a project template with four speech command words built-in.  
  Users can refer to the [readme](./get_started/README.md) of this example to understand the specific use and precautions of speech command recognition.
 
 - garbage_classification
+ 
+  > Support Chinese
 
   In this example, we use wake word detection and speech commands recognition to build an off-line garbage sorting example, which can suggest the type of a garbage according to the present classification when a specific garbage name is identified. For example, if the board hears and identifies “卫生纸” (toilet paper), it plays “干垃圾” (residual waste), which indicates “卫生纸” (toilet paper) should be sorted as “干垃圾” (residual waste).
 

@@ -1,6 +1,6 @@
 # Get Started Guide for ESP-Skainet [[中文]](./README_cn.md)
 
-Currently, Espressif's ESP32-based speech command recognition model [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md) supports up to **100** Chinese speech commands (We will add supports for English speech commands in the next release of [esp-sr](../README.md)). 
+Currently, Espressif's ESP32-based speech command recognition model [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md) supports up to **100** Chinese or English speech commands. 
 
 This example demonstrates the basic process of recognizing Chinese speech commands with ESP32-LyraT-Mini or ESP32-LyraT V4.3. Please also see a flow diagram below.
 
@@ -26,9 +26,9 @@ For more information about ESP32-LyraT-Mini or ESP32-LyraT V4.3, please see [ESP
   - `Wake word engine`: select `WakeNet 5 (quantized)`;
   - `Wake word name`: select `hilexin (WakeNet5)`;
   - `speech commands recognition model to us`: select `MultiNet 1 (quantized)`;
-  - `langugae`: select `chinese (MultiNet1)`;
+  - `langugae`: select `chinese (MultiNet1)`, select `english (MultiNet1)` if use english speech command recognition;
   - `The number of speech commands`-> The number of speech commands ID;
-  - `Add speech commands`-> Add the speech commands in pinyin.
+  - `Add speech commands`-> Add the speech commands in pinyin or Phonetic symbol.
 
   ![speech-commands-recognition-system](../../img/specch_commands_config2.png)  
 
@@ -36,8 +36,17 @@ Then save the configuration and exit.
 
 ### 1.3 Adding Customized Speech Commands
 
-Now, the MultiNet model predifine 4 speech commands. Users also can define their own speech commands and the number of speech commands ID in the `menuconfig -> Component config -> ESP Speech Recognition -> Add speech commands` and `The number of speech commands`. Note that, the speech commands should be provided in Pinyin with spaces in between. For example, the command of “打开空调”, which means to turn on the air conditioner, should be provided as "da kai kong tiao".
+Now, the MultiNet model predifine some speech commands. Users also can define their own speech commands and the number of speech commands ID in the `menuconfig -> Component config -> ESP Speech Recognition -> Add speech commands` and `The number of speech commands`. 
 
+#### 1.3.1 Chinese Speech Command Recognition
+
+The speech commands should be provided in Pinyin with spaces in between. For example, the command of “打开空调”, which means to turn on the air conditioner, should be provided as "da kai kong tiao".
+
+#### 1.3.2 English Speech Command Recognition
+
+The speech commands should be provided in specific phonetic symbol with spaces in between. Please use the `general_label_EN/general_label_en.py` script in the tools directory of the skainet root directory to generate the phonetic symbols corresponding to the command words. For details, please refer to [the phonetic symbol generation method](../../tools/general_label_EN/README.md). 
+
+**Note:**
 - One speech commands ID can correspond to multiple speech command phrases;
 - Up to 100 speech commands ID or speech command phrases, including customized commands, are supported;
 - The corresponding multiple phrases for one Command ID need to be separated by ','.
@@ -72,7 +81,7 @@ void speech_commands_action(int command_id)
 
 ### 1.5 Compiling and Running
 
-Run `make flash monitor` to compile, flash and run this example, and check the output log:
+When you choose to use Chinese command word recognition, run `make flash monitor` to compile, flash and run this example, and check the output log:
 
 ```
 Quantized wakeNet5: wakeNet5_v1_hilexin_5_0.95_0.90, mode:0
