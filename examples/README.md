@@ -19,9 +19,9 @@ The following two examples are currently available:
 
   In this example, we use wake word detection and speech commands recognition to build an off-line garbage sorting example, which can suggest the type of a garbage according to the present classification when a specific garbage name is identified. For example, if the board hears and identifies “卫生纸” (toilet paper), it plays “干垃圾” (residual waste), which indicates “卫生纸” (toilet paper) should be sorted as “干垃圾” (residual waste).
 
-- noise_suppression
+- noise_suppression  
 
- This example shows how to use the Noise Suppression (NS) algorithm. The example takes the audio data collected by the microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data. So when the user inserts the earphone on the AUDIO_OUT interface of the LyraT_Mini development board or the PHONEJACK interface of the ESP32-LyraT V4.3 board, the user can hear the processed sound. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-LyraT V4.3 board.
+  This example shows how to use the Noise Suppression (NS) algorithm. The example takes the audio data collected by the microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the     noise-reduced data. So when the user inserts the earphone on the AUDIO_OUT interface of the LyraT_Mini development board or the PHONEJACK interface of the ESP32-LyraT V4.3 board, the user can hear the processed sound. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-LyraT V4.3 board.
 
 # Using Examples
 
