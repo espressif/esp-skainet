@@ -45,8 +45,8 @@ void recsrcTask(void *arg)
 #elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
         i2s_read(I2S_NUM_1, rsp_in, 2 *AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
         for (int i = 0; i < AEC_FRAME_BYTES / 2; i++) {
-            aec_rec[i] = rsp_in[2 * i];
-            aec_ref[i] = rsp_in[2 * i + 1];
+            aec_ref[i] = rsp_in[2 * i];
+            aec_rec[i] = rsp_in[2 * i + 1];
         }
         aec_process(aec_handle, aec_rec, aec_ref, aec_out);
 #endif

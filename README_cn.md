@@ -55,7 +55,8 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 
 ### ESP-IDF
 
-在本工程中，我们使用 [ESP-IDF v3.2](https://github.com/espressif/esp-idf/releases/v3.2) 版本。如果您之前已经搭建过 ESP-IDF 环境并且不想更改现有的变量，可以将 IDF_PATH 环境变量配置为新的 ESP-IDF 的路径。
+在本工程中，我们建议使用 [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) 版本。如果您之前已经搭建过 ESP-IDF 环境并且不想更改现有的变量，可以将 IDF_PATH 环境变量配置为新的 ESP-IDF 的路径   
+*注意:* 如果使用ESP-IDFv3.2及之前版本，建议参考esp-skainet v0.2.0
 
 获取更多关于搭建 ESP-IDF 环境的细节，请参考 [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html)
 

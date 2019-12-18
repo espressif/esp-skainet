@@ -51,7 +51,7 @@ void noise_suppression(void *arg)
         i2s_read(I2S_NUM_1, ns_in, 2 * NS_FRAME_BYTES, &bytes_read, portMAX_DELAY);
 
         for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
-            ns_in_mono[i] = ns_in[2 * i];
+            ns_in_mono[i] = ns_in[2 * i + 1];
         }
 #endif
         ns_process(ns_inst, ns_in_mono, ns_out);
