@@ -61,14 +61,14 @@ esp_tts_handle_t *tts_handle=esp_tts_create(esp_tts_voice_female);
 // 2. parse text and synthesis wave data
 char *text="欢迎使用乐鑫语音合成";	
 if (esp_tts_parse_chinese(tts_handle, text)) {  // parse text into pinyin list
-			int len[1]={0};
-			do {
-				short *data=esp_tts_stream_play(tts_handle, len, 4); // streaming synthesis
-			    i2s_audio_play(data, len[0]*2, portMAX_DELAY);  // i2s output             
-			} while(len[0]>0);
-			i2s_zero_dma_buffer(0);
+	int len[1]={0};
+	do {
+		short *data=esp_tts_stream_play(tts_handle, len, 4); // streaming synthesis
+	    i2s_audio_play(data, len[0]*2, portMAX_DELAY);  // i2s output             
+	} while(len[0]>0);
+	i2s_zero_dma_buffer(0);
 }
 
 ```
 
-请参考[esp_tts.h](./include/esp_tts.h)查看API定义, 或参考esp-skainet例子.
+请参考[esp_tts.h](./include/esp_tts.h)查看API定义, 或参考esp-skainet中chinese_tts示例.
