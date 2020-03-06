@@ -59,7 +59,7 @@ esp_err_t iot_dac_audio_play(const uint16_t* data, int length, TickType_t ticks_
     }
     i2s_write(0, (const char*) data_out, length*2, &bytes_write, ticks_to_wait);
     free(data_out);
-#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD || defined CONFIG_ESP32_CORVO_V1_1_BOARD
     i2s_write(0, (const char*) data, length, &bytes_write, ticks_to_wait);
 #endif
     i2s_zero_dma_buffer(I2S_NUM_0);

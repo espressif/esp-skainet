@@ -71,6 +71,10 @@ extern "C" {
 #include "lyrat_mini_v1_1_board.h"
 #endif 
 
+#ifdef CONFIG_ESP32_CORVO_V1_1_BOARD
+#include "esp32_corvo_v1_1_board.h"
+#endif 
+
 #ifdef __cplusplus
 }
 #endif

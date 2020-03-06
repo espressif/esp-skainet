@@ -28,6 +28,7 @@
 #include "ES8374_interface.h"
 #include "ES7149_interface.h"
 #include "es8311.h"
+#include "es7210.h"
 #include "msc_dac.h"
 #include "esp_log.h"
 #include "MediaHal.h"
@@ -89,7 +90,7 @@ const i2s_pin_config_t i2s_pin = {
     .data_in_num = IIS_DOUT
 };
 
-#ifdef CONFIG_USE_ES7243
+#if defined CONFIG_USE_ES7243 || defined CONFIG_USE_ES7210
 const i2s_pin_config_t i2s1_pin = {
     .bck_io_num = IIS1_SCLK,
     .ws_io_num = IIS1_LCLK,
@@ -209,6 +210,22 @@ int MediaHalInit(void *config)
     }
 #endif
 
+#ifdef CONFIG_USE_ES7210
+    i2s_config.sample_rate = 16000;
+    i2s_config.bits_per_sample = 32; // for ES7210
+    i2s_config.use_apll = 0;
+    i2s_config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;
+    ret = i2s_driver_install(I2S_NUM_1, &i2s_config, 0, NULL);
+    if (ret < 0) {
+        ESP_LOGE(HAL_TAG, "I2S_NUM_1 install failed");
+        return -1;
+    }
+    ret |= i2s_set_pin(I2S_NUM_1, &i2s1_pin);
+
+    Es7210Config Es7210Conf = AUDIO_CODEC_ES7210_DEFAULT();
+    Es7210Init(&Es7210Conf);
+#endif
+
 #ifdef CONFIG_USE_ES7243
     i2s_config.sample_rate = 16000;
     i2s_config.use_apll = 0;
@@ -220,6 +237,7 @@ int MediaHalInit(void *config)
     }
     ret |= i2s_set_pin(I2S_NUM_1, &i2s1_pin);
 #endif
+
 #ifdef ENABLE_MCLK_GPIO0
     if (I2S_NUM == 0) {
         SET_PERI_REG_BITS(PIN_CTRL, CLK_OUT1, 0, CLK_OUT1_S);

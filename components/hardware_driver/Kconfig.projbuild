@@ -10,6 +10,8 @@ config ESP_LYRAT_V4_3_BOARD
     bool "ESP32-Lyrat V4.3"
 config ESP_LYRAT_MINI_V1_1_BOARD
     bool "ESP32-Lyrat Mini V1.1"
+config ESP32_CORVO_V1_1_BOARD
+    bool "ESP32-Corvo V1.1"
 endchoice
 
 choice AUDIO_CODEC_CHIP
@@ -23,7 +25,7 @@ config CODEC_CHIP_IS_ES8388
     depends on ESP_LYRAT_V4_3_BOARD || ESP_LYRAT_V4_2_BOARD || ESP_WHO_ALEXA_DEMO_V1_BOARD
 config CODEC_CHIP_IS_ES8311
     bool "CODEC IS ES8311"
-    depends on ESP_LYRAT_MINI_V1_1_BOARD || ESP_LYRAT_MINI_V1_0_BOARD || ESP_LYRAT_SIGHT_V1_0_BOARD
+    depends on ESP_LYRAT_MINI_V1_1_BOARD || ESP_LYRAT_MINI_V1_0_BOARD || ESP_LYRAT_SIGHT_V1_0_BOARD || ESP32_CORVO_V1_1_BOARD
 endchoice
 
 choice USE_ES7243
@@ -38,6 +40,20 @@ config USE_ES7243
 config DISABLE_ES7243
     bool "disable es7243"
     depends on ESP_LYRAT_MINI_V1_0_BOARD || ESP_LYRAT_MINI_V1_1_BOARD
+endchoice
+
+choice USE_ES7210
+    prompt "use external adc"
+    default DISABLE_ES7210
+    help
+        choose whether use es7210
+
+config USE_ES7210
+    bool "use es7210"
+    depends on ESP32_CORVO_V1_1_BOARD
+config DISABLE_ES7210
+    bool "disable es7210"
+    depends on ESP32_CORVO_V1_1_BOARD
 endchoice
 
 endmenu

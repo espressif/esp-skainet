@@ -23,6 +23,7 @@
 #include "recsrc.h"
 #include "ringbuf.h"
 #include "speech_commands_action.h"
+#include "ws2812.h"
 
 // WakeNet
 static const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
@@ -63,7 +64,11 @@ void wakenetTask(void *arg)
                 printf("%.2f: %s DETECTED.\n", (float)ms / 1000.0, wakenet->get_word_name(model_data, r));
                 detect_flag = 1;
                 printf("-----------------LISTENING-----------------\n\n");
+#if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
                 led_on(LED_GPIO);
+#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+                wake_up_light();
+#endif
                 rb_reset(aec_rb);
                 rb_reset(rec_rb);
             }
@@ -80,7 +85,11 @@ void wakenetTask(void *arg)
                     printf("can not recognize any speech commands\n");
                 }
                 printf("\n-----------awaits to be waken up-----------\n");
+#if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
                 led_off(LED_GPIO);
+#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+                light_off();
+#endif
                 rb_reset(aec_rb);
                 rb_reset(rec_rb);
             }
@@ -93,7 +102,11 @@ void wakenetTask(void *arg)
 void app_main()
 {
     codec_init();
+#if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     led_init(LED_GPIO);
+#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+    init_ws2812();
+#endif
     aec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     rec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
 

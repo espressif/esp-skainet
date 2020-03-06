@@ -28,7 +28,11 @@ extern struct RingBuf *rec_rb;
 void recsrcTask(void *arg)
 {
     size_t bytes_read;
+#ifdef CONFIG_ESP32_CORVO_V1_1_BOARD
+    int16_t *rsp_in = malloc(AEC_FRAME_BYTES * 4);
+#else
     int16_t *rsp_in = malloc(AEC_FRAME_BYTES * 2);
+#endif    
     int16_t *aec_rec = malloc(AEC_FRAME_BYTES);
     int16_t *aec_ref = malloc(AEC_FRAME_BYTES);
     int16_t *aec_out = malloc(AEC_FRAME_BYTES);
@@ -47,6 +51,13 @@ void recsrcTask(void *arg)
         for (int i = 0; i < AEC_FRAME_BYTES / 2; i++) {
             aec_ref[i] = rsp_in[2 * i];
             aec_rec[i] = rsp_in[2 * i + 1];
+        }
+        aec_process(aec_handle, aec_rec, aec_ref, aec_out);
+#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+        i2s_read(I2S_NUM_1, rsp_in, 4 *AEC_FRAME_BYTES, &bytes_read, portMAX_DELAY);
+        for (int i = 0; i < AEC_FRAME_BYTES / 2; i++) {
+            aec_ref[i] = rsp_in[4 * i + 2];
+            aec_rec[i] = rsp_in[4 * i];
         }
         aec_process(aec_handle, aec_rec, aec_ref, aec_out);
 #endif

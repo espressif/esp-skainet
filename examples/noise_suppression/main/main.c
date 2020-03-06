@@ -36,7 +36,11 @@ void noise_suppression(void *arg)
 {
     size_t bytes_read;
     size_t bytes_write;
+#ifdef CONFIG_ESP32_CORVO_V1_1_BOARD
+    int16_t *ns_in = malloc(NS_FRAME_BYTES * 4);
+#else
     int16_t *ns_in = malloc(NS_FRAME_BYTES * 2);
+#endif
     int16_t *ns_in_mono = malloc(NS_FRAME_BYTES);
     int16_t *ns_out = malloc(NS_FRAME_BYTES);
     ns_handle_t ns_inst = arg;
@@ -49,10 +53,14 @@ void noise_suppression(void *arg)
         }
 #elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
         i2s_read(I2S_NUM_1, ns_in, 2 * NS_FRAME_BYTES, &bytes_read, portMAX_DELAY);
-
         for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
             ns_in_mono[i] = ns_in[2 * i + 1];
         }
+#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+        i2s_read(I2S_NUM_1, ns_in, 4 * NS_FRAME_BYTES, &bytes_read, portMAX_DELAY);
+        for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
+            ns_in_mono[i] = ns_in[4 * i];
+        }        
 #endif
         ns_process(ns_inst, ns_in_mono, ns_out);
 
@@ -72,7 +80,7 @@ void noise_suppression(void *arg)
 
         i2s_write(I2S_NUM_0, (const char*) data_out, NS_FRAME_BYTES * 2, &bytes_write, portMAX_DELAY);
         free(data_out);
-#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
+#elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD || defined CONFIG_ESP32_CORVO_V1_1_BOARD
         if (use_ns)
             i2s_write(I2S_NUM_0, (const char*) ns_out, NS_FRAME_BYTES, &bytes_write, portMAX_DELAY);
         else
@@ -90,6 +98,9 @@ void button_Task(void * arg)
 #elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     int min_vol = 1800;
     int max_vol = 2020;
+#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+    int min_vol = 1990;
+    int max_vol = 2040;
 #endif
     int last_trigger_time = 0;
     int trigger_time = 0;
