@@ -32,6 +32,7 @@ extern "C" {
 #endif
 
 #ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+#define CONFIG_CODEC_CHIP_IS_ES8388
 #include "lyrat_v4_3_board.h"
 #endif
 
@@ -68,10 +69,14 @@ extern "C" {
 #endif
 
 #ifdef CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
+#define CONFIG_CODEC_CHIP_IS_ES8311
+#define CONFIG_USE_ES7243
 #include "lyrat_mini_v1_1_board.h"
 #endif 
 
 #ifdef CONFIG_ESP32_CORVO_V1_1_BOARD
+#define CONFIG_CODEC_CHIP_IS_ES8311
+#define CONFIG_USE_ES7210
 #include "esp32_corvo_v1_1_board.h"
 #endif 
 

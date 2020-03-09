@@ -14,46 +14,4 @@ config ESP32_CORVO_V1_1_BOARD
     bool "ESP32-Corvo V1.1"
 endchoice
 
-choice AUDIO_CODEC_CHIP
-    prompt "Audio codec chip"
-    default CODEC_CHIP_IS_ES8388
-    help
-        Select an audio codec to use with the project
-
-config CODEC_CHIP_IS_ES8388
-    bool "CODEC IS ES8388"
-    depends on ESP_LYRAT_V4_3_BOARD || ESP_LYRAT_V4_2_BOARD || ESP_WHO_ALEXA_DEMO_V1_BOARD
-config CODEC_CHIP_IS_ES8311
-    bool "CODEC IS ES8311"
-    depends on ESP_LYRAT_MINI_V1_1_BOARD || ESP_LYRAT_MINI_V1_0_BOARD || ESP_LYRAT_SIGHT_V1_0_BOARD || ESP32_CORVO_V1_1_BOARD
-endchoice
-
-choice USE_ES7243
-    prompt "use external adc"
-    default DISABLE_ES7423
-    help
-        choose whether use es7243
-
-config USE_ES7243
-    bool "use es7243"
-    depends on ESP_LYRAT_MINI_V1_0_BOARD || ESP_LYRAT_MINI_V1_1_BOARD
-config DISABLE_ES7243
-    bool "disable es7243"
-    depends on ESP_LYRAT_MINI_V1_0_BOARD || ESP_LYRAT_MINI_V1_1_BOARD
-endchoice
-
-choice USE_ES7210
-    prompt "use external adc"
-    default DISABLE_ES7210
-    help
-        choose whether use es7210
-
-config USE_ES7210
-    bool "use es7210"
-    depends on ESP32_CORVO_V1_1_BOARD
-config DISABLE_ES7210
-    bool "disable es7210"
-    depends on ESP32_CORVO_V1_1_BOARD
-endchoice
-
 endmenu

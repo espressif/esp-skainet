@@ -25,6 +25,7 @@
 #include <string.h>
 #include "esp_log.h"
 #include "es8311.h"
+#include "board.h"
 
 /* ES8311 address
  * 0x32:CE=1;0x30:CE=0
