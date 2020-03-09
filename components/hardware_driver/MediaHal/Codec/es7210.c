@@ -907,7 +907,7 @@ static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
 int Es7210Init(Es7210Config *cfg)
 {
     unsigned int cnt;
-#if 01 /* corvo doesn't need, mix module0 needs */
+#if 0 /* corvo doesn't need, mix module0 needs */
     I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num);
 #endif
     for(cnt =0; cnt < ADC_DEV_MAXNUM; cnt++)
