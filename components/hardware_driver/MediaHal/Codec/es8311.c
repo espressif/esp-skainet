@@ -354,7 +354,7 @@ static void es8311_pcm_hw_params(uint32_t mclk, uint32_t lrck)
             default:
                 break;
         }
-#if CONFIG_ESP32_CORVO_V1_1_BOARD
+#if CONFIG_ESP32_KORVO_V1_1_BOARD
         datmp = 3;
 #endif
         regv |= (datmp) << 3;
@@ -570,7 +570,7 @@ static void es8311_Codec_Startup(uint32_t mclk_freq, uint32_t lrck_freq)
     es8311_priv->pcm_format = I2S_FMT;
     es8311_priv->pcm_resolution = LENGTH_16BIT;
     es8311_priv->master_slave_mode = SLAVE_MODE;
-#ifdef CONFIG_ESP32_CORVO_V1_1_BOARD
+#ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
     es8311_priv->mclk_src = FROM_SCLK_PIN;
 #else
     es8311_priv->mclk_src = FROM_MCLK_PIN;

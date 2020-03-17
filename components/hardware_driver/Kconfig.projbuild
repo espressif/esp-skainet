@@ -10,8 +10,8 @@ config ESP_LYRAT_V4_3_BOARD
     bool "ESP32-Lyrat V4.3"
 config ESP_LYRAT_MINI_V1_1_BOARD
     bool "ESP32-Lyrat Mini V1.1"
-config ESP32_CORVO_V1_1_BOARD
-    bool "ESP32-Corvo V1.1"
+config ESP32_KORVO_V1_1_BOARD
+    bool "ESP32-Korvo V1.1"
 endchoice
 
 endmenu

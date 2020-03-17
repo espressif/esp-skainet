@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _AUDIO_LYRAT_MINI_V1_1_BOARD_H_
-#define _AUDIO_LYRAT_MINI_V1_1_BOARD_H_
+#ifndef _AUDIO_KORVO_V1_1_BOARD_H_
+#define _AUDIO_KORVO_V1_1_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +31,7 @@ extern "C" {
 
 /* Board functions related */
 #define DIFFERENTIAL_MIC            0
-#define BOARD_INFO                  "ESP_LYRAT_MINI_V1"
+#define BOARD_INFO                  "ESP32_KORVO_V1_1"
 #define ENABLE_AUXIN_DETECT
 #define ENABLE_KEYWORD_DETECT
 #define ENABLE_ADC_BUTTON

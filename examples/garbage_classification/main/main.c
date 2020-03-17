@@ -66,7 +66,7 @@ void wakenetTask(void *arg)
                 printf("-----------------LISTENING-----------------\n\n");
 #if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
                 led_on(LED_GPIO);
-#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+#elif defined CONFIG_ESP32_KORVO_V1_1_BOARD
                 wake_up_light();
 #endif
                 rb_reset(aec_rb);
@@ -87,7 +87,7 @@ void wakenetTask(void *arg)
                 printf("\n-----------awaits to be waken up-----------\n");
 #if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
                 led_off(LED_GPIO);
-#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+#elif defined CONFIG_ESP32_KORVO_V1_1_BOARD
                 light_off();
 #endif
                 rb_reset(aec_rb);
@@ -104,7 +104,7 @@ void app_main()
     codec_init();
 #if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     led_init(LED_GPIO);
-#elif defined CONFIG_ESP32_CORVO_V1_1_BOARD
+#elif defined CONFIG_ESP32_KORVO_V1_1_BOARD
     init_ws2812();
 #endif
     aec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
