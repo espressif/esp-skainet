@@ -24,7 +24,7 @@ This section describes how to get started with ESP32-Korvo. It begins with a few
 
 ESP32-Korvo is a dual-core ESP32-based audio development board with microphone arrays. Together with Espressif's speech recognition SDK ESP-Skainet, ESP32-Korvo is suitable for far-field speech recognition applications with low power consumption, such as smart displays, smart plugs, smart switches, etc.
 
-Unlike other Espressif's audio development boards, ESP32-Korvo achieves far-field offline speech recoginition with a single ESP32 chip. The board can be equipped with either two, three or six microphone arrays. Combined with beamforming, AEC and other speech enhancement algorithms, it applies to various speech-recognition scenarios. 
+Unlike other Espressif's audio development boards, ESP32-Korvo achieves far-field offline speech recoginition with a single ESP32 chip. The board can be equipped with either two or three microphone arrays. Combined with beamforming, AEC and other speech enhancement algorithms, it applies to various speech-recognition scenarios. 
 
 ## 1.2  Contents and Packaging
 
@@ -96,6 +96,12 @@ Before powering up your ESP32-Korvo, please make sure that it is in good conditi
 
 ### 1.4.3 Software Setup
 
+If ESP32-Korvo is initially set up and checked, you can proceed with preparation of the development tools. Go to the section [Software Preparation](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#software-preparation), which will walk you through the following steps:
+
+* [get esp-IDF](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#esp-idf) in your PC that provides a common framework to develop applications for ESP32 in C language
+* [get esp-Skainet](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#esp-skainet) to run espressif's voice assistant
+* [get esp-sr](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#esp-sr) to check API specifics for esp-Skainet applications
+* [build, flash and run esp-Skainet examples](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#examples)
 
 # 2. Hardware Reference
 

@@ -24,7 +24,7 @@ ESP32-Korvo 是一个基于双核 ESP32、搭载麦克风阵列的音频开发�
 
 ESP32-Korvo 是一个基于双核 ESP32、搭载麦克风阵列的音频开发板，配合乐鑫语音识别 SDK ESP-Skainet，适用于远场低功耗语音识别应用，例如智能语音面板、语音插座、智能语音开关等。
 
-不同于乐鑫其他的音频开发板，ESP32-Korvo 用单颗 ESP32 芯片实现远场本地语音识别，支持双麦、三麦、六麦阵列，配合波束成形 (beamforming)、AEC 等语音增强算法，满足多种场景下的语音识别需求。
+不同于乐鑫其他的音频开发板，ESP32-Korvo 用单颗 ESP32 芯片实现远场本地语音识别，支持双麦和三麦阵列，配合波束成形 (beamforming)、AEC 等语音增强算法，满足多种场景下的语音识别需求。
 
 ## 1.2 内含组件和包装
 
@@ -96,7 +96,12 @@ ESP32-Korvo 是一个基于双核 ESP32、搭载麦克风阵列的音频开发�
 
 ### 1.4.3 软件设置
 
+如果硬件设置已完成，请准备开发工具。前往 [esp-skainet 软件设置](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#%E8%BD%AF%E4%BB%B6%E5%87%86%E5%A4%87) 查看以下步骤：
 
+* [获取 esp-IDF](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#esp-idf) 以配置基于 ESP32 的 C 语言 PC 开发环境
+* [获取 esp-Skainet](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/tree/feature/rename_corvo_as_korvo/#esp-skainet) 以运行乐鑫智能语音助手
+* [获取 esp-sr](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#esp-sr) 查询和调用 esp-Skainet 所需要的 API，包括唤醒词识别、语音命令词识别和前端声学算法
+* [编译、烧写和运行 esp-Skainet 示例](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#%E7%A4%BA%E4%BE%8B) 
 
 # 2. 硬件参考
 
