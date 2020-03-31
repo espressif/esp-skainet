@@ -12,13 +12,13 @@ ESP32-Korvo 是一个基于双核 ESP32、搭载麦克风阵列的音频开发�
 
 本指南包括如下内容：
 
-* [入门指南](#入门指南): 简要介绍了 ESP32-Korvo 和硬件、软件设置指南。
-* [硬件参考](#硬件参考): 详细介绍了 ESP32-Korvo 的硬件。
-* [相关文档](#相关文档): 列出了相关文档的链接。
+* [入门指南](#1-入门指南): 简要介绍了 ESP32-Korvo 和硬件、软件设置指南。
+* [硬件参考](#2-硬件参考): 详细介绍了 ESP32-Korvo 的硬件。
+* [相关文档](#3-相关文档): 列出了相关文档的链接。
 
 # 1. 入门指南
 
-本节介绍了如何快速上手 ESP32-Korvo。开头部分介绍了 ESP32-Korvo，[开始开发应用](#开始开发应用) 小节介绍了怎样在 ESP32-Korvo 上安装模组、设置和烧录固件。
+本节介绍了如何快速上手 ESP32-Korvo。开头部分介绍了 ESP32-Korvo，[开始开发应用](#14-开始开发应用) 小节介绍了怎样在 ESP32-Korvo 上安装模组、设置和烧录固件。
 
 ## 1.1 概述
 
@@ -96,12 +96,12 @@ ESP32-Korvo 是一个基于双核 ESP32、搭载麦克风阵列的音频开发�
 
 ### 1.4.3 软件设置
 
-如果硬件设置已完成，请准备开发工具。前往 [esp-skainet 软件设置](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#%E8%BD%AF%E4%BB%B6%E5%87%86%E5%A4%87) 查看以下步骤：
+如果硬件设置已完成，请准备开发工具。前往 [ESP-Skainet 软件准备](https://github.com/espressif/esp-skainet/blob/master/README_cn.md#esp-skainet-english) 查看以下步骤：
 
-* [获取 esp-IDF](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#esp-idf) 以配置基于 ESP32 的 C 语言 PC 开发环境
-* [获取 esp-Skainet](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/tree/feature/rename_corvo_as_korvo/#esp-skainet) 以运行乐鑫智能语音助手
-* [获取 esp-sr](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#esp-sr) 查询和调用 esp-Skainet 所需要的 API，包括唤醒词识别、语音命令词识别和前端声学算法
-* [编译、烧写和运行 esp-Skainet 示例](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README_cn.md#%E7%A4%BA%E4%BE%8B) 
+* [获取 ESP-IDF](https://github.com/espressif/esp-skainet/blob/master/README_cn.md#esp-idf)，配置基于 ESP32 的 C 语言 PC 开发环境。
+* [获取 ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README_cn.md#esp-skainet)，运行乐鑫智能语音助手。
+* [获取 ESP-SR](https://github.com/espressif/esp-skainet/blob/master/README_cn.md#esp-sr)，查询和调用 ESP-Skainet 所需要的 API，包括唤醒词识别、语音命令词识别和前端声学算法。
+* [编译、烧写和运行 ESP-Skainet 示例](https://github.com/espressif/esp-skainet/blob/master/README_cn.md#示例)。
 
 # 2. 硬件参考
 

@@ -12,13 +12,13 @@ ESP32-Korvo is a dual-core ESP32-based audio development board with microphone a
 
 The document consists of the following major sections:
 
--   [Getting started](#getting-started): Provides an overview of ESP32-Korvo and hardware/software setup instructions to get started.
--   [Hardware reference](#hardware-reference): Provides more detailed information about the ESP32-Korvo's hardware.
--   [Related Documents](#related-documents): Gives links to related documentaiton.
+-   [Getting started](#1-getting-started): Provides an overview of ESP32-Korvo and hardware/software setup instructions to get started.
+-   [Hardware reference](#2-hardware-reference): Provides more detailed information about the ESP32-Korvo's hardware.
+-   [Related Documents](#3-related-documents): Gives links to related documentaiton.
 
 # 1. Getting Started
 
-This section describes how to get started with ESP32-Korvo. It begins with a few introductory sections about ESP32-Korvo, then Section [Start Application Development](#start-application-development) provides instructions on how to do the initial hardware setup and then how to flash firmware into ESP32-Korvo.
+This section describes how to get started with ESP32-Korvo. It begins with a few introductory sections about ESP32-Korvo, then Section [Start Application Development](#14-start-application-development) provides instructions on how to do the initial hardware setup and then how to flash firmware into ESP32-Korvo.
 
 ## 1.1 Overview
 
@@ -96,12 +96,12 @@ Before powering up your ESP32-Korvo, please make sure that it is in good conditi
 
 ### 1.4.3 Software Setup
 
-If ESP32-Korvo is initially set up and checked, you can proceed with preparation of the development tools. Go to the section [Software Preparation](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#software-preparation), which will walk you through the following steps:
+After hardware setup, you can proceed with preparation of development tools. Go to section [Software Preparation](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-skainet-中文), which will walk you through the following steps:
 
-* [get esp-IDF](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#esp-idf) in your PC that provides a common framework to develop applications for ESP32 in C language
-* [get esp-Skainet](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#esp-skainet) to run espressif's voice assistant
-* [get esp-sr](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#esp-sr) to check API specifics for esp-Skainet applications
-* [build, flash and run esp-Skainet examples](https://gitlab.espressif.cn:6688/speech-recognition-internal/esp-skainet/-/blob/feature/rename_corvo_as_korvo/README.md#examples)
+* [Set up ESP-IDF](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-idf) which provides a common framework to develop applications for ESP32 in C language.
+* [Get ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-skainet) to run Espressif's voice assistant.
+* [Get ESP-SR](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-sr) to call APIs specific for ESP-Skainet applications, including wake work detection, speech command recognition and acoustic algorithm.
+* [Build, flash and run ESP-Skainet examples](https://github.com/espressif/esp-skainet/blob/master/README.md#examples).
 
 # 2. Hardware Reference
 
