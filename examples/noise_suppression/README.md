@@ -10,6 +10,8 @@ This example takes the audio data collected by the microphone through noise supp
 
 - This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
 
+- This example can run on ESP32-Korvo board as well, however, it is suggested to use mic-array speech enhancement (MASE) API for Korvo for a better speech enhancement result; please check [MASE example](https://github.com/espressif/esp-skainet/tree/master/examples/mic_array_speech_enhancement) for more information
+
 - headphone
 
 ### Configure the project
@@ -17,8 +19,6 @@ This example takes the audio data collected by the microphone through noise supp
 * Go to `make menuconfig`.
 
 * Set the serial port number under `Serial Flasher Options`.
-
-* Add or modify the garbage name, such as “wei sheng zhi” (toilet paper).
 
 ### Build and Flash
 
