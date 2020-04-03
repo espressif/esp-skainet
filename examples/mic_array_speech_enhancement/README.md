@@ -14,7 +14,7 @@ This example takes the multi-channel audio data collected by the microphone arra
 
 ### Configure the project
 
-* Go to `make menuconfig`.
+* Go to `idf.py menuconfig`.
 
 * Set the serial port number under `Serial flasher config`.
 
@@ -25,7 +25,7 @@ This example takes the multi-channel audio data collected by the microphone arra
 Build the project and flash it to the board, then run the monitor tool to view the output via serial port:
 
 ```
-make -j4 flash monitor
+idf.py flash monitor
 ```
 
 (To exit the serial monitor, type ``Ctrl-]``.)
@@ -52,7 +52,7 @@ indicating MASE is turned off. Pressing "Mode" button again will turn MASE back 
 
 ### Audio stream
 
-You can listen to the enhanced audio signal with your earphone. For a more straightforward illustration, you can record and view the signal before and after MASE with your audio analysis software. In this example, MASE operates in `WAKE_UP_ENHANCEMENT_MODE`, which means that it is specially designed to enhance the wake-up word (and following speech for local or cloud speech recognition, if there is any). A typical comparison of audio signal before and after MASE is as follows, in which wake-up words are clearly highlighted:
+You can listen to the enhanced audio signal with your earphone. For a more straightforward illustration, you can record and view the signal before and after MASE with your audio analysis software. In this example, MASE operates in `WAKE_UP_ENHANCEMENT_MODE`, which means that it is specially designed to enhance the wake-up word (and following speech for local or cloud speech recognition, if there is any). A typical input/output comparison for  2-mic MASE is as follows, in which wake-up words are clearly highlighted:
 
 * time domain
 
@@ -64,4 +64,4 @@ You can listen to the enhanced audio signal with your earphone. For a more strai
 
 ### Improvement on speech recognition
 
-MASE can significantly improve the performance of the following speech recognition stage, including local wake-up detection (WakeNet), local command word recognition (MultiNet), and cloud service. Test results show that in 5dB SNR environment, 2-mic and 3-mic MASE can improve over **15%** and **20%** WakeNet performance and over **10%** and **15%** MultiNet performance comparing to 1-mic system.
+MASE can significantly improve the performance of the following speech recognition stage, including local wake word detection (WakeNet), local speech commands recognition (MultiNet), and cloud service. Test results show that in 5dB SNR environment, 2-mic and 3-mic MASE can improve over **15%** and **20%** WakeNet performance and over **10%** and **15%** MultiNet performance comparing to 1-mic system.
