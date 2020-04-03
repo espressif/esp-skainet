@@ -50,11 +50,11 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg1[] =
     { 0x21, 0x2A },
     { 0x20, 0x0A },
 };
-static const struct es7210_reg_config es7210_tdm_reg_fmt_cfg[] =
-{
-    { 0x11, 0x63 },
-    { 0x12, 0x01 },
-};
+//static const struct es7210_reg_config es7210_tdm_reg_fmt_cfg[] =
+//{
+//    { 0x11, 0x63 },
+//    { 0x12, 0x01 },
+//};
 static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
 {
     { 0x40, 0xC3 },
@@ -70,10 +70,10 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
     { 0x4A, 0x08 },
     { 0x07, 0x20 },
 };
-static const struct es7210_reg_config es7210_tdm_reg_mclk_cfg[] =
-{
-    { 0x02, 0xC3 },
-};
+//static const struct es7210_reg_config es7210_tdm_reg_mclk_cfg[] =
+//{
+//    { 0x02, 0xC3 },
+//};
 static const struct es7210_reg_config es7210_tdm_reg_common_cfg3[] =
 {
     { 0x06, 0x04 },

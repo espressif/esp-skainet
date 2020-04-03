@@ -13,6 +13,9 @@
 #include "ringbuf.h"
 
 #include "tts_urat.h"
+#include "sdcard_init.h"
+
+//#define SDCARD_OUTPUT_ENABLE
 
 struct RingBuf *urat_rb=NULL;
 
@@ -25,7 +28,14 @@ int iot_dac_audio_play(const uint8_t* data, int length, TickType_t ticks_to_wait
 }
 
 int app_main() {
-    codec_init();      
+    codec_init(); 
+
+#ifdef SDCARD_OUTPUT_ENABLE
+    sd_card_mount("/sdcard");
+    FILE* fp=fopen("/sdcard/OUT", "w+");
+    if(fp==NULL)
+        printf("can not open file!\n");
+#endif
 
     // use pre-define xiaole voice to create tts handle
     esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
@@ -65,8 +75,12 @@ int app_main() {
             if (esp_tts_parse_chinese(tts_handle, data)) {
                 int len[1]={0};
                 do {
-                    short *data=esp_tts_stream_play(tts_handle, len, 4);
-                    iot_dac_audio_play(data, len[0]*2, portMAX_DELAY);
+                    short *pcm_data=esp_tts_stream_play(tts_handle, len, 4);
+#ifdef SDCARD_OUTPUT_ENABLE
+                    FatfsComboWrite(pcm_data, 1, len[0]*2, fp);
+#else
+                    iot_dac_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
+#endif
                 } while(len[0]>0);
                 i2s_zero_dma_buffer(0);
             }
@@ -81,6 +95,5 @@ int app_main() {
             data_len=0;
         }
     }
-
 }
 
