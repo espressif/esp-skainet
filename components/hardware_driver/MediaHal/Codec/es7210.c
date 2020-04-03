@@ -907,9 +907,8 @@ static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
 int Es7210Init(Es7210Config *cfg)
 {
     unsigned int cnt;
-#if 0 /* corvo doesn't need, mix module0 needs */
     I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num);
-#endif
+    
     for(cnt =0; cnt < ADC_DEV_MAXNUM; cnt++)
     {
         es7210_private.i2c_chip_id[cnt] = 0x80 + cnt; // set i2c chip address
@@ -921,9 +920,10 @@ int Es7210Init(Es7210Config *cfg)
 
     // es7210_write(ES7210_MCLK_CTL_REG02, 0xC3, 0x41);
     // es7210_multi_chips_write(ES7210_MCLK_CTL_REG02, 0xc3);
-    es7210_multi_chips_write(0x02, 0xC2);
-    es7210_multi_chips_write(0x08, 0x10);
-    es7210_multi_chips_write(0x12, 0x02);
-    es7210_multi_chips_write(0x11, 0x60);
+
+    // es7210_multi_chips_write(0x02, 0xC2);
+    // es7210_multi_chips_write(0x08, 0x10);
+    // es7210_multi_chips_write(0x12, 0x02);
+    // es7210_multi_chips_write(0x11, 0x60);
     return 0;
 }

@@ -613,7 +613,9 @@ esp_err_t Es8311GetRef(bool flag)
 int Es8311Init(Es8311Config *cfg)
 {
     es8311_priv = calloc(1, sizeof(struct es8311_private));
+#ifndef CONFIG_ESP32_KORVO_V1_1_BOARD /* for Korvo, i2c has been initialized when installing ES7210 */
     I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num); // ESP32 in master mode
+#endif
     es8311_Codec_Startup(12288000, 48000);
     return 0;
 }

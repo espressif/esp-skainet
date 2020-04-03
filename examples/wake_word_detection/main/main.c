@@ -27,8 +27,9 @@
 static const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
 static const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
-struct RingBuf *aec_rb = NULL;
 struct RingBuf *rec_rb = NULL;
+struct RingBuf *ns_rb = NULL;
+struct RingBuf *agc_rb = NULL;
 
 void wakenetTask(void *arg)
 {
@@ -42,7 +43,7 @@ void wakenetTask(void *arg)
     bool detect_flag = 0;
 
     while (1) {
-        rb_read(rec_rb, (uint8_t *)buffer, audio_chunksize * sizeof(int16_t), portMAX_DELAY);
+        rb_read(agc_rb, (uint8_t *)buffer, audio_chunksize * sizeof(int16_t), portMAX_DELAY);
         int r = wakenet->detect(model_data, buffer);
         if (r) {
             float ms = (chunks * audio_chunksize * 1000.0) / frequency;
@@ -57,14 +58,16 @@ void wakenetTask(void *arg)
 void app_main()
 {
     codec_init();
-    aec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     rec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
+    ns_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
+    agc_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
 
     model_iface_data_t *model_data = wakenet->create(model_coeff_getter, DET_MODE_90);
     // set wake word detection threshold
     //wakenet->set_det_threshold(model_data, 0.96, 1);
 
     xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&nsTask, "ns", 2 * 1024, NULL, 8, NULL, 1);
     xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 0);
     xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, (void*)model_data, 5, NULL, 0);
 

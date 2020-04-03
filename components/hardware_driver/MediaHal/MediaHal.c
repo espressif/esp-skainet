@@ -220,6 +220,20 @@ int MediaHalInit(void *config)
         return -1;
     }
     ret |= i2s_set_pin(I2S_NUM_1, &i2s1_pin);
+#elif defined CONFIG_USE_ES7210
+    i2s_config.sample_rate = 16000;
+    i2s_config.bits_per_sample = 32; // for ES7210
+    i2s_config.use_apll = 0;
+    i2s_config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;
+    ret = i2s_driver_install(I2S_NUM_1, &i2s_config, 0, NULL);
+    if (ret < 0) {
+        ESP_LOGE(HAL_TAG, "I2S_NUM_1 install failed");
+        return -1;
+    }
+    ret |= i2s_set_pin(I2S_NUM_1, &i2s1_pin);
+
+    Es7210Config Es7210Conf = AUDIO_CODEC_ES7210_DEFAULT();
+    Es7210Init(&Es7210Conf);
 #endif
 
 #ifdef ENABLE_MCLK_GPIO0
@@ -246,22 +260,6 @@ int MediaHalInit(void *config)
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
 #endif // CONFIG_CODEC_CHIP_IS_MICROSEMI
 #endif // I2S_DAC_EN
-
-#ifdef CONFIG_USE_ES7210
-    i2s_config.sample_rate = 16000;
-    i2s_config.bits_per_sample = 32; // for ES7210
-    i2s_config.use_apll = 0;
-    i2s_config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;
-    ret = i2s_driver_install(I2S_NUM_1, &i2s_config, 0, NULL);
-    if (ret < 0) {
-        ESP_LOGE(HAL_TAG, "I2S_NUM_1 install failed");
-        return -1;
-    }
-    ret |= i2s_set_pin(I2S_NUM_1, &i2s1_pin);
-
-    Es7210Config Es7210Conf = AUDIO_CODEC_ES7210_DEFAULT();
-    Es7210Init(&Es7210Conf);
-#endif
 
     MediaHalConfig._currentMode = CODEC_MODE_UNKNOWN;
     if (MediaHalConfig._halLock) {

@@ -14,4 +14,14 @@ config ESP32_KORVO_V1_1_BOARD
     bool "ESP32-Korvo V1.1"
 endchoice
 
+choice MIC_ARRAY_TYPE
+    prompt "Mic-array type"
+    depends on ESP32_KORVO_V1_1_BOARD
+
+config 2_MIC_LINEAR_ARRAY
+	bool "2-mic linear array"
+config 3_MIC_CIRCULAR_ARRAY
+	bool "3-mic circular array"
+endchoice
+
 endmenu
