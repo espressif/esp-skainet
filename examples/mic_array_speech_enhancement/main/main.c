@@ -21,6 +21,7 @@
 
 #include "MediaHal.h"
 #include "esp_mase.h"
+#include "esp_agc.h"
 #include "ringbuf.h"
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
@@ -28,6 +29,7 @@
 #define DEFAULT_VREF    1100
 #define NO_OF_SAMPLES   64          //Multisampling
 #define MASE_FRAME_BYTES     512
+#define AGC_FRAME_BYTES     320
 
 static esp_adc_cal_characteristics_t *adc_chars;
 static const adc_channel_t channel = ADC_CHANNEL_3;
@@ -35,6 +37,7 @@ static const adc_atten_t atten = ADC_ATTEN_11db;
 static const adc_unit_t unit = ADC_UNIT_1;
 
 struct RingBuf *mase_rb = NULL;
+struct RingBuf *agc_rb = NULL;
 
 static bool enable_mase = 1;
 void maseTask(void *arg)
@@ -77,6 +80,40 @@ void maseTask(void *arg)
     vTaskDelete(NULL);
 }
 
+void agcTask(void *arg)
+{
+    int16_t *agc_in  = malloc(AGC_FRAME_BYTES);
+    int16_t *agc_out = malloc(AGC_FRAME_BYTES);
+
+    void *agc_handle = esp_agc_open(3, 16000);
+    set_agc_config(agc_handle, 15, 1, 3);
+
+    int _err_step = 1;
+    if (0 == (agc_in && _err_step ++ && agc_out && _err_step ++ && agc_handle && _err_step ++)) {
+        printf("Failed to apply for memory, err_step = %d", _err_step);
+        goto _agc_init_fail;
+    }
+    while (1) {
+        rb_read(mase_rb, (uint8_t *)agc_in, AGC_FRAME_BYTES, portMAX_DELAY);
+        esp_agc_process(agc_handle, agc_in, agc_out, AGC_FRAME_BYTES / 2, 16000);
+        rb_write(agc_rb, (uint8_t *)agc_out, AGC_FRAME_BYTES, portMAX_DELAY);
+    }
+_agc_init_fail:
+    if (agc_in) {
+        free(agc_in);
+        agc_in = NULL;
+    }
+    if (agc_out) {
+        free(agc_out);
+        agc_out = NULL;
+    }
+    if (agc_handle) {
+        free(agc_handle);
+        agc_handle = NULL;
+    }
+    vTaskDelete(NULL);
+}
+
 void wakenetTask(void *arg)
 {
     esp_wn_iface_t *wakenet = &WAKENET_MODEL;
@@ -92,7 +129,7 @@ void wakenetTask(void *arg)
     bool detect_flag = 0;
 
     while (1) {
-        rb_read(mase_rb, (uint8_t *)buffer, audio_chunksize * sizeof(int16_t), portMAX_DELAY);
+        rb_read(agc_rb, (uint8_t *)buffer, audio_chunksize * sizeof(int16_t), portMAX_DELAY);
         int r = wakenet->detect(model_data, buffer);
         if (r) {
             float ms = (chunks * audio_chunksize * 1000.0) / frequency;
@@ -147,9 +184,11 @@ void app_main()
 
     codec_init();
     mase_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
+    agc_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     printf("MASE STATE: 1\n");
 
     xTaskCreatePinnedToCore(&maseTask, "mase", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 0);
     xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, NULL, 8, NULL, 1);
     xTaskCreatePinnedToCore(&buttonTask, "button", 2 * 1024, NULL, 8, NULL, 0);
 }
