@@ -25,6 +25,9 @@
 #include "ringbuf.h"
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
+#include "esp_mn_iface.h"
+#include "esp_mn_models.h"
+#include "ws2812.h"
 
 #define DEFAULT_VREF    1100
 #define NO_OF_SAMPLES   64          //Multisampling
@@ -116,12 +119,18 @@ _agc_init_fail:
 
 void wakenetTask(void *arg)
 {
+    /* WakeNet */
     esp_wn_iface_t *wakenet = &WAKENET_MODEL;
     model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
     model_iface_data_t *model_data = wakenet->create(model_coeff_getter, DET_MODE_90);
 
+    /* MultiNet */
+    static const esp_mn_iface_t *multinet = &MULTINET_MODEL;
+    model_iface_data_t *model_data_mn = multinet->create(&MULTINET_COEFF, 6000);
+
     int frequency = wakenet->get_samp_rate(model_data);
     int audio_chunksize = wakenet->get_samp_chunksize(model_data);
+    int chunk_num = multinet->get_samp_chunknum(model_data_mn);
     int16_t *buffer = malloc(audio_chunksize * sizeof(int16_t));
     assert(buffer);
     unsigned int chunks = 0;
@@ -130,12 +139,39 @@ void wakenetTask(void *arg)
 
     while (1) {
         rb_read(agc_rb, (uint8_t *)buffer, audio_chunksize * sizeof(int16_t), portMAX_DELAY);
-        int r = wakenet->detect(model_data, buffer);
-        if (r) {
-            float ms = (chunks * audio_chunksize * 1000.0) / frequency;
-            printf("%.2f: %s DETECTED.\n", (float)ms / 1000.0, wakenet->get_word_name(model_data, r));
-            detect_flag = 1;
-        } 
+        if (detect_flag == 0) {
+            int r = wakenet->detect(model_data, buffer);
+            if (r) {
+                float ms = (chunks * audio_chunksize * 1000.0) / frequency;
+                printf("%.2f: %s DETECTED.\n", (float)ms / 1000.0, wakenet->get_word_name(model_data, r));
+                detect_flag = 1;
+                wake_up_light();
+                printf("-----------------LISTENING-----------------\n\n");
+            }
+        } else {
+            int command_id = multinet->detect(model_data_mn, buffer);
+            mn_chunks++;
+            if (mn_chunks == chunk_num || command_id > -1) {
+                mn_chunks = 0;
+                detect_flag = 0;
+                if (command_id > -1) {
+                    printf("Commands ID: %d.\n", command_id);
+                    switch (command_id)
+                    {
+                        case 0: white_light_on(); break;
+                        case 1: red_light_on(); break;
+                        case 2: green_light_on(); break;
+                        case 3: blue_light_on(); break;
+                        case 4: light_off(); break;
+                    }
+                } else {
+                    printf("can not recognize any speech commands\n");
+                    return_light_state();
+                }
+
+                printf("\n-----------awaits to be waken up-----------\n");
+            }
+        }
         chunks++;
     }
     vTaskDelete(NULL);
@@ -184,12 +220,13 @@ void app_main()
 #endif
 
     codec_init();
+    init_ws2812();
     mase_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     agc_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     printf("MASE STATE: 1\n");
 
     xTaskCreatePinnedToCore(&maseTask, "mase", 2 * 1024, NULL, 8, NULL, 1);
     xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 1);
-    xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 8 * 1024, NULL, 8, NULL, 0);
     xTaskCreatePinnedToCore(&buttonTask, "button", 2 * 1024, NULL, 8, NULL, 1);
 }

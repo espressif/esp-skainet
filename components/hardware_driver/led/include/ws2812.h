@@ -1,0 +1,12 @@
+void init_ws2812();
+void RGB_1s();
+void wake_up_light();
+void return_light_state();
+void light_off();
+void white_light_on();
+void red_light_on();
+void green_light_on();
+void blue_light_on();
+void yellow_light_on();
+void orange_light_on();
+void purple_light_on();
