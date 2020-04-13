@@ -172,6 +172,7 @@ void buttonTask(void *arg)
                 }
             }
         }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
@@ -187,8 +188,8 @@ void app_main()
     agc_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
     printf("MASE STATE: 1\n");
 
-    xTaskCreatePinnedToCore(&maseTask, "mase", 2 * 1024, NULL, 8, NULL, 0);
-    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 0);
-    xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, NULL, 8, NULL, 1);
-    xTaskCreatePinnedToCore(&buttonTask, "button", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&maseTask, "mase", 2 * 1024, NULL, 8, NULL, 1);
+    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 1);
+    xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&buttonTask, "button", 2 * 1024, NULL, 8, NULL, 1);
 }
