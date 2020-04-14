@@ -15,9 +15,6 @@
 #include "driver/i2s.h"
 #include "esp_system.h"
 #include "sdkconfig.h"
-#include "driver/gpio.h"
-#include "driver/adc.h"
-#include "esp_adc_cal.h"
 
 #include "MediaHal.h"
 #include "esp_mase.h"
@@ -28,16 +25,10 @@
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
 #include "ws2812.h"
+#include "button.h"
 
-#define DEFAULT_VREF    1100
-#define NO_OF_SAMPLES   64          //Multisampling
 #define MASE_FRAME_BYTES     512
 #define AGC_FRAME_BYTES     320
-
-static esp_adc_cal_characteristics_t *adc_chars;
-static const adc_channel_t channel = ADC_CHANNEL_3;
-static const adc_atten_t atten = ADC_ATTEN_11db;
-static const adc_unit_t unit = ADC_UNIT_1;
 
 struct RingBuf *mase_rb = NULL;
 struct RingBuf *agc_rb = NULL;
@@ -179,36 +170,45 @@ void wakenetTask(void *arg)
 
 void buttonTask(void *arg)
 {
-    int min_vol = 1990;
-    int max_vol = 2040;
-    int last_trigger_time = 0;
-    int trigger_time = 0;
-    adc1_config_width(ADC_WIDTH_12Bit);
-    adc1_config_channel_atten(channel, atten);
-    //Characterize ADC
-    adc_chars = calloc(1, sizeof(esp_adc_cal_characteristics_t));
-    esp_adc_cal_characterize(unit, atten, ADC_WIDTH_12Bit, DEFAULT_VREF, adc_chars);
+    button_init();
+    char *det = calloc(4, sizeof(char));
 
     while (1) {
-        uint32_t adc_reading = 0;
-        //Multisampling
-        for (int i = 0; i < NO_OF_SAMPLES; i++) {
-            adc_reading += adc1_get_raw((adc1_channel_t)channel);
+        button_detect(det);
+
+        if (0 == strcmp(det, "null"))
+        {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
-        adc_reading /= NO_OF_SAMPLES;
-        //Convert adc_reading to voltage in mV
-        uint32_t voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_chars);
-        if (min_vol <= voltage) {
-            if ( voltage <= max_vol) {
-                trigger_time = system_get_time();
-                if ((trigger_time - last_trigger_time) > 500000) {
-                    enable_mase = 1 - enable_mase;
-                    last_trigger_time = trigger_time;
-                    printf("MASE STATE: %d\n", enable_mase);
-                }
+        else
+        {
+            if(0 == strcmp(det, "mode"))
+            {
+                enable_mase = 1 - enable_mase;
+                printf("MASE STATE: %d\n", enable_mase);
             }
+            else if(0 == strcmp(det, "play"))
+            {
+                white_light_on();
+            }
+            else if(0 == strcmp(det, "set"))
+            {
+                red_light_on();
+            }
+            else if(0 == strcmp(det, "vol+"))
+            {
+                green_light_on();
+            }
+            else if(0 == strcmp(det, "vol-"))
+            {
+                blue_light_on();
+            }
+            else if(0 == strcmp(det, "rec"))
+            {
+                light_off();
+            }
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
