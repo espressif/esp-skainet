@@ -4,6 +4,8 @@ set(COMPONENT_SRCDIRS
     ./SystemSal
     ./i2c_bus
     ./SDCardConfig
+    ./button
+    ./led
     )
 
 set(COMPONENT_ADD_INCLUDEDIRS 
@@ -14,9 +16,15 @@ set(COMPONENT_ADD_INCLUDEDIRS
     ./SystemSal
     ./i2c_bus
     ./userconfig
+    ./button/include
+    ./led/include
     )
 
-set(COMPONENT_REQUIRES fatfs)
+set(COMPONENT_REQUIRES
+    fatfs
+    esp_adc_cal
+    nvs_flash
+    )
 
 register_component()
 
