@@ -2,7 +2,7 @@
 
 (See the [README.md](../README.md) file in the upper level 'examples' directory for more information about examples.)
 
-This example takes the multi-channel audio data collected by the microphone array through Espressif's mic-array speech enhancement (MASE) algorithm to obtain 16kHz 16bit mono audio data, and immediately outputs the enhanced audio data via your earphone. You can choose whether to turn on MASE by pressing the "Mode" button.
+This example takes the multi-channel audio data collected by the microphone array through Espressif's mic-array speech enhancement (MASE) algorithm to obtain 16kHz 16bit mono audio data, and immediately outputs the enhanced audio data via your earphone. You can choose whether to turn on MASE by pressing the "Mode" button, and changing the states of the LED lights by pressing other buttons. In the meantime, the enhanced signal is sent to Espressif's local wake word detection (WakeNet) and local speech commands recognition (MultiNet), you can also control the states of LED lights via your voice.
  
 ## How to use this example
 
@@ -32,9 +32,11 @@ idf.py flash monitor
 
 See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) for full steps to configure and use ESP-IDF to build projects.
 
-### Turn on and off MASE
+### Use the buttons
 
-The console output of this example will be:
+There are six function buttons, i.e. `PLAY`, `SET`, `VOL-`, `VOL+`, `MODE` and `REC` on ESP32-Korvo. In this example, button `MODE` is used to control whether MASE algorithm is enabled, while the others are used to control the states of LED lights.
+
+The initial console output of this example will be:
 
 ```
 MASE STATE: 1
@@ -47,6 +49,30 @@ MASE STATE: 0
 ```
 
 indicating MASE is turned off. Pressing "Mode" button again will turn MASE back on, and so on.
+
+The corresponding relationship between buttons and LED states is:
+
+|Button|Response|
+|:- |:- |
+|PLAY|RGB LEDs glow white.|
+|SET|RGB LEDs glow red.|
+|VOL+|RGB LEDs glow green.|
+|VOL-|RGB LEDs glow blue.|
+|REC|RGB LEDs go out.|
+
+### Use wake word detection and speech commands recognition
+
+After powering up, you can activate the board with the default wake word “Hi, Le Xin”, which translates in English as “Hello, Espressif”. When the wake word is detected, the 12 on-board RGB LEDs glow white one by one, meaning that the board is waiting for a speech command.
+
+This example supports speech commands to control LED states, the corresponding relationship is:
+
+|Default Speech Command (in Chinese)|Meaning|Response|
+|:- |:- |:- |
+|Da Kai Bai Deng|Turn on the white light|RGB LEDs glow white.|
+|Da Kai Hong Deng|Turn on the red light|RGB LEDs glow red.|
+|Da Kai Lv Deng|Turn on the green light|RGB LEDs glow green.|
+|Da Kai Lan Deng|Turn on the blue light|RGB LEDs glow blue.|
+|Guan Bi Dian Deng|Turn off the light|RGB LEDs go out.|
 
 ## Example Output
 

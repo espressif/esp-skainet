@@ -2,7 +2,7 @@
 
 （参考在上一级的 `examples` 目录下的 [README.md](../README.md) 文件来获取更多信息。）
 
-本示例使用乐鑫麦克风阵列语音增强（mic-array speech enhancement, MASE）算法处理多通道语音信号，输出单通道 16kHz 16bit 信号，并通过耳机输出增强后的信号。通过按下开发板的 "Mode" 按键，用户可控制输出信号是否经过 MASE 算法。
+本示例使用乐鑫麦克风阵列语音增强（mic-array speech enhancement, MASE）算法处理多通道语音信号，输出单通道 16kHz 16bit 信号，并通过耳机输出增强后的信号。开发板的 "Mode" 按键用于控制输出信号是否经过 MASE 算法，其他按键用于控制 LED 灯的状态。同时，增强后的信号输入乐鑫唤醒识别引擎 WakeNet 和本地命令词识别引擎 MultiNet，您也可以通过语音来控制 LED 灯的状态。
 
 ## 如何使用例程
 
@@ -30,9 +30,11 @@ idf.py flash monitor
 
 (退出窗口，请键入 ``Ctrl-]``.)
 
-参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.
+参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节。
 
-### MASE 的开启和关闭
+### 使用按键功能
+
+ESP32-Korvo 有 6 个按键：`MODE`、`PLAY`、`SET`、`VOL+`、`VOL-` 和 `REC`。在本例程中，`MODE` 用于设置输出信号是否经过 MASE 算法，其他案件用于控制 LED 灯的状态。
 
 命令行的初始打印是：
 
@@ -47,6 +49,30 @@ MASE STATE: 0
 ```
 
 再按下 "Mode" 按键即可重新开启 MASE。
+
+其他按键和 LED 灯状态的对应关系如下：
+
+|按键|设备反馈|
+|:- |:- |
+|PLAY|打开 RGB LED，显示白色。|
+|SET|打开 RGB LED，显示红色。|
+|VOL+|打开 RGB LED，显示绿色。|
+|VOL-|打开 RGB LED，显示蓝色。|
+|REC|熄灭 RGB LED。|
+
+### 使用唤醒和命令词识别功能
+
+上电后，您可使用默认唤醒词“嗨，乐鑫”唤醒开发板。唤醒后，板载的 12 个 RGB LED 将被循环点亮为白色，表示设备正在等待命令词。
+
+本例程支持使用命令词控制 LED 灯的状态，对应关系如下：
+
+|命令词|设备反馈|
+|:- |:- |
+|打开白灯|打开 RGB LED，显示白色。|
+|打开红灯|打开 RGB LED，显示红色。|
+|打开绿灯|打开 RGB LED，显示绿色。|
+|打开蓝灯|打开 RGB LED，显示蓝色。|
+|关闭电灯|熄灭 RGB LED。|
 
 ## 例程输出
 
