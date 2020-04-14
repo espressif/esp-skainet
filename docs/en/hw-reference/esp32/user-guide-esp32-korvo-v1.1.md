@@ -58,7 +58,7 @@ For wholesale orders, please check [Espressif Product Ordering Information](http
 
 |Key Componenet|Description|
 |:- |:- |
-|ESP32-WROVER-B|This ESP32 module contains an ESP32 chip to provide Wi-Fi / BT connectivity and data processing power. It integrates 64 Mbit SPI flash and 128 Mbit PSRAM for flexible data storage.|
+|ESP32-WROVER-B|This ESP32 module contains an ESP32 chip to provide Wi-Fi / BT connectivity and data processing power. It integrates 128 Mbit SPI flash and 64 Mbit PSRAM for flexible data storage.|
 |Power Regulator|5V-to-3.3V regulator.|
 |Power Switch|On: The board is powered on; Off: The board is powered off.|
 |Battery Port|Connect a battery.|

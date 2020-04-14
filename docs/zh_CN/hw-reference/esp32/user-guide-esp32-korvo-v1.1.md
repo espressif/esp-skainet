@@ -58,7 +58,7 @@ ESP32-Korvo V1.1 由两块开发板组成，集成多个外设：主板包含 ES
 
 |主要组件|介绍|
 |:- |:- |
-|ESP32-WROVER-B|这款 ESP32 模组内置 ESP32 芯片、64 Mbit SPI flash 和 128 Mbit PSRAM，可灵活存储数据，具有 Wi-Fi / BT 连接和数据处理能力。|
+|ESP32-WROVER-B|这款 ESP32 模组内置 ESP32 芯片、128 Mbit SPI flash 和 64 Mbit PSRAM，可灵活存储数据，具有 Wi-Fi / BT 连接和数据处理能力。|
 |电源稳压器|5 V 转 3.3 V 稳压器。|
 |电源开关|拨动至 On，开发板上电；拨动至 Off，开发板断电。|
 |电池接口|连接电池。|
