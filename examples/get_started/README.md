@@ -2,12 +2,12 @@
 
 Currently, Espressif's ESP32-based speech command recognition model [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md) supports up to **100** Chinese or English speech commands. 
 
-This example demonstrates the basic process of recognizing Chinese speech commands with ESP32-LyraT-Mini or ESP32-LyraT V4.3. Please also see a flow diagram below.
+This example demonstrates the basic process of recognizing Chinese speech commands with ESP32-LyraT-Mini or ESP32-Korvo V1.1. Please also see a flow diagram below.
 
 ![speech-commands-recognition-system](../../img/speechs_commands_workflow.png)  
 
-For more information about ESP32-LyraT-Mini or ESP32-LyraT V4.3, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html).
- 
+For more information about ESP32-LyraT-Mini or ESP32-Korvo V1.1, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-Korvo V1.1 Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md).
+
 # 1. Quick Start
 
 ### 1.1 Hardware Configuration
@@ -15,10 +15,10 @@ For more information about ESP32-LyraT-Mini or ESP32-LyraT V4.3, please see [ESP
   If use ESP32-Lyrat Mini V1.1, Navigate to `Audio Media HAL`, and configure the following parameters as instructed.  
   `Audio hardware board`: select `ESP32-Lyrat Mini V1.1`;  
 
-  ![speech-commands-recognition-system](../../img/specch_commands_config1.png)  
+  ![speech-commands-recognition-system](../../img/audio_boards.png)  
 
-  If use ESP32-LyraT V4.3, Navigate to `Audio Media HAL`, and configure the following parameters as instructed.  
-  `Audio hardware board`: select `ESP32-LyraT V4.3`;    
+  If use ESP32-Korvo V1.1, Navigate to `Audio Media HAL`, and configure the following parameters as instructed.  
+  `Audio hardware board`: select `ESP32-Korvo V1.1`;    
 
 ### 1.2 Software Configuration
 
@@ -81,7 +81,7 @@ void speech_commands_action(int command_id)
 
 ### 1.5 Compiling and Running
 
-When you choose to use Chinese command word recognition, run `make flash monitor` to compile, flash and run this example, and check the output log:
+When you choose to use Chinese command word recognition, run `ida.py flash monitor` to compile, flash and run this example, and check the output log:
 
 ```
 Quantized wakeNet5: wakeNet5_v1_hilexin_5_0.95_0.90, mode:0
@@ -127,31 +127,30 @@ Now, you can give one speech command, for example, “打开空调 (turn on the 
     -----------awaits to be waken up-----------
 
 	```
-* If this command does not exist in the supported speech command list, the board prints an error message of "cannot recognize any speech commands" in its log: 
+	
+* If this command does not exist in the supported speech command list, the board prints an error message of "cannot recognize any speech commands" in its log:   
 
+  ```
+  -----------------LISTENING-----------------
+  
+  cannot recognize any speech commands
+  
+  -----------awaits to be waken up-----------
+  ```
 
-	```
-	-----------------LISTENING-----------------
-    
-	cannot recognize any speech commands
-    
-	-----------awaits to be waken up-----------
-
-	```
-
-Also, the board prints `-----------awaits to be waken up-----------` when it ends the current recognition cycle and re-enters the Waiting-for-Wakeup status.
+  Also, the board prints `-----------awaits to be waken up-----------` when it ends the current recognition cycle and re-enters the Waiting-for-Wakeup status.
 
 **Notices:** 
- 
+
 The board can only stay in the Listening status for up to six seconds. After that, it ends the current recognition cycle and re-enters the Waiting-for-wakeup status. Therefore, you must give speech commands in six seconds after the board wakes up.
 
 # 2. Workflow Walkthrough
 ### 2.1 Hardware Initialization
 
-You don't need any special-purpose boards to run the **WakeNet** and **MultiNet** examples. Currently, Espressif has launched several audio boards. Such as ESP32-LyraT-Mini and ESP32-LyraT V4.3, which is what we use in this example.
+You don't need any special-purpose boards to run the **WakeNet** and **MultiNet** examples. Currently, Espressif has launched several audio boards. Such as ESP32-LyraT-Mini and ESP32-Korvo V1.1, which is what we use in this example.
 
-For details on the initialization of the ESP32-LyraT-Mini board or ESP32-LyraT V4.3 board, please see codes in `components/hardware_driver`.
- 
+For details on the initialization of the ESP32-LyraT-Mini board or ESP32-Korvo V1.1 board, please see codes in [components/hardware_driver](../../components/hardware_driver).
+
 If you want to choose other development boards, please go to [esp-adf](https://github.com/espressif/esp-adf), which is Espressif's development framework for building audio applications based on ESP32 products, for more detailed information on hardware drivers.
 
 ### 2.2 Wake-up by Wake Word

@@ -4,16 +4,16 @@ This example is used to test wake word detection.The data processing flow is as 
 1. Audio data from microphone will be processed by speech enhancement module  
 2. The processed data is inputed into wake word engine
 3. If wake word is detected, a string like "hilexin DETECTED" will be printed. 
- 
+
 ## How to use this example
 
 ### Hardware Required
 
-- This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
+- This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)
 
 ### Configure the project
 
-* Go to `make menuconfig`.
+* Go to `idf.py menuconfig`.
 
 * Set the serial port number under `Serial Flasher Options`.
 
@@ -22,7 +22,7 @@ This example is used to test wake word detection.The data processing flow is as 
 Build the project and flash it to the board, then run the monitor tool to view the output via serial port:
 
 ```
-make -j4 flash monitor
+idf.py flash monitor
 ```
 
 (To exit the serial monitor, type ``Ctrl-]``.)
@@ -34,7 +34,7 @@ See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/s
 There is the console output for this example:
 
 ```
-Wakenet5x3_v2_hilexin_5_0.97_0.90
+Wakenet5x3_v5_hilexin_5_0.97_0.90
 ```
 
 Indicates that the WakeNet version and wake word.

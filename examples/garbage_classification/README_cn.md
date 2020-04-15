@@ -8,32 +8,32 @@
 * 干垃圾
 * 可回收垃圾
 * 有害垃圾
- 
+
 我们已经通过 `menuconfig` 配置了 45 类常见的垃圾名称。
- 
+
 ## 如何使用例程
 
 ### Hardware Required
 ### 硬件需求
 
-- 这个示例能够在 ESP32-LyraT-Mini 开发板或者 ESP32-LyraT V4.3 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html) .
+- 这个示例能够在 ESP32-LyraT-Mini 开发板或者 ESP32-LyraT V4.3 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md).
 
 - 一只音箱
 
 ### 配置工程
 
-* 进入 `make menuconfig`
+* 进入 `idf.py menuconfig`
 
 * 通过 `Serial Flasher Options`设置串口信息
 
-* 添加或更改垃圾名称
+* 通过`ESP Speech Recognition`添加或更改垃圾名称
 
 ### 编译和烧写
 
 编译并烧写，然后运行终端监控查看打印：
 
 ```
-make -j4 flash monitor
+idf.py flash monitor
 ```
 
 (退出窗口，请键入 ``Ctrl-]``.)

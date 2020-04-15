@@ -2,11 +2,11 @@
 
 本示例主要用于展示乐鑫中文语音合成库的使用方法。示例可通过URAT串口输入中文文本，回车后播放合成的语音数据。
 参考`components/esp-tts` 目录下的 [README.md](../../components/esp-tts/README.md) 来获取更多有关乐鑫中文语言合成库的信息。
- 
+
 
 ### 硬件需求
 
-- ESP32-LyraT-Mini 开发板或者 ESP32-LyraT V4.3 开发板上。关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html) .
+- ESP32-LyraT-Mini 、ESP32-Korvo V1.1开发板或者 ESP32-LyraT V4.3 开发板上。关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html)， [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)或者 [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html).
 
 - 一只外接喇叭(4~6 欧姆)
 

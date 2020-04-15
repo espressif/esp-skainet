@@ -2,11 +2,11 @@
 
 目前，基于乐鑫 ESP32 的语音命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README_cn.md) 支持 100 个以内的中文或英文自定义命令词。
 
-这个示例展示了使用 ESP32-LyraT-Mini 或 ESP32-LyraT V4.3 进行语音命令词识别的基本流程。请参考以下流程：
+这个示例展示了使用 ESP32-LyraT-Mini 或 ESP32-Korvo V1.1 进行语音命令词识别的基本流程。请参考以下流程：
 
 ![speech-commands-recognition-system](../../img/speechs_commands_workflow.png)  
 
-获取更多关于 ESP32-LyraT-Mini 或者 ESP32-LyraT V4.3 的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
+获取更多关于 ESP32-LyraT-Mini 或者 ESP32-Korvo V1.1 的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-Korvo V1.1 Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)
 
 # 1. 快速开始
 
@@ -15,11 +15,11 @@
   如果使用 ESP32-Lyrat Mini V1.1 开发板，进入 `Audio Media HAL`，按照指示配置以下参数：  
   `Audio hardware board`: 选择 `ESP32-Lyrat Mini V1.1`;  
 
-  ![speech-commands-recognition-system](../../img/specch_commands_config1.png)  
+  ![speech-commands-recognition-system](../../img/audio_boards.png)  
 
-  如果使用 ESP32-LyraT V4.3 开发板，进入 `Audio Media HAL`，按照指示配置以下参数：  
-  `Audio hardware board`: 选择 `ESP32-LyraT V4.3`;  
-  
+  如果使用 ESP32-Korvo V1.1 开发板，进入 `Audio Media HAL`，按照指示配置以下参数：  
+  `Audio hardware board`: 选择 `ESP32-Korvo V1.1`;  
+
 
 ### 1.2 软件配置
 
@@ -115,7 +115,7 @@ hilexin DETECTED.
 
 目前，MultiNet 已经预定义了 20 个词，可以参考 [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README.md).
 
-* 如果命令词存在于命令词列表中，回打印如下 log：
+* 如果命令词存在于命令词列表中，会打印如下 log：
 
 	```
 	-----------------LISTENING-----------------
@@ -127,7 +127,7 @@ hilexin DETECTED.
 
 	```
 
-* 如果命令词不存在于命令词列表中，回打印如下 log：
+* 如果命令词不存在于命令词列表中，会打印如下 log：
 
 	```
 	-----------------LISTENING-----------------
@@ -138,20 +138,20 @@ hilexin DETECTED.
 
 	```
 
-当板子结束当前的识别过程并且进入等待唤醒状态时，会打印： `-----------awaits to be waken up-----------` 
+当板子结束当前的识别过程并且进入等待唤醒状态时，会再次打印 `-----------awaits to be waken up-----------`
 
 **注意：**
-板子会在侦听状态最长持续 6 s，之后，会结束当前的识别过程并且再次进入等待唤醒状态。因此，用户必须在板子被唤醒后 6 s 内发出语音命令词。
+板子在侦听状态持续 6 s之后，会结束当前的识别过程并且再次进入等待唤醒状态。因此，用户必须在板子被唤醒后 6 s 内发出语音命令词。
 
 # 2. 工作流程
 
 ### 2.1 硬件初始化
 
-用户不需要任何特殊用途的开发板即可运行** WakeNet **和** MultiNet **示例。 目前，乐鑫已经发布了数种音频开发板，其中 ESP32-LyraT-Mini 和 ESP32-LyraT V4.3 是我们在本示例中使用的开发板。 
+用户不需要任何特殊用途的开发板即可运行** WakeNet **和** MultiNet **示例。 目前，乐鑫已经发布了数种音频开发板，其中 ESP32-LyraT-Mini 和 ESP32-Korvo V1.1 是我们在本示例中使用的开发板。 
 
-关于 ESP32-LyraT-Mini 开发板和 ESP32-LyraT V4.3 开发板的初始化，请参考 `components/hardware_driver` 的代码。
+关于 ESP32-LyraT-Mini 开发板和 ESP32-Korvo V1.1 开发板的初始化，请参考 [components/hardware_driver](../../components/hardware_driver) 的代码。
 
-如果用户选择其他的开发板，请参考 [esp-adf](https://github.com/espressif/esp-adf)， ESP-ADF 可以提供更多关于硬件驱动和应用搭建的细节。
+如果用户选择其他的开发板，请参考 [esp-adf](https://github.com/espressif/esp-adf)， ESP-ADF 提供更多关于硬件驱动和应用搭建的细节。
 
 ### 2.2 唤醒
 

@@ -12,7 +12,7 @@ In general, the ESP-Skainet features will be supported, as shown below:
 
 ## Input Voice Stream
 
-The input audio stream can come from any way of providing voice, such as MIC, wav/pcm files in flash/TF Card.
+The input audio stream can come from any way of providing voice, such as MIC, wav/pcm files in flash/SD Card.
 
 ## Wake Word Engine
 
@@ -28,21 +28,17 @@ Currently, Espressif **MultiNet** supports up to 100 Chinese or English speech c
 
 ## Acoustic Algorithm
 
-Now, ESP-Skainet integrates AEC (Acoustic Echo Cancellation), AGC (automatic_gain_control), NS (Noise Suppression), VAD (Voice Activity Detection) and Mic Array Processing.
+Now, ESP-Skainet integrates AEC (Acoustic Echo Cancellation), AGC (automatic_gain_control), NS (Noise Suppression), VAD (Voice Activity Detection) and MASE (Mic Array Speech Enhancement).
 
 # Quick Start with ESP-Skainet
 
 ## Hardware Preparation
 
-To run ESP-Skainet, you need to have an ESP32 development board which integrates an audio input module and at least **4 MB** of external SPI RAM. We use [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html) in examples.
+To run ESP-Skainet, you need to have an ESP32 development board which integrates an audio input module . We use [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-Korvo V1.1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) in examples.
 
 On how to configure ESP32 module for your applications, please refer to the README.md of each example.
 
 ## Software Preparation
-
-### Audio Config
-
-During the wake word detection and speech commands recognition, the board will pick up audio data with the on-board microphone, and feed them to the WakeNet/MultiNet model frame by frame (30 ms, 16 KHz, 16 bit, mono).
 
 ### ESP-Skainet
 Make sure you have cloned this project with the `--recursive` option, shown as follows:
@@ -55,39 +51,27 @@ If you have cloned this project without the `--recursive` option, please go to t
 
 ### ESP-IDF
 
-In this case, we take [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF.  
-*NOTE:* If you want to use ESP-IDF v3.2 or previous version, please refer to esp-skainet v0.2.0
+In this case, we take [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF.  Now we have supported ESP-IDF v4.0.    
+
+*NOTE:* If you want to use ESP-IDF v3.2 or previous version, please refer to esp-skainet v0.2.0.
 
 For details on how to set up the ESP-IDF, please refer to [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/`esp-idf/en/stable/get-started-cmake/index.html)
- 
-# Components
-
-A component is the main framework of the SDK, with some drivers and algorithm inside.
-
-## hardware_driver
-
-The hardware_driver component contains drivers for the ESP32-LyraT-Mini board and ESP32-LyraT V4.3 board.
-
-## esp-sr
-
-The [esp-sr](https://github.com/espressif/esp-sr/tree/master) component contains the APIs of ESP-Skainet neural networks, including the wake word detection and speech commands recognition framework.
 
 # Examples
 The folder of [examples](examples) contains sample applications demonstrating the API features of ESP-Skainet.
 
-Take one Garbage classification as an example.
+Please start with the [get_started](./examples/get_started)  example.
 
-1. Navigate to one example folder `esp-skainet/examples/garbage_classification`.
+1. Navigate to one example folder `esp-skainet/examples/get_started).
 ```
-cd esp-skainet/examples/garbage_classification
+cd esp-skainet/examples/get_started
 ```
 
 2. Compile and flash the project.
 ```
-make
-make flash monitor
+idf.py flash monitor
 ```
-3. Advanced users can add or modify speech commands by using the `make menuconfig` command.
+3. Advanced users can add or modify speech commands by using the `idf.py menuconfig` command.
 
 
 For details, please read the README file in each example.

@@ -28,21 +28,17 @@ ESP-Skainet 的功能支持如下所示：
 
 ## 声学算法
 
-目前 ESP-Skainet 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Processing)。
+目前 ESP-Skainet 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Speech Enhancement)。
 
 # 快速开始
 
 ## 硬件准备
 
-为了运行 ESP-Skainet，您需要一块集成了音频输入模块和至少** 4 MB **的外部 SPI RAM ESP32 开发板，我们在示例中使用 [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-LyraT V4.3](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
+为了运行 ESP-Skainet，您需要一块集成了音频输入模块的开发板，我们在示例中使用 [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-Korvo V1.1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) 。
 
-关于针对应用的具体配置，请参考每个示例中的 README.md.
+关于针对应用的具体配置，请参考每个示例中的 README.md。
 
 ## 软件准备
-
-### 音频输入配置
-
-在唤醒词识别和语音命令词识别期间，开发板将使用板载麦克风拾取音频数据，并将它们逐帧（30 ms，16 KHz，16位，单声道）送到 WakeNet/MultiNet 模型中。
 
 ### ESP-Skainet
 
@@ -55,43 +51,30 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 
 ### ESP-IDF
 
-在本工程中，我们建议使用 [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) 版本。如果您之前已经搭建过 ESP-IDF 环境并且不想更改现有的变量，可以将 IDF_PATH 环境变量配置为新的 ESP-IDF 的路径   
-*注意:* 如果使用ESP-IDFv3.2及之前版本，建议参考esp-skainet v0.2.0
+在本工程中，我们建议使用 [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) 版本。如果您之前已经搭建过 ESP-IDF 环境并且不想更改现有的变量，可以将 IDF_PATH 环境变量配置为新的 ESP-IDF 的路径 . 目前支持到ESP-IDF v4.0  
+
+
+  *注意:* 如果使用ESP-IDFv3.2及之前版本，建议参考esp-skainet v0.2.0
 
 获取更多关于搭建 ESP-IDF 环境的细节，请参考 [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html)
-
-
-# Components
-
-组件是 SDK 中最重要的架构，其中包含驱动和算法。
-
-## hardware_driver
-
-hardware_driver 组件包含了 ESP32-LyraT-Mini 开发板和 ESP32-LyraT V4.3 开发板的驱动。
-
-
-## esp-sr
-
-[esp-sr](https://github.com/espressif/esp-sr/tree/master) 组件包含了 ESP-Skainet 中的 API， 包括唤醒词识别、语音命令词识别和前端声学算法。
 
 # 示例
 
 [examples](examples) 文件夹包含了使用 ESP-Skainet API 搭建的一些应用示例。
 
-选取垃圾分类（garbage_classification）示例代码举例：
+请从get_started示例开始：
 
-1. 进入示例文件夹 `esp-skainet/examples/garbage_classification`
+1. 进入示例文件夹 `esp-skainet/examples/get_started
 ```
-cd esp-skainet/examples/garbage_classification
+cd esp-skainet/examples/get_started
 ```
 
 2. 编译和烧写
 ```
-make
-make flash monitor
+idf.py flash monitor
 ```
 
-3. 用户可以使用 make menuconfig 命令添加或修改语音命令。
+3. 用户可以使用 idf.py menuconfig 命令添加或修改语音命令。
 
 获取更多细节，请阅读示例中的 README.md
 

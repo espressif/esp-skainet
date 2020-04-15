@@ -1,40 +1,17 @@
 # 示例 [[English]](./README.md)
 
-这个文件夹包含了 ESP-Skainet 中的一些示例。这些示例的是为了演示 ESP-Skainet 的功能，并提供在项目开发过程中可以复制和适应的源代码。
+这个文件夹包含了 ESP-Skainet 中的所有示例。这些示例的是为了演示 ESP-Skainet 中模型和算法的使用方法，并提供在项目开发过程中可以复用的源代码。
 
 # 示例设计
 
-目前有以下两个示例可用：
-
-- get_started
-
- > 支持中文和英文
- 
- 此示例是一个内置有四个语音命令字的项目模板。用户可以参考本示例的 [readme](./get_started/README.md)，来了解语音命令词识别的特定用法和注意事项。
-
-- garbage_classification
-
- > 支持中文
-
- 在此示例中，我们使用唤醒词识别和语音命令词识别来构建离线垃圾分类示例，当识别出特定的垃圾名称时，该示例可以根据当前分类建议垃圾的类型。 例如，如果开发板听到并识别了“卫生纸”，则其播放 “干垃圾”，这表示“卫生纸”应分类为“干垃圾”。
-
-- noise_suppression
-
- 在此示例中，展示了如何使用声学算法中的噪声抑制 NS(Noise Suppression)算法。示例将麦克风采集的声音经过降噪处理，得到 16KHz，16bit，单声道的音频数据，并且立即将降噪后的数据输出，因此当用户在 LyraT_Mini 开发板的 AUDIO_OUT 接口或者 ESP32-LyraT V4.3 开发板上的 PHONEJACK 上插入耳机时，可以听到处理的声音。用户可以通过通过按下 LyraT_Mini 开发板或 ESP32-LyraT V4.3 开发板上的 "Mode" 按键来选择降噪是否打开。
-
- - chinese_tts  
-
- 此示例展示了中文语言合成系统的使用方法。用户可以通过urat输入中文字符串(目前只支持UTF-8编码)，点击回车确认后会播放输入字符串对应的发音。  
-
-# 使用示例
-
-构建新示例的步骤：
-
-* 按照入门说明创建一个 "get_started" 示例。
-* 进入至您要构建的新示例的目录。
-* 运行 `make menuconfig` 来配置示例。
-* 运行 `make` 构建示例。
-* 按照日志中打印的说明进行烧写，或运行 `make flash` 命令。
+| No.  | Example Name                                                 |                   Models or Algorithms                    | Boards                           |
+| :--: | :----------------------------------------------------------- | :-------------------------------------------------------: | -------------------------------- |
+|  1   | [get_started](./get_started)                                 | acoustic algorithms<br>WakeNet<br>MultiNet_CN/MultiNet_EN | ESP32_Lyrat_Mini<br>ESP32_Korvo  |
+|  2   | [garbage_classification](./garbage_classification)           |       acoustic Algorithms<br>WakeNet<br>MultiNet_CN       | ESP32_Lyrat_Mini<br/>ESP32_Korvo |
+|  3   | [wake_word_detection](./wake_word_detection)                 |              acoustic Algorithms<br>WakeNet               | ESP32_Lyrat_Mini<br/>ESP32_Korvo |
+|  4   | [noise_suppression](./noise_suppression)                     |                noise suppression algorithm                | ESP32_Lyrat_Mini<br/>ESP32_Korvo |
+|  5   | [mic_array_speech_enhancement](./mic_array_speech_enhancement) |         MASE Algorithms<br>WakeNet<br>MultiNet_CN         | ESP32_Korvo                      |
+|  6   | [chinese_tts](./chinese_tts)                                 |                          TTS_CN                           | ESP32_Lyrat_Mini<br/>ESP32_Korvo |
 
 # 贡献示例
 

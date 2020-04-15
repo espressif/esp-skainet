@@ -10,29 +10,29 @@ In this example, we have configured four command IDs to represent:
 * 有害垃圾 (Hazardous Waste)
 
 And we have configured 45 kinds of garbages with their corresponding command IDs in `menuconfig`.
- 
+
 ## How to use this example
 
 ### Hardware Required
 
-- This example can run on ESP32-LyraT-Mini board or ESP32-LyraT V4.3 board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html).
+- This example can run on ESP32-LyraT-Mini board or ESP32-LyraT V4.3 board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or  [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)
 
 - A Speaker
 
 ### Configure the project
 
-* Go to `make menuconfig`.
+* Go to `idf.py menuconfig`.
 
 * Set the serial port number under `Serial Flasher Options`.
 
-* Add or modify the garbage name, such as “wei sheng zhi” (toilet paper).
+* Add or modify the garbage name under `ESP Speech Recognition`
 
 ### Build and Flash
 
 Build the project and flash it to the board, then run the monitor tool to view the output via serial port:
 
 ```
-make -j4 flash monitor
+idf.py flash monitor
 ```
 
 (To exit the serial monitor, type ``Ctrl-]``.)

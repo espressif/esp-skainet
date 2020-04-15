@@ -2,21 +2,21 @@
 
 (See the [README.md](../README.md) file in the upper level 'examples' directory for more information about examples.)
 
-This example takes the audio data collected by the microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-LyraT V4.3 board.
- 
+This example takes the audio data collected by the single microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-Korvo V1.1 board.
+
 ## How to use this example
 
 ### Hardware Required
 
-- This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-LyraT V4.3 Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat.html)
+- This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
 
-- This example can run on ESP32-Korvo board as well, however, it is suggested to use mic-array speech enhancement (MASE) API for Korvo for a better speech enhancement result; please check [MASE example](https://github.com/espressif/esp-skainet/tree/master/examples/mic_array_speech_enhancement) for more information
+- This example can run on ESP32-Korvo board as well, however, it is suggested to use mic-array speech enhancement (MASE) API for Korvo for a better speech enhancement result; please check [MASE example](https://github.com/espressif/esp-skainet/tree/master/examples/mic_array_speech_enhancement) for more information.
 
 - headphone
 
 ### Configure the project
 
-* Go to `make menuconfig`.
+* Go to `idf.py menuconfig`.
 
 * Set the serial port number under `Serial Flasher Options`.
 
@@ -25,7 +25,7 @@ This example takes the audio data collected by the microphone through noise supp
 Build the project and flash it to the board, then run the monitor tool to view the output via serial port:
 
 ```
-make -j4 flash monitor
+idf.py flash monitor
 ```
 
 (To exit the serial monitor, type ``Ctrl-]``.)
