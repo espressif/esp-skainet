@@ -137,7 +137,8 @@ ESP32-Korvo V1.1 的主要组件和连接方式如下图所示。
 
 * [ESP32-Korvo V1.1 主板原理图](https://dl.espressif.com/dl/schematics/ESP32-KORVO_V1.1_schematics.pdf) (PDF)
 * [ESP32-Korvo V1.1 子板原理图](https://dl.espressif.com/dl/schematics/ESP32-KORVO-MIC_V1.1_schematics.pdf) (PDF)
-* [ESP32-Korvo V1.1 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-Korvo_V1.1_Reference_Design.zip) (ZIP)
+* [ESP32-Korvo V1.1 主板 PCB 布局](https://dl.espressif.com/dl/schematics/ESP32-Korvo-Mainboard_V1.1_PCB_Layout.pdf) (PDF)
+* [ESP32-Korvo V1.1 子板 PCB 布局](https://dl.espressif.com/dl/schematics/ESP32-Korvo-Mic_V1.1_PCB_Layout.pdf) (PDF)
 * [ESP32 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_cn.pdf) (PDF)
 * [ESP32-WROVER-B 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-b_datasheet_cn.pdf)(PDF)
 * [ESP32-WROVER-B V1.0 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-WROVER-B_Reference_Design_V1-r1.0_0.zip) (ZIP)

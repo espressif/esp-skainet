@@ -136,8 +136,9 @@ A block diagram below shows the components of ESP32-Korvo V1.1 and their interco
 # 3. Related Documents
 
 * [ESP32-Korvo V1.1 Mainboard Schematics](https://dl.espressif.com/dl/schematics/ESP32-KORVO_V1.1_schematics.pdf) (PDF)
-* [ESP32-Korvo V1.1 Mic Schematics](https://dl.espressif.com/dl/schematics/ESP32-KORVO-MIC_V1.1_schematics.pdf) (PDF)
-* [ESP32-Korvo V1.1 Reference Design](https://www.espressif.com/sites/default/files/documentation/ESP32-Korvo_V1.1_Reference_Design_0.zip) (ZIP)
+* [ESP32-Korvo V1.1 Subboard Schematics](https://dl.espressif.com/dl/schematics/ESP32-KORVO-MIC_V1.1_schematics.pdf) (PDF)
+* [ESP32-Korvo V1.1 Mainboard PCB Layout](https://dl.espressif.com/dl/schematics/ESP32-Korvo-Mainboard_V1.1_PCB_Layout.pdf) (PDF)
+* [ESP32-Korvo V1.1 Subboard PCB Layout](https://dl.espressif.com/dl/schematics/ESP32-Korvo-Mic_V1.1_PCB_Layout.pdf) (PDF)
 * [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) (PDF)
 * [ESP32-WROVER-B Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-b_datasheet_en.pdf)(PDF)
 * [ESP32-WROVER-B V1.0 Reference Design](https://www.espressif.com/sites/default/files/documentation/ESP32-WROVER-B_Reference_Design_V1-r1.0_0.zip) (ZIP)
