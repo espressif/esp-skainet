@@ -28,6 +28,7 @@ static const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
 static const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
 struct RingBuf *rec_rb = NULL;
+struct RingBuf *mase_rb = NULL;
 struct RingBuf *ns_rb = NULL;
 struct RingBuf *agc_rb = NULL;
 
@@ -59,16 +60,24 @@ void app_main()
 {
     codec_init();
     rec_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
+#ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
+    mase_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
+#else
     ns_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
+#endif
     agc_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
 
     model_iface_data_t *model_data = wakenet->create(model_coeff_getter, DET_MODE_90);
     // set wake word detection threshold
     //wakenet->set_det_threshold(model_data, 0.96, 1);
 
-    xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 0);
+    xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 1);
+#ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
+    xTaskCreatePinnedToCore(&maseTask, "mase", 2 * 1024, NULL, 8, NULL, 1);
+#else
     xTaskCreatePinnedToCore(&nsTask, "ns", 2 * 1024, NULL, 8, NULL, 1);
-    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 0);
+#endif
+    xTaskCreatePinnedToCore(&agcTask, "agc", 2 * 1024, NULL, 8, NULL, 1);
     xTaskCreatePinnedToCore(&wakenetTask, "wakenet", 2 * 1024, (void*)model_data, 5, NULL, 0);
 
     //printf("-----------awaits to be waken up-----------\n");

@@ -151,7 +151,7 @@ void wakenetTask(void *arg)
                     {
                         case 0: white_light_on(); break;
                         case 1: red_light_on(); break;
-                        case 2: green_light_on(); break;
+                        case 2: yellow_light_on(); break;
                         case 3: blue_light_on(); break;
                         case 4: light_off(); break;
                     }
@@ -197,7 +197,7 @@ void buttonTask(void *arg)
             }
             else if(0 == strcmp(det, "vol+"))
             {
-                green_light_on();
+                yellow_light_on();
             }
             else if(0 == strcmp(det, "vol-"))
             {

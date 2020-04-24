@@ -56,7 +56,7 @@ MASE STATE: 0
 |:- |:- |
 |PLAY|打开 RGB LED，显示白色。|
 |SET|打开 RGB LED，显示红色。|
-|VOL+|打开 RGB LED，显示绿色。|
+|VOL+|打开 RGB LED，显示黄色。|
 |VOL-|打开 RGB LED，显示蓝色。|
 |REC|熄灭 RGB LED。|
 
@@ -70,7 +70,7 @@ MASE STATE: 0
 |:- |:- |
 |打开白灯|打开 RGB LED，显示白色。|
 |打开红灯|打开 RGB LED，显示红色。|
-|打开绿灯|打开 RGB LED，显示绿色。|
+|打开黄灯|打开 RGB LED，显示黄色。|
 |打开蓝灯|打开 RGB LED，显示蓝色。|
 |关闭电灯|熄灭 RGB LED。|
 

@@ -56,7 +56,7 @@ The corresponding relationship between buttons and LED states is:
 |:- |:- |
 |PLAY|RGB LEDs glow white.|
 |SET|RGB LEDs glow red.|
-|VOL+|RGB LEDs glow green.|
+|VOL+|RGB LEDs glow yellow.|
 |VOL-|RGB LEDs glow blue.|
 |REC|RGB LEDs go out.|
 
@@ -70,7 +70,7 @@ This example supports speech commands to control LED states, the corresponding r
 |:- |:- |:- |
 |Da Kai Bai Deng|Turn on the white light|RGB LEDs glow white.|
 |Da Kai Hong Deng|Turn on the red light|RGB LEDs glow red.|
-|Da Kai Lv Deng|Turn on the green light|RGB LEDs glow green.|
+|Da Kai Lv Deng|Turn on the yellow light|RGB LEDs glow yellow.|
 |Da Kai Lan Deng|Turn on the blue light|RGB LEDs glow blue.|
 |Guan Bi Dian Deng|Turn off the light|RGB LEDs go out.|
 
