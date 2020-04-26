@@ -82,7 +82,7 @@ For wholesale orders, please check [Espressif Product Ordering Information](http
 
 [The default firmware](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/esp32_korvo_v1_1_fw_v0_1_20200323.bin) in ESP32-Korvo V1.1 allows you to experience voice wake-up and speech command recognition with on-board RGB LEDs.
 
-After powering up your ESP32-Korvo 1.1 (mainboard and subboard connected by the FPC cable), please activate the board with the default wake word “Hi, Le Xin”, which translates in English as “Hello, Espressif”. When the wake word is detected, the 12 on-board RGB LEDs glow white one by one, meaning that the board is waiting for a speech command.
+After powering up your ESP32-Korvo 1.1 (mainboard and subboard connected by the FPC cable) and pressing the Reset button, please activate the board with the default wake word “Hi, Le Xin”, which translates in English as “Hello, Espressif”. When the wake word is detected, the 12 on-board RGB LEDs glow white one by one, meaning that the board is waiting for a speech command.
 
 |Default Speech Command (in Chinese)|Meaning|Response|
 |:- |:- |:- |

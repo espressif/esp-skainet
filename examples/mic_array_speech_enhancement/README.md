@@ -70,7 +70,7 @@ This example supports speech commands to control LED states, the corresponding r
 |:- |:- |:- |
 |Da Kai Bai Deng|Turn on the white light|RGB LEDs glow white.|
 |Da Kai Hong Deng|Turn on the red light|RGB LEDs glow red.|
-|Da Kai Lv Deng|Turn on the yellow light|RGB LEDs glow yellow.|
+|Da Kai Huang Deng|Turn on the yellow light|RGB LEDs glow yellow.|
 |Da Kai Lan Deng|Turn on the blue light|RGB LEDs glow blue.|
 |Guan Bi Dian Deng|Turn off the light|RGB LEDs go out.|
 

@@ -82,7 +82,7 @@ ESP32-Korvo V1.1 由两块开发板组成，集成多个外设：主板包含 ES
 
 ESP32-Korvo V1.1 [默认固件](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/esp32_korvo_v1_1_fw_v0_1_20200323.bin)通过控制板载 RGB LED，展示唤醒功能和命令词识别功能。
 
-ESP32-Korvo V1.1 （用 FPC 排线连接主板和子板）上电后，您可使用默认唤醒词“嗨，乐鑫”唤醒开发板。唤醒后，板载的 12 个 RGB LED 将被循环点亮为白色，表示设备正在等待命令词。
+ESP32-Korvo V1.1 （用 FPC 排线连接主板和子板）上电并按下 Reset 键后，您可使用默认唤醒词“嗨，乐鑫”唤醒开发板。唤醒后，板载的 12 个 RGB LED 将被循环点亮为白色，表示设备正在等待命令词。
 
 |默认固件支持的命令词|设备反馈|
 |:- |:- |
