@@ -121,7 +121,7 @@ void app_main()
     agc_rb = rb_init(BUFFER_PROCESS, 8 * 1024, 1, NULL);
 
     model_iface_data_t *model_data = wakenet->create(model_coeff_getter, DET_MODE_90);
-    model_data_mn = multinet->create(&MULTINET_COEFF, 6000);
+    model_data_mn = multinet->create(&MULTINET_COEFF, 4000);
 
     xTaskCreatePinnedToCore(&recsrcTask, "rec", 2 * 1024, NULL, 8, NULL, 1);
 #ifdef CONFIG_ESP32_KORVO_V1_1_BOARD

@@ -117,7 +117,7 @@ void wakenetTask(void *arg)
 
     /* MultiNet */
     static const esp_mn_iface_t *multinet = &MULTINET_MODEL;
-    model_iface_data_t *model_data_mn = multinet->create(&MULTINET_COEFF, 6000);
+    model_iface_data_t *model_data_mn = multinet->create(&MULTINET_COEFF, 4000);
 
     int frequency = wakenet->get_samp_rate(model_data);
     int audio_chunksize = wakenet->get_samp_chunksize(model_data);
