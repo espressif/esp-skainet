@@ -54,9 +54,23 @@ CPU loading test（ESP32 @ 240 MHz）:
 ```c
 #include "esp_tts.h"
 #include "esp_tts_voice_female.h"
+#include "esp_partition.h"
 
-// 1. create esp tts handle by pre-define voice set 'esp_tts_voice_female'
-esp_tts_handle_t *tts_handle=esp_tts_create(esp_tts_voice_female);
+/*** 1. create esp tts handle  ***/
+
+//// Method1: use pre-define xiaole voice lib.
+//// This method is not recommended because the method may make app bin exceed the limit of esp32
+// esp_tts_handle_t *tts_handle=esp_tts_create(esp_tts_voice_female);
+
+  
+// method2: initial voice set from separate voice data partition
+
+const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
+if (part==0) printf("Couldn't find voice data partition!\n");
+spi_flash_mmap_handle_t mmap;
+uint16_t* voicedata;
+esp_err_t err=esp_partition_mmap(part, 0, 3*1024*1024, SPI_FLASH_MMAP_DATA, (const void**)&voicedata, &mmap);
+esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
 
 // 2. parse text and synthesis wave data
 char *text="欢迎使用乐鑫语音合成";	
@@ -64,7 +78,7 @@ if (esp_tts_parse_chinese(tts_handle, text)) {  // parse text into pinyin list
 	int len[1]={0};
 	do {
 		short *data=esp_tts_stream_play(tts_handle, len, 4); // streaming synthesis
-	    i2s_audio_play(data, len[0]*2, portMAX_DELAY);  // i2s output             
+		i2s_audio_play(data, len[0]*2, portMAX_DELAY);  // i2s output             
 	} while(len[0]>0);
 	i2s_zero_dma_buffer(0);
 }
