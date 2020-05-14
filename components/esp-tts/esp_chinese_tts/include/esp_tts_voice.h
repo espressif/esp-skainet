@@ -7,10 +7,12 @@ typedef struct {
 	int sample_rate;        // the sample rate of voice data, just for pcm format
 	int bit_width;          // the bit width of voice data, just for pcm format
 	int syll_num;           // the syllable mumber 
-	int *syll_pos;          // the position of syllable in syllable audio data array
 	char **sylls;           // the syllable names
+	int *syll_pos;          // the position of syllable in syllable audio data array
 	short *pinyin_idx;      // the index of pinyin
 	short *phrase_dict;     // the pinyin dictionary of common phrase
+	short *extern_idx;      // the idx of extern phrases 
+	short *extern_dict;     // the extern phrase dictionary
 	unsigned char *data;    // the audio data of all syllables
 } esp_tts_voice_t;
 

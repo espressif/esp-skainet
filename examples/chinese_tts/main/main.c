@@ -9,11 +9,16 @@
 #include "MediaHal.h"
 #include "esp_tts.h"
 #include "esp_tts_voice_xiaole.h"
+#include "esp_tts_voice_template.h"
 #include "esp_tts_player.h"
 #include "ringbuf.h"
 
 #include "tts_urat.h"
 #include "sdcard_init.h"
+
+#include "esp_spi_flash.h"
+#include "xtensa/core-macros.h"
+#include "esp_partition.h"
 
 //#define SDCARD_OUTPUT_ENABLE
 
@@ -37,10 +42,20 @@ int app_main() {
         printf("can not open file!\n");
 #endif
 
-    // use pre-define xiaole voice to create tts handle
-    esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
-    esp_tts_handle_t *tts_handle=esp_tts_create(voice);
+    // create esp tts handle 
+    // method1: use pre-define xiaole voice lib.
+    // This method is not recommended because the method may make app bin exceed the limit of esp32  
+    // esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
 
+    // method2: initial voice set from separate voice data partition
+    const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
+    if (part==0) printf("Couldn't find voice data partition!\n");
+    spi_flash_mmap_handle_t mmap;
+    uint16_t* voicedata;
+    esp_err_t err=esp_partition_mmap(part, 0, 3*1024*1024, SPI_FLASH_MMAP_DATA, (const void**)&voicedata, &mmap);
+    esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
+
+    esp_tts_handle_t *tts_handle=esp_tts_create(voice);
     // urat ringbuf init
     urat_rb = rb_init(BUFFER_PROCESS+1, URAT_BUF_LEN, 1, NULL);
     char data[URAT_BUF_LEN+1];
@@ -53,7 +68,7 @@ int app_main() {
     if (esp_tts_parse_chinese(tts_handle, prompt1)) {
             int len[1]={0};
             do {
-                short *data=esp_tts_stream_play(tts_handle, len, 4);
+                short *data=esp_tts_stream_play(tts_handle, len, 3);
                 iot_dac_audio_play(data, len[0]*2, portMAX_DELAY);
                 //printf("data:%d \n", len[0]);
             } while(len[0]>0);
@@ -75,7 +90,7 @@ int app_main() {
             if (esp_tts_parse_chinese(tts_handle, data)) {
                 int len[1]={0};
                 do {
-                    short *pcm_data=esp_tts_stream_play(tts_handle, len, 4);
+                    short *pcm_data=esp_tts_stream_play(tts_handle, len, 3);
 #ifdef SDCARD_OUTPUT_ENABLE
                     FatfsComboWrite(pcm_data, 1, len[0]*2, fp);
 #else

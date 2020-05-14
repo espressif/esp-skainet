@@ -9,5 +9,6 @@ target_link_libraries(${COMPONENT_TARGET} INTERFACE "-L ${CMAKE_CURRENT_SOURCE_D
 target_link_libraries(${COMPONENT_TARGET} INTERFACE
     speech_synthesis 
     voice_set_xiaole 
+    voice_set_template
     )
 

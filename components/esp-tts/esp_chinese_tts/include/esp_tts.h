@@ -30,13 +30,36 @@ typedef enum {
 
 typedef void * esp_tts_handle_t;
 
+
+/**
+ * @brief Init an instance of the TTS voice set structure.
+ *
+ * @param template      The const esp_tts_voice_template.
+ * @param data          The customize voice data
+ * @return
+ *         - NULL: Init failed
+ *         - Others: The instance of voice set
+ */
+esp_tts_voice_t *esp_tts_voice_set_init(const esp_tts_voice_t *template, void *data);
+
+/**
+ * @brief Init an instance of the TTS voice set structure.
+ *
+ * @param template      The const esp_tts_voice_template.
+ * @param data          The customize voice data
+ * @return
+ *         - NULL: Init failed
+ *         - Others: The instance of voice set
+ */
+void esp_tts_voice_set_free(esp_tts_voice_t *voice);
+
 /**
  * @brief Creates an instance of the TTS structure.
  *
  * @param voice      Voice set containing all basic phonemes.
  * @return
  *         - NULL: Create failed
- *         - Others: The instance of AEC
+ *         - Others: The instance of TTS structure
  */
 esp_tts_handle_t esp_tts_create(esp_tts_voice_t *voice);
 
