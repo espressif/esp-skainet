@@ -1,5 +1,11 @@
+set(COMPONENT_SRCS
+    ./esp_tts_wav/wav_decoder.c
+    ./esp_tts_wav/wav_encoder.c
+    )
+
 set(COMPONENT_ADD_INCLUDEDIRS
     ./esp_tts_chinese/include
+    ./esp_tts_wav/
     )
 
 

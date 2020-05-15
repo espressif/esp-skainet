@@ -16,11 +16,10 @@
 #include "tts_urat.h"
 #include "sdcard_init.h"
 
-#include "esp_spi_flash.h"
-#include "xtensa/core-macros.h"
+#include "wav_encoder.h"
 #include "esp_partition.h"
 
-//#define SDCARD_OUTPUT_ENABLE
+#define SDCARD_OUTPUT_ENABLE
 
 struct RingBuf *urat_rb=NULL;
 
@@ -37,9 +36,12 @@ int app_main() {
 
 #ifdef SDCARD_OUTPUT_ENABLE
     sd_card_mount("/sdcard");
-    FILE* fp=fopen("/sdcard/OUT", "w+");
+    FILE* fp=fopen("/sdcard/URAT.pcm", "w+");
     if(fp==NULL)
         printf("can not open file!\n");
+
+    //sample rate:16000Hz, int16, mono
+    void * wav_encoder=wav_encoder_open("/sdcard/prompt.wav", 16000, 16, 1);
 #endif
 
     /*** 1. create esp tts handle ***/
@@ -65,7 +67,7 @@ int app_main() {
             do {
                 short *pcm_data=esp_tts_stream_play(tts_handle, len, 3);
 #ifdef SDCARD_OUTPUT_ENABLE
-                FatfsComboWrite(pcm_data, 1, len[0]*2, fp);
+                wav_encoder_run(wav_encoder, pcm_data, len[0]*2);
 #else
                 iot_dac_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
 #endif
@@ -73,6 +75,7 @@ int app_main() {
             } while(len[0]>0);
             i2s_zero_dma_buffer(0);
     }
+    wav_encoder_close(wav_encoder);
 
     /*** 3. play urat input text ***/
     urat_rb = rb_init(BUFFER_PROCESS+1, URAT_BUF_LEN, 1, NULL);  // urat ringbuf init
@@ -114,5 +117,7 @@ int app_main() {
             data_len=0;
         }
     }
+
+    return 0;
 }
 
