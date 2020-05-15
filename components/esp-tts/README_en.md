@@ -21,6 +21,8 @@ The Chinese TTS is based on concatenative  method. The flow diagram of system is
 
 - [x] Adjustable speech rate
 
+- [x] Digital broadcasting optimization
+
 - [ ] Custom sound set
 
 
@@ -37,15 +39,15 @@ CPU loading test（ESP32 @ 240 MHz）:
 
 | speech rate                 |  0   |  1   |  2   |  3   |  4   |  5   |
 | --------------------------- | :--: | :--: | :--: | :--: | :--: | :--: |
-| times faster than real time | 7.5  | 4.3  | 3.8  | 3.4  | 2.9  | 2.4  |
+| times faster than real time | 4.5  | 3.2  |  2.9 | 2.5  | 2.2  | 1.8  |
 
 **Note:** the bigger rate, the faster speech speed. 0: slowest speaking speed, 5: fastest speaking speed.
 
 #### Samples
 
-- 欢迎使用乐鑫语音合成, &nbsp; &nbsp; [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=4](./samples/S1_xiaole_speed4.wav) 
+- 欢迎使用乐鑫语音合成, &nbsp; &nbsp; [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=2](./samples/S1_xiaole_speed2.wav) 
 
-- 支付宝收款 1111.11 元, &nbsp; &nbsp;  [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=4](./samples/S2_xiaole_speed4.wav) 
+- 支付宝收款 1111.11 元, &nbsp; &nbsp;  [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=2](./samples/S2_xiaole_speed2.wav) 
 
 - 空调制热模式已打开，并调节到25度, &nbsp; &nbsp;  [voice=小乐,speed=0](./samples/S3_xiaole_speed0.wav), &nbsp; &nbsp;   [voice=小乐,speed=4](./samples/S3_xiaole_speed4.wav) 
 

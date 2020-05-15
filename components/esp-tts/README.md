@@ -21,6 +21,8 @@
 
 - [x] 可调节合成语速
 
+- [x] 数字播报优化
+
 - [ ] 自定义声音集
 
 
@@ -35,15 +37,15 @@ RAM runtime: 20 KB
 
 CPU loading test（基于ESP32 @ 240MHz测试 ）:
 
-| speech speed                |  0   |  1   |  2   |  3   |  4   |  5   |
+| speech rate                 |  0   |  1   |  2   |  3   |  4   |  5   |
 | --------------------------- | :--: | :--: | :--: | :--: | :--: | :--: |
-| times faster than real time | 7.5  | 4.3  | 3.8  | 3.4  | 2.9  | 2.4  |
+| times faster than real time | 4.5  | 3.2  |  2.9 | 2.5  | 2.2  | 1.8  |
 
 #### Samples
 
-- 欢迎使用乐鑫语音合成, &nbsp; &nbsp; [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=4](./samples/S1_xiaole_speed4.wav) 
+- 欢迎使用乐鑫语音合成, &nbsp; &nbsp; [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=2](./samples/S1_xiaole_speed2.wav) 
 
-- 支付宝收款 1111.11 元, &nbsp; &nbsp;  [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=4](./samples/S2_xiaole_speed4.wav) 
+- 支付宝收款 1111.11 元, &nbsp; &nbsp;  [voice=小乐,speed=0](./samples/S1_xiaole_speed0.wav), &nbsp; &nbsp;  [voice=小乐,speed=2](./samples/S2_xiaole_speed2.wav) 
 
 - 空调制热模式已打开，并调节到25度, &nbsp; &nbsp;  [voice=小乐,speed=0](./samples/S3_xiaole_speed0.wav), &nbsp; &nbsp;   [voice=小乐,speed=4](./samples/S3_xiaole_speed4.wav) 
 
@@ -54,6 +56,7 @@ CPU loading test（基于ESP32 @ 240MHz测试 ）:
 ```c
 #include "esp_tts.h"
 #include "esp_tts_voice_female.h"
+#include "esp_partition.h"
 
 /*** 1. create esp tts handle  ***/
 
