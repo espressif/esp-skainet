@@ -19,10 +19,24 @@
 
 ### 编译和烧写
 
-编译并烧写，然后运行终端监控查看打印：
+#### 1. 参考partition.csv中第二行添加voice data部分的分区列表:  
 
 ```
-idf.py flash monitor
+# Name,  Type, SubType, Offset,  Size
+factory, app,  factory, 0x010000, 0x3E0000
+voice_data, data,  fat, 0x400000, 4M
+```
+
+#### 2. 烧写voice data到指定分区:   
+
+```
+source flash_voicedata.sh ../../components/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
+```
+
+#### 3. 编译app bin并烧写，然后运行终端监控查看打印：  
+
+```
+idf.py flash monitor -p /dev/ttyUSB0
 ```
 
 参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.

@@ -42,7 +42,7 @@ int app_main() {
         printf("can not open file!\n");
 #endif
 
-    // create esp tts handle 
+    /*** 1. create esp tts handle ***/
     // method1: use pre-define xiaole voice lib.
     // This method is not recommended because the method may make app bin exceed the limit of esp32  
     // esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
@@ -56,30 +56,34 @@ int app_main() {
     esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
 
     esp_tts_handle_t *tts_handle=esp_tts_create(voice);
-    // urat ringbuf init
-    urat_rb = rb_init(BUFFER_PROCESS+1, URAT_BUF_LEN, 1, NULL);
-    char data[URAT_BUF_LEN+1];
-    char in;
-    int data_len=0;
 
-    // play prompt text
+    /*** 2. play prompt text ***/
     char *prompt1="欢迎使用乐鑫语音合成";  
     printf("%s\n", prompt1);
     if (esp_tts_parse_chinese(tts_handle, prompt1)) {
             int len[1]={0};
             do {
-                short *data=esp_tts_stream_play(tts_handle, len, 3);
-                iot_dac_audio_play(data, len[0]*2, portMAX_DELAY);
+                short *pcm_data=esp_tts_stream_play(tts_handle, len, 3);
+#ifdef SDCARD_OUTPUT_ENABLE
+                FatfsComboWrite(pcm_data, 1, len[0]*2, fp);
+#else
+                iot_dac_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
+#endif
                 //printf("data:%d \n", len[0]);
             } while(len[0]>0);
             i2s_zero_dma_buffer(0);
     }
 
+    /*** 3. play urat input text ***/
+    urat_rb = rb_init(BUFFER_PROCESS+1, URAT_BUF_LEN, 1, NULL);  // urat ringbuf init
+    char data[URAT_BUF_LEN+1];
+    char in;
+    int data_len=0;
+
     xTaskCreatePinnedToCore(&uartTask, "urat", 3 * 1024, NULL, 5, NULL, 0);
     char *prompt2="\n请输入短语:";
     printf("%s\n", prompt2);
-
-    // play urat input text
+ 
     while (1) {
         rb_read(urat_rb, (uint8_t *)&in, 1, portMAX_DELAY);
 
