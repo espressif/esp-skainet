@@ -19,7 +19,7 @@
 #include "wav_encoder.h"
 #include "esp_partition.h"
 
-#define SDCARD_OUTPUT_ENABLE
+//#define SDCARD_OUTPUT_ENABLE
 
 struct RingBuf *urat_rb=NULL;
 
@@ -51,10 +51,17 @@ int app_main() {
 
     // method2: initial voice set from separate voice data partition
     const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
-    if (part==0) printf("Couldn't find voice data partition!\n");
+    if (part==0) { 
+        printf("Couldn't find voice data partition!\n"); 
+        return 0;
+    }
     spi_flash_mmap_handle_t mmap;
     uint16_t* voicedata;
     esp_err_t err=esp_partition_mmap(part, 0, 3*1024*1024, SPI_FLASH_MMAP_DATA, (const void**)&voicedata, &mmap);
+    if (err != ESP_OK) {
+        printf("Couldn't map voice data partition!\n"); 
+        return 0;
+    }
     esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
 
     esp_tts_handle_t *tts_handle=esp_tts_create(voice);
@@ -75,7 +82,9 @@ int app_main() {
             } while(len[0]>0);
             i2s_zero_dma_buffer(0);
     }
+#ifdef SDCARD_OUTPUT_ENABLE
     wav_encoder_close(wav_encoder);
+#endif
 
     /*** 3. play urat input text ***/
     urat_rb = rb_init(BUFFER_PROCESS+1, URAT_BUF_LEN, 1, NULL);  // urat ringbuf init
