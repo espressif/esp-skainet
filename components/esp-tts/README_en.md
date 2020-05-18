@@ -87,6 +87,6 @@ if (esp_tts_parse_chinese(tts_handle, text)) {  // parse text into pinyin list
 
 ```
 
-please refer to [esp_tts.h](./include/esp_tts.h) for the details of API or chinese_tts example in esp-skainet.
+please refer to [esp_tts.h](./esp_tts_chinese/include/esp_tts.h) for the details of API or [chinese_tts](../../examples/chinese_tts) example in esp-skainet.
 
 
