@@ -21,7 +21,7 @@ ESP32-Korvo V1.1 是一个基于双核 ESP32、搭载麦克风阵列的音频开
 
 ## 1.1 概述
 
-ESP32-Korvo V1.1 由两块开发板组成，集成多个外设：主板包含 ESP32-WROVER-B 模组、USB 电源接口、micro SD 卡槽、耳机连接器和扬声器连接器，子板包含麦克风阵列、功能键和 RGB LED 灯，两板由 FPC 排线相连。
+ESP32-Korvo V1.1 由两块开发板组成，集成多个外设：主板包含 ESP32-WROVER-E 模组、USB 电源接口、micro SD 卡槽、耳机连接器和扬声器连接器，子板包含麦克风阵列、功能键和 RGB LED 灯，两板由 FPC 排线相连。
 
 不同于乐鑫其他的音频开发板，ESP32-Korvo V1.1 用单颗 ESP32 芯片实现远场本地语音识别，支持双麦和三麦阵列，配合波束成形 (beamforming)、AEC 等语音增强算法，满足多种场景下的语音识别需求。
 
@@ -41,7 +41,7 @@ ESP32-Korvo V1.1 由两块开发板组成，集成多个外设：主板包含 ES
 
 ### 1.2.2 批量订单
 
-如批量购买，开放版将以大纸板箱包装。
+如批量购买，开发板将以大纸板箱包装。
 
 批量订单请参考[乐鑫产品订购信息](https://www.espressif.com/sites/default/files/documentation/espressif_products_ordering_information_cn.pdf) (PDF) 。
 
@@ -58,12 +58,12 @@ ESP32-Korvo V1.1 由两块开发板组成，集成多个外设：主板包含 ES
 
 |主要组件|介绍|
 |:- |:- |
-|ESP32-WROVER-B|这款 ESP32 模组内置 ESP32 芯片、64 Mbit SPI flash 和 128 Mbit PSRAM，可灵活存储数据，具有 Wi-Fi / BT 连接和数据处理能力。|
+|ESP32-WROVER-E|这款 ESP32 模组内置 ESP32-D0WD-V3 芯片、16 MB flash 和 8 MB PSRAM，可灵活存储数据，具有 Wi-Fi / BT 连接和数据处理能力。|
 |电源稳压器|5 V 转 3.3 V 稳压器。|
 |电源开关|拨动至 On，开发板上电；拨动至 Off，开发板断电。|
 |电池接口|连接电池。|
 |USB 电源接口|为开发板供电。|
-|USB 转 UART 接口|电脑和 ESP32-WROVER-B 之间的通信接口。|
+|USB 转 UART 接口|电脑和 ESP32-WROVER-E 之间的通信接口。|
 |USB 转 UART 桥接器|单芯片 USB-UART 桥接器，可提供高达 3 Mbps 的传输速率。|
 |Reset 键|按住此键使系统复位。|
 |Boot 键 |下载按键。按住 Boot 键的同时按一下 EN 键进入"固件下载"模式，通过串口下载固件。|
@@ -86,7 +86,7 @@ ESP32-Korvo V1.1 （用 FPC 排线连接主板和子板）上电后，您可使�
 
 |默认固件支持的命令词|设备反馈|
 |:- |:- |
-|关闭电灯|熄灭 RGB lED|
+|关闭电灯|熄灭 RGB LED|
 |打开白灯|打开 RGB LED，显示白色。|
 |打开红灯|打开 RGB LED，显示红色。|
 |打开绿灯|打开 RGB LED，显示绿色。|
@@ -139,6 +139,5 @@ ESP32-Korvo V1.1 的主要组件和连接方式如下图所示。
 * [ESP32-Korvo V1.1 子板原理图](https://dl.espressif.com/dl/schematics/ESP32-KORVO-MIC_V1.1_schematics.pdf) (PDF)
 * [ESP32-Korvo V1.1 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-Korvo_V1.1_Reference_Design.zip) (ZIP)
 * [ESP32 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_cn.pdf) (PDF)
-* [ESP32-WROVER-B 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-b_datasheet_cn.pdf)(PDF)
-* [ESP32-WROVER-B V1.0 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-WROVER-B_Reference_Design_V1-r1.0_0.zip) (ZIP)
+* [ESP32-WROVER-E & ESP32-WROVER-IE 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-e_esp32-wrover-ie_datasheet_cn.pdf) (PDF)
 * [乐鑫产品订购信息](https://www.espressif.com/sites/default/files/documentation/espressif_products_ordering_information_cn.pdf)  (PDF)
