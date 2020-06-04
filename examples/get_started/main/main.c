@@ -58,6 +58,9 @@ void wakenetTask(void *arg)
                 printf("%.2f: %s DETECTED.\n", (float)ms / 1000.0, wakenet->get_word_name(model_data, r));
                 detect_flag = 1;
                 printf("-----------------LISTENING-----------------\n\n");
+                rb_reset(rec_rb);
+                rb_reset(ns_rb);
+                rb_reset(agc_rb);
             }
         } else {
             int command_id = multinet->detect(model_data_mn, buffer);
@@ -72,6 +75,9 @@ void wakenetTask(void *arg)
                 }
 
                 printf("\n-----------awaits to be waken up-----------\n");
+                rb_reset(rec_rb);
+                rb_reset(ns_rb);
+                rb_reset(agc_rb);
             }
         }
         chunks++;
