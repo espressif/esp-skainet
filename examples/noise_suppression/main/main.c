@@ -59,7 +59,7 @@ void noise_suppression(void *arg)
 #elif defined CONFIG_ESP32_KORVO_V1_1_BOARD
         i2s_read(I2S_NUM_1, ns_in, 4 * NS_FRAME_BYTES, &bytes_read, portMAX_DELAY);
         for (int i = 0; i < NS_FRAME_BYTES / 2; i++) {
-            ns_in_mono[i] = ns_in[4 * i];
+            ns_in_mono[i] = ns_in[4 * i + 1];
         }        
 #endif
         ns_process(ns_inst, ns_in_mono, ns_out);

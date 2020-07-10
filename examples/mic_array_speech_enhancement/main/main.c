@@ -57,7 +57,7 @@ void maseTask(void *arg)
             mase_in[i + MASE_FRAME_BYTES / 2] = i2s_in[4 * i + 3];
             if (nch == 3)
             {
-                mase_in[i + MASE_FRAME_BYTES] = i2s_in[4 * i];
+                mase_in[i + MASE_FRAME_BYTES] = i2s_in[4 * i + 2];
             }
         }
         mase_process(mase_handle, mase_in, mase_out);
