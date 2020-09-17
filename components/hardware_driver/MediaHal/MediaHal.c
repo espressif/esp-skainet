@@ -254,10 +254,14 @@ int MediaHalInit(void *config)
     ret |= MediaHalConfig.codec_set_adc_input(ADC_INPUT_LINPUT2_RINPUT2);
     ret |= MediaHalConfig.codec_sart(ES_MODULE_ADC_DAC);
 #ifndef CONFIG_CODEC_CHIP_IS_MICROSEMI
+#ifdef CONFIG_IDF_TARGET_ESP32S2
+    gpio_matrix_out(IIS_MCLK, CLK_I2S_MUX_IDX, 0, 0);
+#else
     if (I2S_NUM == 0) {
         SET_PERI_REG_BITS(PIN_CTRL, CLK_OUT1, 0, CLK_OUT1_S);
     }
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+#endif // CONFIG_IDF_TARGET_ESP32S2
 #endif // CONFIG_CODEC_CHIP_IS_MICROSEMI
 #endif // I2S_DAC_EN
 

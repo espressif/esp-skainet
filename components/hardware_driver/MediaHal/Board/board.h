@@ -78,6 +78,11 @@ extern "C" {
 #define CONFIG_CODEC_CHIP_IS_ES8311
 #define CONFIG_USE_ES7210
 #include "esp32_korvo_v1_1_board.h"
+#endif
+
+#ifdef CONFIG_ESP32_S2_KALUGA_1_V1_2_BOARD
+#define CONFIG_CODEC_CHIP_IS_ES8311
+#include "esp32_s2_kaluga_1_V1_2_board.h"
 #endif 
 
 #ifdef __cplusplus

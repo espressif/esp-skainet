@@ -23,8 +23,8 @@
 
 ```
 # Name,  Type, SubType, Offset,  Size
-factory, app,  factory, 0x010000, 0x3E0000
-voice_data, data,  fat, 0x400000, 4M
+factory, app,  factory, 0x010000, 0xE0000
+voice_data, data,  fat, 0x100000, 3M
 ```
 
 #### 2. 烧写voice data到指定分区:   
@@ -35,6 +35,15 @@ source flash_voicedata.sh ../../components/esp-tts/esp_tts_chinese/esp_tts_voice
 
 #### 3. 编译app bin并烧写，然后运行终端监控查看打印：  
 
+##### 1)如果使用ESP32-S2，请手动将IDF版本切换到4.2或以上，再执行以下命令设置编译目标芯片。使用ESP32则可跳过该步骤
+```
+idf.py set-target esp32s2
+```
+##### 2)进入配置界面，选择合适的开发板
+```
+idf.py menuconfig
+```
+##### 3)编译烧录程序
 ```
 idf.py flash monitor -p /dev/ttyUSB0
 ```
