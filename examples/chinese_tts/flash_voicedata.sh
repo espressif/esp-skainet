@@ -16,7 +16,7 @@ if [ -n "$3" ]; then
 	baud="$3"
 fi
 
-python ${IDF_PATH}/components/esptool_py/esptool/esptool.py --chip esp32 \
+python ${IDF_PATH}/components/esptool_py/esptool/esptool.py \
 		--port $port --baud $baud --before default_reset --after hard_reset write_flash \
-		--flash_mode dio --flash_freq 40m --flash_size detect 0x400000 "$file"
+		--flash_mode dio --flash_freq 40m --flash_size detect 0x100000 "$file"
 

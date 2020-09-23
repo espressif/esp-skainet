@@ -8,7 +8,9 @@
 #include "dirent.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#ifndef CONFIG_IDF_TARGET_ESP32S2
 #include "driver/sdmmc_host.h"
+#endif
 #include "driver/sdspi_host.h"
 #include "sdmmc_cmd.h"
 #include "sdcard_init.h"
@@ -113,7 +115,9 @@ esp_err_t sd_card_mount(const char* basePath)
         return;
     }
     sdmmc_card_print_info(stdout, card);
-
+#else
+    esp_err_t ret = 0;
+    ESP_LOGW("APP_TAG","SD card is not currently supported");
 #endif
 
     return ret;
