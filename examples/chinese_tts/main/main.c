@@ -27,7 +27,17 @@ struct RingBuf *urat_rb=NULL;
 int iot_dac_audio_play(const uint8_t* data, int length, TickType_t ticks_to_wait)
 {
     size_t bytes_write = 0;
+#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
+    short *out=malloc(length*sizeof(short));
+    short *in=(short*)data;
+    for(int i=0; i<length/2; i++) {
+        out[i*2]=data[i];
+        out[i*2+1]=data[i];
+    }
+    i2s_write(0, (const char*) out, length*2, &bytes_write, ticks_to_wait);
+#else
     i2s_write(0, (const char*) data, length, &bytes_write, ticks_to_wait);
+#endif
     return ESP_OK;
 }
 
@@ -82,6 +92,7 @@ int app_main() {
             } while(len[0]>0);
             i2s_zero_dma_buffer(0);
     }
+    esp_tts_stream_reset(tts_handle);
 #ifdef SDCARD_OUTPUT_ENABLE
     wav_encoder_close(wav_encoder);
 #endif
@@ -115,6 +126,7 @@ int app_main() {
                 } while(len[0]>0);
                 i2s_zero_dma_buffer(0);
             }
+            esp_tts_stream_reset(tts_handle);
             printf("%s\n", prompt2);
             data_len=0;
         } else if(data_len<URAT_BUF_LEN) {

@@ -30,7 +30,7 @@ voice_data, data,  fat, 0x100000, 3M
 #### 2. 烧写voice data到指定分区:   
 
 ```
-source flash_voicedata.sh ../../components/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
+source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
 ```
 
 #### 3. 编译app bin并烧写，然后运行终端监控查看打印：  

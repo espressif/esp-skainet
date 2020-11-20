@@ -160,3 +160,20 @@ int wav_decoder_run(void* obj, unsigned char* data, unsigned int length) {
 	return n;
 }
 
+int wav_decoder_get_channel(void* obj) {
+
+	struct wav_decoder* wr = (struct wav_decoder*) obj;
+	return wr->channels;
+}
+
+int wav_decoder_get_sample_rate(void* obj) {
+
+	struct wav_decoder* wr = (struct wav_decoder*) obj;
+	return wr->sample_rate;
+}
+
+int wav_decoder_get_data_length(void* obj) {
+
+	struct wav_decoder* wr = (struct wav_decoder*) obj;
+	return wr->data_length;
+}

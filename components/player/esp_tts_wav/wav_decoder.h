@@ -27,6 +27,9 @@ void* wav_decoder_open(const char *filename);
 void wav_decoder_close(void* obj);
 int wav_decoder_get_header(void* obj, int* format, int* channels, int* sample_rate, int* bits_per_sample, unsigned int* data_length);
 int wav_decoder_run(void* obj, unsigned char* data, unsigned int length);
+int wav_decoder_get_sample_rate(void* obj);
+int wav_decoder_get_channel(void* obj);
+int wav_decoder_get_data_length(void* obj);
 
 #ifdef __cplusplus
 }
