@@ -9,6 +9,10 @@ set(COMPONENT_ADD_INCLUDEDIRS
     ./esp_tts_wav
     )
 
+set(COMPONENT_REQUIRES
+    hardware_driver
+    )
+
 register_component()
 
 

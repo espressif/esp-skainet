@@ -5,7 +5,7 @@ set(COMPONENT_SRCS
 set(COMPONENT_REQUIRES
     esp-sr
     hardware_driver
-    esp_adc_cal
+    player
     )
 
 register_component()

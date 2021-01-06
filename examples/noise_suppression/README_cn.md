@@ -2,7 +2,10 @@
 
 （参考在上一级的 `examples` 目录下的 [README.md](../README.md) 文件来获取更多信息。）
 
-在这个示例中,将单麦克风采集的声音经过降噪处理，得到 16KHz，16bit，单声道的音频数据，并且立即将降噪后的数据通过耳机孔输出。用户可以通过按下 LyraT_Mini 开发板或 ESP32-Korvo V1.1 开发板上的 "Mode" 按键来选择开启或关闭降噪。 该示例主要展示单麦克法降噪算法，麦克风真理语音增强请参考示例[mic_array_speech_enhancement](../mic_array_speech_enhancement).
+在这个示例中,将单麦克风采集的声音经过降噪处理，得到 16KHz，16bit，单声道的音频数据，并且将降噪后的数据保存到SD card。该示例主要展示单麦克法降噪算法，麦克风阵列语音增强请参考示例[mic_array_speech_enhancement](../mic_array_speech_enhancement).　
+"RST"按键，开始录音（重新开始,会覆盖原始录音文件）
+"Mode"按键，选择开启或关闭降噪，开启降噪:`NS STATE: 1`, 关闭降噪：`NS STATE: ０`。 　　
+"Rec"按键，结束录音。　　　
 
 ## 如何使用例程
 
@@ -10,7 +13,7 @@
 ### 硬件需求
 
 - 这个示例能够在 ESP32-LyraT-Mini 开发板或 ESP32-Korvo V1.1 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)
-- 耳机
+- SD card
 
 ### 配置工程
 
@@ -32,17 +35,19 @@ idf.py flash monitor
 
 ## 例程输出
 
-上电打印：
+- 上电打印：
 
 ```
+Start to record: 
 NS STATE: 1
+record:1 s
+record:2 s
+record:3 s
+record:4 s
+record:5 s
+...
 ```
 
-表示初始状态为降噪打开的状态。当插上耳机时，就可以听到经过降噪处理后的声音。
-
-
-```
-NS STATE: 0
-```
-
-表示目前状态为降噪关闭的状态。再次按下 "Mode" 键则又会进入降噪打开的模式。
+- 按压 `Mode` 按钮，关闭或重新开启降噪   
+- 按压 `Rec` 按钮，结束录音,录音文件"TEST.WAV"保存与SD card根目录．*注意：如果不按`Rec`按钮，直接拔出SD card，录音文件的编码会出现错误．*   
+- 按压 `RST` 按钮，重新开始录音  

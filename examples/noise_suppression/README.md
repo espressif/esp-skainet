@@ -2,17 +2,16 @@
 
 (See the [README.md](../README.md) file in the upper level 'examples' directory for more information about examples.)
 
-This example takes the audio data collected by the single microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-Korvo V1.1 board.
+This example takes the audio data collected by the single microphone through noise suppression to obtain 16KHz, 16bit, mono audio data, and immediately outputs the noise-reduced data　into SD card. The user can select whether the noise suppression is turned on by pressing the "Mode" button on the LyraT_Mini development board or ESP32-Korvo V1.1 board.
+
 
 ## How to use this example
 
 ### Hardware Required
 
-- This example can run on ESP32-LyraT-Mini board and an external speaker connected to the board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html).
+- This example can run on ESP32-LyraT-Mini board and ESP32-Korvo board. For more information about ESP32-LyraT-Mini, please see [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html or [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) for more information.
 
-- This example can run on ESP32-Korvo board as well, however, it is suggested to use mic-array speech enhancement (MASE) API for Korvo for a better speech enhancement result; please check [MASE example](https://github.com/espressif/esp-skainet/tree/master/examples/mic_array_speech_enhancement) for more information.
-
-- headphone
+- SD card
 
 ### Configure the project
 
@@ -37,15 +36,18 @@ See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/s
 There is the console output for this example:
 
 ```
+Start to record: 
 NS STATE: 1
+record:1 s
+record:2 s
+record:3 s
+record:4 s
+record:5 s
+...
 ```
 
 Indicates that the initial state is the state in which noise suppression is turned on, you can hear the noise after the noise reduction process by headphone.
 
-Press the "Mode" button and the following output will be displayed:
-
-```
-NS STATE: 0
-```
-
-Indicates that the current state is the state of noise suppression off. Pressing the "Mode" button again will enter the mode of noise suppression on.
+Press the `Mode` button to enable/disable noise suppression
+Press the `Rec` button to stop recording. **Note: if do not press `Rec` button before pull out SD card, the wav file can not be encoded correctly.**
+Press the `RST` button to restart to record
