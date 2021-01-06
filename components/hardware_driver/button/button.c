@@ -19,7 +19,7 @@ static const adc_channel_t channel = ADC_CHANNEL_3;
 static const adc_atten_t atten = ADC_ATTEN_11db;
 
 
-uint32_t voltage;
+static uint32_t _button_voltage;
 
 void buttondetTask(void *arg)
 {
@@ -30,9 +30,9 @@ void buttondetTask(void *arg)
         }
         adc_reading /= NO_OF_SAMPLES;
 #ifdef CONFIG_IDF_TARGET_ESP32
-        voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_chars);
+        _button_voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_chars);
 #else
-        voltage = (float)adc_reading * 3300 / 4096;
+        _button_voltage = (float)adc_reading * 3300 / 4096;
 #endif
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
@@ -53,10 +53,8 @@ void button_init()
 
 void button_detect(char *s)
 {
-    
+    uint32_t voltage1 = _button_voltage;
 #ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
-    uint32_t voltage1 = voltage;
-    
     if (voltage1 > 1970 && voltage1 < 2020)
     {
     	sprintf(s, "mode");
@@ -85,7 +83,35 @@ void button_detect(char *s)
     {
     	sprintf(s, "null");
     }
-
+#elif CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
+    if (voltage1 > 2300 && voltage1 < 2500)
+    {
+    	sprintf(s, "rec");
+    }
+    else if (voltage1 > 1900 && voltage1 < 2100)  //1970
+    {
+    	sprintf(s, "mode");
+    }
+    else if (voltage1 > 1500 && voltage1 < 1700) //1566
+    {
+    	sprintf(s, "play");
+    }
+    else if (voltage1 > 1100 && voltage1 < 1300)  //1170
+    {
+    	sprintf(s, "set");
+    }
+    else if (voltage1 > 700 && voltage1 < 900)  //795
+    {
+    	sprintf(s, "vol-");
+    }
+    else if (voltage1 > 300 && voltage1 < 500) //370
+    {
+    	sprintf(s, "vol+");    	
+    }
+    else
+    {
+    	sprintf(s, "null");
+    }
 #endif
 
 }
