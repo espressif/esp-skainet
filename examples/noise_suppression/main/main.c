@@ -51,7 +51,7 @@ void noise_suppression(void *arg)
     int16_t *ns_in_mono = malloc(NS_FRAME_BYTES);
     int16_t *ns_out = malloc(NS_FRAME_BYTES);
     int16_t *agc_out = malloc(NS_FRAME_BYTES);
-    ns_handle_t ns_inst = ns_create(3, NS_FRAME_LENGTH_MS);
+    ns_handle_t ns_inst = ns_pro_create(NS_FRAME_LENGTH_MS, 3);
 
     void *agc_inst = esp_agc_open(3, 16000);
     set_agc_config(agc_inst, 10, 1, 2);
@@ -96,7 +96,6 @@ void record_Task(void *arg)
     FILE *fp=NULL;
     if (ret == ESP_OK) {
         wav_encoder=wav_encoder_open("/sdcard/test.wav", 16000, 16, 1);
-        fp=fopen("/sdcard/test.pcm", "wb");
         if (wav_encoder==NULL) {
             printf("Could not open the test.wav!\n");
         } else {
@@ -131,16 +130,19 @@ void button_Task(void * arg)
 {
 
 #ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
-    printf("Do not support LYRAT_V4_3, please use LYRAT_MINI_V1_1 or ESP32_KORVO_V1_1\n");
-    
+    int mode_min_vol = 120;
+    int mode_max_vol = 160;
+    int rec_min_vol = 120;
+    int rec_max_vol = 160;
+
 #elif defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     int mode_min_vol = 1800;
     int mode_max_vol = 2020;
-    int rec_min_vol=2300;
-    int rec_max_vol=2500;
+    int rec_min_vol = 2300;
+    int rec_max_vol = 2500;
 #elif defined CONFIG_ESP32_KORVO_V1_1_BOARD
-    int rec_min_vol=2400;
-    int rec_max_vol=2450;
+    int rec_min_vol = 2400;
+    int rec_max_vol = 2450;
     int mode_min_vol = 1990;
     int mode_max_vol = 2040;
 #endif
@@ -161,7 +163,7 @@ void button_Task(void * arg)
         adc_reading /= NO_OF_SAMPLES;
         //Convert adc_reading to voltage in mV
         uint32_t voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_chars);
-        printf("%d\n", voltage);
+        // printf("%d\n", voltage);
 
         if (rec_min_vol <= voltage && voltage <= rec_max_vol) {
             trigger_time = esp_timer_get_time();
