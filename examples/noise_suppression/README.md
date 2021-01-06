@@ -46,8 +46,6 @@ record:5 s
 ...
 ```
 
-Indicates that the initial state is the state in which noise suppression is turned on, you can hear the noise after the noise reduction process by headphone.
-
-Press the `Mode` button to enable/disable noise suppression
-Press the `Rec` button to stop recording. **Note: if do not press `Rec` button before pull out SD card, the wav file can not be encoded correctly.**
-Press the `RST` button to restart to record
+Press the `Mode` button to enable/disable noise suppression  
+Press the `Rec` button to stop recording. **Note: if do not press `Rec` button before pull out SD card, the wav file can not be encoded correctly.**  
+Press the `RST` button to restart to record  
