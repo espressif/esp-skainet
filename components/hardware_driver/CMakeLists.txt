@@ -1,3 +1,4 @@
+if(IDF_TARGET STREQUAL "esp32")
 set(COMPONENT_SRCDIRS 
     ./MediaHal
     ./MediaHal/Codec
@@ -25,6 +26,7 @@ set(COMPONENT_REQUIRES
     esp_adc_cal
     nvs_flash
     )
+endif()
 
 register_component()
 
