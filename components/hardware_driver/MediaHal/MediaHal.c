@@ -173,7 +173,7 @@ int MediaHalInit(void *config)
 
 #ifdef CONFIG_IDF_TARGET_ESP32S2
     gpio_matrix_out(35, CLK_I2S_MUX_IDX, 0, 0);
-#else
+#endif
 
 #ifdef ENABLE_MCLK_GPIO0
     SET_PERI_REG_BITS(PIN_CTRL, CLK_OUT1, 0, CLK_OUT1_S);
