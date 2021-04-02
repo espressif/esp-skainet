@@ -102,7 +102,7 @@ void multinetTask(void *arg)
 void feedTask(void *arg) 
 {
     esp_afe_sr_data_t *afe_data = arg;
-    int audio_chunksize = esp_afe->get_samp_chunksize(afe_data);
+    int audio_chunksize = esp_afe->get_feed_chunksize(afe_data);
     int nch = esp_afe->get_channel_num(afe_data);
     int16_t *buffer = malloc(audio_chunksize * sizeof(int16_t)*(nch+1));
     assert(buffer);
@@ -127,7 +127,7 @@ void feedTask(void *arg)
 void fetchTask(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
-    int afe_chunksize = esp_afe->get_samp_chunksize(afe_data);
+    int afe_chunksize = esp_afe->get_fetch_chunksize(afe_data);
     int16_t *buffer = malloc(afe_chunksize * sizeof(int16_t));
     // model_iface_data_t *mn_data = multinet->create(&MULTINET_COEFF, 6000);
     // int mn_chunksize = multinet->get_samp_chunksize(mn_data);

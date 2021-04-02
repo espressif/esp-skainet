@@ -27,7 +27,7 @@
 
 #include "ESCodec_common.h"
 #include "esp_types.h"
-#include "driver/i2c.h"
+
 #include "userconfig.h"
 
 
@@ -96,31 +96,14 @@
 #define ES8388_DACCONTROL29     0x33
 #define ES8388_DACCONTROL30     0x34
 
-typedef struct {
-    ESCodecMode esMode;
-    i2c_port_t i2c_port_num;
-    i2c_config_t i2c_cfg;
-    DacOutput dacOutput;
-    AdcInput adcInput;
-} Es8388Config;
-
 
 #define AUDIO_CODEC_ES8388_DEFAULT(){ \
     .esMode = ES_MODE_SLAVE, \
-    .i2c_port_num = I2C_NUM_0, \
-    .i2c_cfg = { \
-        .mode = I2C_MODE_MASTER, \
-        .sda_io_num = IIC_DATA, \
-        .scl_io_num = IIC_CLK, \
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,\
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,\
-        .master.clk_speed = 100000\
-    }, \
     .adcInput = ADC_INPUT_LINPUT1_RINPUT1,\
     .dacOutput = DAC_OUTPUT_LOUT1 | DAC_OUTPUT_LOUT2 | DAC_OUTPUT_ROUT1 | DAC_OUTPUT_ROUT2,\
 };
 
-int Es8388Init(Es8388Config *cfg);
+int Es8388Init(CodecConfig *cfg);
 void Es8388Uninit();
 
 int Es8388ConfigFmt(ESCodecModule mode, ESCodecI2SFmt fmt);

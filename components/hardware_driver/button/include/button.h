@@ -24,16 +24,6 @@
 #ifndef _ESP32_BUTTON_H_
 #define _ESP32_BUTTON_H_
 
-typedef enum {
-    BUTTON_NULL=0,
-    BUTTON_REC=1,
-    BUTTON_MODE=2,
-    BUTTON_PLAY=3,
-    BUTTON_SET=4,
-    BUTTON_VOL_SUB=5,
-    BUTTON_VOL_PLUS=6
-} button_type;
-
 void button_init();
 void button_detect(char *s);
 

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include <sys/unistd.h>
 #include <sys/stat.h>
@@ -19,14 +18,49 @@
 #define SD_CARD_INTR_GPIO           34
 #define SD_CARD_PWR_CTRL            13
 
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD
 #define PIN_NUM_MISO 21
 #define PIN_NUM_MOSI 18
 #define PIN_NUM_CLK  5
 #define PIN_NUM_CS   23
 #endif
 
-esp_err_t sd_card_mount(const char* basePath)
+
+#define SDMMC_SLOT_CONFIG_DEFAULT_MIX() {\
+    .clk = 38, \
+    .cmd = 39, \
+    .d0 = 42, \
+    .d1 = 4, \
+    .d2 = 12, \
+    .d3 = 1, \
+    .d4 = 33, \
+    .d5 = 34, \
+    .d6 = 35, \
+    .d7 = 36, \
+    .gpio_cd = SDMMC_SLOT_NO_CD, \
+    .gpio_wp = SDMMC_SLOT_NO_WP, \
+    .width   = SDMMC_SLOT_WIDTH_DEFAULT, \
+    .flags = 0, \
+}
+
+#define SDMMC_SLOT_CONFIG_DEFAULT_KORVO_V2() {\
+    .clk = 18, \
+    .cmd = 17, \
+    .d0 = 16, \
+    .d1 = 4, \
+    .d2 = 12, \
+    .d3 = 15, \
+    .d4 = 33, \
+    .d5 = 34, \
+    .d6 = 35, \
+    .d7 = 36, \
+    .gpio_cd = SDMMC_SLOT_NO_CD, \
+    .gpio_wp = SDMMC_SLOT_NO_WP, \
+    .width   = SDMMC_SLOT_WIDTH_DEFAULT, \
+    .flags = 0, \
+}
+
+int sd_card_mount(const char* basePath)
 {
 #if defined CONFIG_ESP_LYRAT_V4_3_BOARD || defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
@@ -71,6 +105,7 @@ esp_err_t sd_card_mount(const char* basePath)
             // Card has been initialized, print its properties
             sdmmc_card_print_info(stdout, card);
             ESP_LOGI(SD_CARD_TAG, "CID name %s!\n", card->cid.name);
+            return 1;
             break;
         case ESP_ERR_INVALID_STATE:
             ESP_LOGE(SD_CARD_TAG, "File system already mounted");
@@ -82,8 +117,9 @@ esp_err_t sd_card_mount(const char* basePath)
             ESP_LOGE(SD_CARD_TAG, "Failed to initialize the card (%d). Make sure SD card lines have pull-up resistors in place.", ret);
             break;
     }
+    return -1;
 
-#elif defined CONFIG_ESP32_KORVO_V1_1_BOARD
+#elif defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD
 
     ESP_LOGI("APP_TAG", "Initializing SD card");
     ESP_LOGI("APP_TAG", "Using SPI peripheral");
@@ -108,19 +144,130 @@ esp_err_t sd_card_mount(const char* basePath)
         if (ret == ESP_FAIL) {
             ESP_LOGE("APP_TAG", "Failed to mount filesystem. "
                      "If you want the card to be formatted, set format_if_mount_failed = true.");
+
         } else {
             ESP_LOGE("APP_TAG", "Failed to initialize the card (%s). "
                      "Make sure SD card lines have pull-up resistors in place.", esp_err_to_name(ret));
+            return -1;
         }
-        return;
+        
     }
     sdmmc_card_print_info(stdout, card);
+    return 1;
+
+
+#elif defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD
+        esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = false,
+        .max_files = 5,
+        .allocation_unit_size = 16 * 1024
+    };
+    sdmmc_card_t* card;
+    ESP_LOGI("APP_TAG", "Using SDMMC peripheral");
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+
+    // This initializes the slot without card detect (CD) and write protect (WP) signals.
+    // Modify slot_config.gpio_cd and slot_config.gpio_wp if your board has these signals.
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+
+    // To use 1-line SD mode, uncomment the following line:
+    slot_config.width = 1;
+    gpio_set_pull_mode(7, GPIO_PULLUP_ONLY);   // CMD, needed in 4- and 1- line modes
+    gpio_set_pull_mode(6, GPIO_PULLUP_ONLY);    // D0, needed in 4- and 1-line modes
+    gpio_set_pull_mode(5, GPIO_PULLUP_ONLY);   // D3, needed in 4- and 1-line modes
+
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE("APP_TAG", "Failed to mount filesystem. "
+                "If you want the card to be formatted, set format_if_mount_failed = true.");
+        } else {
+            ESP_LOGE("APP_TAG", "Failed to initialize the card (%s). "
+                "Make sure SD card lines have pull-up resistors in place.", esp_err_to_name(ret));
+        }
+        return -1;
+    }
+
+    // Card has been initialized, print its properties
+    sdmmc_card_print_info(stdout, card);
+    return 1;
+#elif defined CONFIG_ESP_KORVO_MIX_B_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD
+        esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = false,
+        .max_files = 5,
+        .allocation_unit_size = 16 * 1024
+    };
+    sdmmc_card_t* card;
+    ESP_LOGI("APP_TAG", "MIX Using SDMMC peripheral");
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+
+    // This initializes the slot without card detect (CD) and write protect (WP) signals.
+    // Modify slot_config.gpio_cd and slot_config.gpio_wp if your board has these signals.
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT_MIX();
+
+    // To use 1-line SD mode, uncomment the following line:
+    slot_config.width = 1;
+    gpio_set_pull_mode(39, GPIO_PULLUP_ONLY);   // CMD, needed in 4- and 1- line modes
+    gpio_set_pull_mode(42, GPIO_PULLUP_ONLY);    // D0, needed in 4- and 1-line modes
+    gpio_set_pull_mode(1, GPIO_PULLUP_ONLY);   // D3, needed in 4- and 1-line modes
+
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE("APP_TAG", "Failed to mount filesystem. "
+                "If you want the card to be formatted, set format_if_mount_failed = true.");
+        } else {
+            ESP_LOGE("APP_TAG", "Failed to initialize the card (%s). "
+                "Make sure SD card lines have pull-up resistors in place.", esp_err_to_name(ret));
+        }
+        return 0;
+    }
+
+    // Card has been initialized, print its properties
+    sdmmc_card_print_info(stdout, card);
+    return 1;
+#elif defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD
+        esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = false,
+        .max_files = 5,
+        .allocation_unit_size = 16 * 1024
+    };
+    sdmmc_card_t* card;
+    ESP_LOGI("APP_TAG", "Using SDMMC peripheral");
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+
+    // This initializes the slot without card detect (CD) and write protect (WP) signals.
+    // Modify slot_config.gpio_cd and slot_config.gpio_wp if your board has these signals.
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT_KORVO_V2();
+
+    // To use 1-line SD mode, uncomment the following line:
+    slot_config.width = 1;
+    gpio_set_pull_mode(17, GPIO_PULLUP_ONLY);   // CMD, needed in 4- and 1- line modes
+    gpio_set_pull_mode(16, GPIO_PULLUP_ONLY);    // D0, needed in 4- and 1-line modes
+    gpio_set_pull_mode(15, GPIO_PULLUP_ONLY);   // D3, needed in 4- and 1-line modes
+
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE("APP_TAG", "Failed to mount filesystem. "
+                "If you want the card to be formatted, set format_if_mount_failed = true.");
+        } else {
+            ESP_LOGE("APP_TAG", "Failed to initialize the card (%s). "
+                "Make sure SD card lines have pull-up resistors in place.", esp_err_to_name(ret));
+        }
+        return -1;
+    }
+
+    // Card has been initialized, print its properties
+    sdmmc_card_print_info(stdout, card);
+    return 1;
 #else
     esp_err_t ret = 0;
     ESP_LOGW("APP_TAG","SD card is not currently supported");
 #endif
-
-    return ret;
 
 }
 

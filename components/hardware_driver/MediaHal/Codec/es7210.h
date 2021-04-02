@@ -161,24 +161,7 @@ struct es7210_priv
 } ;
 extern struct es7210_priv es7210_private;
 
-typedef struct {
-    i2c_port_t i2c_port_num;
-    i2c_config_t i2c_cfg;
-} Es7210Config;
-
-#define AUDIO_CODEC_ES7210_DEFAULT(){ \
-    .i2c_port_num = I2C_NUM_0, \
-    .i2c_cfg = { \
-        .mode = I2C_MODE_MASTER, \
-        .sda_io_num = IIC_DATA, \
-        .scl_io_num = IIC_CLK, \
-        .sda_pullup_en = GPIO_PULLUP_ENABLE, \
-        .scl_pullup_en = GPIO_PULLUP_ENABLE, \
-        .master.clk_speed = 100000 \
-    }, \
-};
-
-int Es7210Init(Es7210Config *cfg);
+int Es7210Init(void);
 int es7210_read(unsigned char reg, unsigned char *rt_value, unsigned char i2c_chip_addr);
 
 static int es7210_mute(unsigned char mute);

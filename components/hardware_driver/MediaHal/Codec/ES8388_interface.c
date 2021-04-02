@@ -262,7 +262,7 @@ void Es8388Uninit()
  *     - (-1)  Error
  *     - (0)   Success
  */
-int Es8388Init(Es8388Config *cfg)
+int Es8388Init(CodecConfig *cfg)
 {
     int res = 0;
     res = I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num); // ESP32 in master mode

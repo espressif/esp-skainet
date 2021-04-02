@@ -22,78 +22,40 @@
  *
  */
 
-#ifndef _AUDIO_S2_KALUGA_BOARD_H_
-#define _AUDIO_S2_KALUGA_BOARD_H_
+#ifndef _AUDIO_KORVO_MIX_A_V1_0_BOARD_H_
+#define _AUDIO_KORVO_MIX_A_V1_0_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Board functions related */
-#define BOARD_INFO                  "ESP_KORVO_V1_1_BOARD"
-#define ENABLE_MCLK_GPIO0
+#define BOARD_INFO                  "ESP_KORVO_MIX_A_V1_0_BOARD"
 #define USE_CODEC                   1
 #define USE_ADC                     0
 #define CONFIG_CODEC_CHIP_IS_ES8311
 #define USE_I2S_0                   1
 #define USE_I2S_1                   0
 
-/* SD card related */
-#define SD_CARD_INTR_GPIO           34
-#define SD_CARD_INTR_SEL            GPIO_SEL_34
-
-#define SD_CARD_DATA0               2
-#define SD_CARD_DATA1               4
-#define SD_CARD_DATA2               12
-#define SD_CARD_DATA3               13
-#define SD_CARD_CMD                 15
-#define SD_CARD_CLK                 14
-
-/* AUX-IN related */
-#ifdef ENABLE_AUXIN_DETECT
-#define AUXIN_DETECT_PIN           12
-#endif
-
-/* LED indicators */
-#define GPIO_LED_GREEN              22
-
-/* Headphone detect */
-#define GPIO_HEADPHONE_DETECT       19
-
 /* I2C gpios */
-#define IIC_CLK                     7
-#define IIC_DATA                    8
+#define IIC_CLK                     32
+#define IIC_DATA                    19
 
 /* PA */
-#define GPIO_PA_EN                  GPIO_NUM_10
-
-/* Press button related */
-#define GPIO_REC                    GPIO_NUM_36
-#define GPIO_MODE                   GPIO_NUM_39
-
-/* Touch pad related */
-#define TOUCH_SET                   TOUCH_PAD_NUM9  // 32
-#define TOUCH_PLAY                  TOUCH_PAD_NUM8  // 33
-#define TOUCH_VOLUP                 TOUCH_PAD_NUM7  // 27
-#define TOUCH_VOLDWN                TOUCH_PAD_NUM4  // 13
+#define GPIO_PA_EN                  12
 
 /* I2S gpios */
-#define IIS_MCLK                    35
-
-// #define IIS_SCLK                    17
-// #define IIS_LCLK                    18
-// #define IIS_DSIN                    14
-// #define IIS_DOUT                    12
-#define IIS_SCLK                    18
-#define IIS_LCLK                    17
-#define IIS_DSIN        12
-#define IIS_DOUT        46
+#define IIS_MCLK                    0
+#define IIS_SCLK                    25
+#define IIS_LCLK                    22
+#define IIS_DSIN                    13
+#define IIS_DOUT                    -1
 
 #define I2S0_CONFIG(){ \
     .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX, \
     .sample_rate = 16000, \
     .bits_per_sample = 16, \
-    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, \
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
     .communication_format = I2S_COMM_FORMAT_I2S, \
     .dma_buf_count = 3, \
     .dma_buf_len = 300, \
