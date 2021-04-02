@@ -32,8 +32,6 @@
  */
 #define ES8311_ADDR         0x30
 
-#define ES7243_ADDR         0x26
-
 /*
 * to define the clock soure of MCLK
 */
@@ -211,7 +209,7 @@ static int Es8311WriteReg(uint8_t regAdd, uint8_t data)
     res |= i2c_master_stop(cmd);
     res |= i2c_master_cmd_begin(0, cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
-    ES_ASSERT(res, "Es8311 Write Reg error", -1);
+    // ES_ASSERT(res, "Es8311 Write Reg error", -1);
     return res;
 }
 
@@ -238,63 +236,6 @@ int Es8311ReadReg(uint8_t regAdd)
 
     ES_ASSERT(res, "Es8311 Read Reg error", -1);
     return (int)data;
-}
-
-static int Es7243WriteReg(uint8_t regAdd, uint8_t data)
-{
-    int res = 0;
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    res |= i2c_master_start(cmd);
-    res |= i2c_master_write_byte(cmd, ES7243_ADDR, 1 /*ACK_CHECK_EN*/);
-    res |= i2c_master_write_byte(cmd, regAdd, 1 /*ACK_CHECK_EN*/);
-    res |= i2c_master_write_byte(cmd, data, 1 /*ACK_CHECK_EN*/);
-    res |= i2c_master_stop(cmd);
-    res |= i2c_master_cmd_begin(0, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-    ES_ASSERT(res, "Es7243 Write Reg error", -1);
-    return res;
-}
-
-
-int Es7243ReadReg(uint8_t regAdd)
-{
-    uint8_t data;
-    int res = 0;
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-
-    res |= i2c_master_start(cmd);
-    res |= i2c_master_write_byte(cmd, ES7243_ADDR, 1 /*ACK_CHECK_EN*/);
-    res |= i2c_master_write_byte(cmd, regAdd, 1 /*ACK_CHECK_EN*/);
-    res |= i2c_master_stop(cmd);
-    res |= i2c_master_cmd_begin(0, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-
-    cmd = i2c_cmd_link_create();
-    res |= i2c_master_start(cmd);
-    res |= i2c_master_write_byte(cmd, ES7243_ADDR | 0x01, 1 /*ACK_CHECK_EN*/);
-    res |= i2c_master_read_byte(cmd, &data, 0x01 /*NACK_VAL*/);
-    res |= i2c_master_stop(cmd);
-    res |= i2c_master_cmd_begin(0, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-
-    ES_ASSERT(res, "Es7243 Read Reg error", -1);
-    return (int)data;
-}
-
-esp_err_t Es7243Init(void)
-{
-    esp_err_t ret = ESP_OK;
-    ret |= Es7243WriteReg(0x00, 0x01);
-    ret |= Es7243WriteReg(0x06, 0x00);
-    ret |= Es7243WriteReg(0x05, 0x1B);
-    ret |= Es7243WriteReg(0x01, 0x0C);
-    ret |= Es7243WriteReg(0x08, 0x43);
-    ret |= Es7243WriteReg(0x05, 0x13);
-    if (ret) {
-        ESP_LOGE(TAG, "Es7243 initialize failed!");
-        return ESP_FAIL;
-    }
-    return ret;
 }
 
 static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
@@ -354,7 +295,7 @@ static void es8311_pcm_hw_params(uint32_t mclk, uint32_t lrck)
             default:
                 break;
         }
-#if CONFIG_ESP32_KORVO_V1_1_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD 
         datmp = 3;
 #endif
         regv |= (datmp) << 3;
@@ -553,10 +494,6 @@ static void es8311_init(uint32_t mclk_freq, uint32_t lrck_freq)
     Es8311WriteReg(ES8311_DAC_REG37, 0x48);
     Es8311WriteReg(ES8311_GPIO_REG44, 0x08);
     Es8311WriteReg(ES8311_DAC_REG32, 0xBF);
-
-#ifdef CONFIG_USE_ES7243
-    Es7243Init();
-#endif
 }
 /*
 * set codec private data and initialize codec
@@ -570,7 +507,7 @@ static void es8311_Codec_Startup(uint32_t mclk_freq, uint32_t lrck_freq)
     es8311_priv->pcm_format = I2S_FMT;
     es8311_priv->pcm_resolution = LENGTH_16BIT;
     es8311_priv->master_slave_mode = SLAVE_MODE;
-#ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD
     es8311_priv->mclk_src = FROM_SCLK_PIN;
 #else
     es8311_priv->mclk_src = FROM_MCLK_PIN;
@@ -610,12 +547,11 @@ esp_err_t Es8311GetRef(bool flag)
     return ret;
 }
 
-int Es8311Init(Es8311Config *cfg)
+int Es8311Init(CodecConfig *cfg)
 {
     es8311_priv = calloc(1, sizeof(struct es8311_private));
-#ifndef CONFIG_ESP32_KORVO_V1_1_BOARD /* for Korvo, i2c has been initialized when installing ES7210 */
-    I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num); // ESP32 in master mode
-#endif
+// #ifndef CONFIG_ESP32_KORVO_V1_1_BOARD /* for Korvo, i2c has been initialized when installing ES7210 */
+// #endif
     es8311_Codec_Startup(12288000, 48000);
     return 0;
 }

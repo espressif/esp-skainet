@@ -31,57 +31,35 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
-#define CONFIG_CODEC_CHIP_IS_ES8388
-#include "lyrat_v4_3_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRAT_V4_2_BOARD
-#include "lyrat_v4_2_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRATD_MSC_V2_1_BOARD
-#include "lyratd_msc_v2_1_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRATD_MSC_V2_2_BOARD
-#include "lyratd_msc_v2_2_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRATD_MSC_BV1_0_BOARD
-#include "lyratd_msc_bv1_0_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRATD_FT_V1_0_BOARD
-#include "lyratd_ft_v1_0_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRATD_KN_V1_0_BOARD
-#include "lyratd_kn_v1_0_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRATD_FT_DOSS_V1_0_BOARD
-#include "lyratd_ft_doss_v1_0_board.h"
-#endif
-
-#ifdef CONFIG_ESP_LYRAT_MINI_V1_0_BOARD
-#include "lyrat_mini_v1_0_board.h"
-#endif
-
 #ifdef CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
-#define CONFIG_CODEC_CHIP_IS_ES8311
-#define CONFIG_USE_ES7243
 #include "lyrat_mini_v1_1_board.h"
 #endif 
 
 #ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
-#define CONFIG_CODEC_CHIP_IS_ES8311
-#define CONFIG_USE_ES7210
 #include "esp32_korvo_v1_1_board.h"
+#endif 
+
+#ifdef CONFIG_ESP32_S3_KORVO_V1_0_BOARD
+#include "esp32_s3_korvo_v1_0_board.h"
+#endif
+
+#ifdef CONFIG_ESP_KORVO_MIX_B_V1_0_BOARD
+#include "esp_korvo_mix_b_v1_0_board.h"
+#endif
+
+#ifdef CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD
+#include "esp_korvo_mix_a_v1_0_board.h"
+#endif
+
+#ifdef CONFIG_ESP32_S3_KORVO_V2_0_BOARD
+#include "esp32_s3_korvo_v2_0_board.h"
+#endif
+
+#ifdef CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD
+#include "esp_korvo_mix_b_v2_0_board.h"
 #endif
 
 #ifdef CONFIG_ESP32_S2_KALUGA_1_V1_2_BOARD
-#define CONFIG_CODEC_CHIP_IS_ES8311
 #include "esp32_s2_kaluga_1_V1_2_board.h"
 #endif 
 

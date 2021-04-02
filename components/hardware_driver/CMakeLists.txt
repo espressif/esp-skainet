@@ -1,11 +1,9 @@
-if(IDF_TARGET STREQUAL "esp32")
 set(COMPONENT_SRCDIRS 
     ./MediaHal
     ./MediaHal/Codec
     ./SystemSal
-    ./i2c_bus
-    ./SDCardConfig
     ./button
+    ./SDCardConfig
     ./led
     )
 
@@ -13,11 +11,10 @@ set(COMPONENT_ADD_INCLUDEDIRS
     ./MediaHal/Board
     ./MediaHal/Codec
     ./MediaHal
-    ./SDCardConfig
     ./SystemSal
-    ./i2c_bus
     ./userconfig
     ./button/include
+    ./SDCardConfig
     ./led/include
     )
 
@@ -26,7 +23,6 @@ set(COMPONENT_REQUIRES
     esp_adc_cal
     nvs_flash
     )
-endif()
 
 register_component()
 

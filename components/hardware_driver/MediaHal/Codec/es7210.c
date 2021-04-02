@@ -55,6 +55,41 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg1[] =
 //    { 0x11, 0x63 },
 //    { 0x12, 0x01 },
 //};
+
+// static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
+// {
+//     { 0x40, 0xC3 },
+//     { 0x41, 0x70 },
+//     { 0x42, 0x70 },
+//     { 0x43, 0x1B },
+//     { 0x44, 0x1B },
+//     { 0x45, 0x1B },
+//     { 0x46, 0x18 },
+//     { 0x47, 0x08 },
+//     { 0x48, 0x08 },
+//     { 0x49, 0x08 },
+//     { 0x4A, 0x08 },
+//     { 0x07, 0x20 },
+// };
+
+
+// static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
+// {
+//     { 0x40, 0xC3 },
+//     { 0x41, 0x70 },
+//     { 0x42, 0x70 },
+//     { 0x43, 0x1E },
+//     { 0x44, 0x1E },
+//     { 0x45, 0x1E },
+//     { 0x46, 0x1E },
+//     { 0x47, 0x08 },
+//     { 0x48, 0x08 },
+//     { 0x49, 0x08 },
+//     { 0x4A, 0x08 },
+//     { 0x07, 0x20 },
+// };
+
+// korvo-mix
 static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
 {
     { 0x40, 0xC3 },
@@ -62,7 +97,7 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
     { 0x42, 0x70 },
     { 0x43, 0x1E },
     { 0x44, 0x1E },
-    { 0x45, 0x1E },
+    { 0x45, 0x18 },
     { 0x46, 0x1E },
     { 0x47, 0x08 },
     { 0x48, 0x08 },
@@ -70,6 +105,8 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
     { 0x4A, 0x08 },
     { 0x07, 0x20 },
 };
+
+
 //static const struct es7210_reg_config es7210_tdm_reg_mclk_cfg[] =
 //{
 //    { 0x02, 0xC3 },
@@ -172,7 +209,7 @@ static int es7210_write(unsigned char reg, unsigned char value, unsigned char i2
     res |= i2c_master_stop(cmd);
     res |= i2c_master_cmd_begin(0, cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
-    ES_ASSERT(res, "ESCodecWriteReg error", -1);
+    // ES_ASSERT(res, "ESCodecWriteReg error", -1);
     return res;
 }
 
@@ -904,10 +941,10 @@ static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
 * return 0, success
 *
 */
-int Es7210Init(Es7210Config *cfg)
+int Es7210Init(void)
 {
     unsigned int cnt;
-    I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num);
+    // I2cInit(&cfg->i2c_cfg, cfg->i2c_port_num);
     
     for(cnt =0; cnt < ADC_DEV_MAXNUM; cnt++)
     {

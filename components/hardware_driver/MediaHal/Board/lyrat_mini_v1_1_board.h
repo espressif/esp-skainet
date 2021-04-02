@@ -30,38 +30,15 @@ extern "C" {
 #endif
 
 /* Board functions related */
-#define DIFFERENTIAL_MIC            0
 #define BOARD_INFO                  "ESP_LYRAT_MINI_V1"
-#define ENABLE_AUXIN_DETECT
-#define ENABLE_KEYWORD_DETECT
-#define ENABLE_ADC_BUTTON
 #define ENABLE_MCLK_GPIO0
-/* SD card related */
-#define SD_CARD_INTR_GPIO           34
-#define SD_CARD_INTR_SEL            GPIO_SEL_34
-#define SD_CARD_PWR_CTRL            13	
-#define SD_CARD_OPEN_FILE_NUM_MAX   5
+#define USE_CODEC                   1
+#define USE_ADC                     1
+#define CONFIG_CODEC_CHIP_IS_ES8311
+#define CONFIG_ADC_CHIP_IS_ES7243
+#define USE_I2S_0                   1
+#define USE_I2S_1                   1
 
-#define SD_CARD_DATA0               2
-#define SD_CARD_CMD                 15
-#define SD_CARD_CLK                 14
-
-/* AUX-IN related */
-#ifdef ENABLE_AUXIN_DETECT
-#define AUXIN_DETECT_PIN           19
-#endif
-
-/* Adc button pin */
-#ifdef ENABLE_ADC_BUTTON
-#define BUTTON_ADC_CH             ADC1_CHANNEL_3
-#endif
-
-/* LED indicators */
-#define GPIO_LED_GREEN              22
-#define GPIO_LED_BLUE               27
-
-/* Headphone detect */
-#define GPIO_HEADPHONE_DETECT       19
 
 /* I2C gpios */
 #define IIC_CLK                     23
@@ -75,14 +52,64 @@ extern "C" {
 #define IIS_SCLK                    5
 #define IIS_LCLK                    25
 #define IIS_DSIN                    26
-#define IIS_DOUT                    35
+#define IIS_DOUT                    -1
 
 /* I2S1 gpios */
 #define IIS1_MCLK                   0
 #define IIS1_SCLK                   32
 #define IIS1_LCLK                   33
+#define IIS1_DSIN                   -1
 #define IIS1_DOUT                   36
 
+#define I2S0_CONFIG(){ \
+    .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX, \
+    .sample_rate = 16000, \
+    .bits_per_sample = 16, \
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
+    .communication_format = I2S_COMM_FORMAT_I2S, \
+    .dma_buf_count = 3, \
+    .dma_buf_len = 300, \
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, \
+    .use_apll = 1, \
+};
+
+#define I2S1_CONFIG(){ \
+    .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX, \
+    .sample_rate = 16000, \
+    .bits_per_sample = 16, \
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
+    .communication_format = I2S_COMM_FORMAT_I2S, \
+    .dma_buf_count = 3, \
+    .dma_buf_len = 300, \
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, \
+    .use_apll = 0, \
+};
+
+#define I2S0_PIN(){ \
+    .bck_io_num = IIS_SCLK, \
+    .ws_io_num = IIS_LCLK, \
+    .data_out_num = IIS_DSIN, \
+    .data_in_num = IIS_DOUT, \
+};
+
+#define I2S1_PIN(){ \
+    .bck_io_num = IIS1_SCLK, \
+    .ws_io_num = IIS1_LCLK, \
+    .data_out_num = IIS1_DSIN, \
+    .data_in_num = IIS1_DOUT, \
+};
+
+#define I2C_CONFIG(){ \
+    .i2c_port_num = I2C_NUM_0, \
+    .i2c_cfg = { \
+        .mode = I2C_MODE_MASTER, \
+        .sda_io_num = IIC_DATA, \
+        .scl_io_num = IIC_CLK, \
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,\
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,\
+        .master.clk_speed = 100000 \
+    }, \
+};
 
 #ifdef __cplusplus
 }

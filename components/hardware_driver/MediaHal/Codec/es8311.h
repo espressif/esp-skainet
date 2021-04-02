@@ -12,7 +12,6 @@
 
 #ifndef _ES8311_H
 #define _ES8311_H
-#include "driver/i2c.h"
 #include "ESCodec_common.h"
 
 /*
@@ -66,32 +65,13 @@
 
 #define ES8311_MAX_REGISTER             0xFF
 
-
-typedef struct {
-    ESCodecMode esMode;
-    i2c_port_t i2c_port_num;
-    i2c_config_t i2c_cfg;
-    DacOutput dacOutput;
-    AdcInput adcInput;
-} Es8311Config;
-
-
 #define AUDIO_CODEC_ES8311_DEFAULT(){ \
     .esMode = ES_MODE_SLAVE, \
-    .i2c_port_num = I2C_NUM_0, \
-    .i2c_cfg = { \
-        .mode = I2C_MODE_MASTER, \
-        .sda_io_num = IIC_DATA, \
-        .scl_io_num = IIC_CLK, \
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,\
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,\
-        .master.clk_speed = 100000\
-    }, \
     .adcInput = ADC_INPUT_LINPUT1_RINPUT1,\
     .dacOutput = DAC_OUTPUT_LOUT1 | DAC_OUTPUT_LOUT2 | DAC_OUTPUT_ROUT1 | DAC_OUTPUT_ROUT2,\
 };
 
-int Es8311Init(Es8311Config *cfg);
+int Es8311Init(CodecConfig *cfg);
 void Es8311Uninit();
 esp_err_t Es8311GetRef(bool flag);
 esp_err_t Es7243Init(void);

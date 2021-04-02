@@ -1,6 +1,8 @@
 #ifndef __ESCODEC_COMMON_H__
 #define __ESCODEC_COMMON_H__
 
+#include "driver/i2c.h"
+
 typedef enum BitsLength {
     BIT_LENGTH_MIN = -1,
     BIT_LENGTH_16BITS = 0x03,
@@ -162,6 +164,19 @@ typedef struct {
     SclkDiv sclkDiv;
     LclkDiv lclkDiv;
 } ESCodecI2sClock;
+
+typedef struct {
+    ESCodecMode esMode;
+    i2c_port_t i2c_port_num;
+    i2c_config_t i2c_cfg;
+    DacOutput dacOutput;
+    AdcInput adcInput;
+} CodecConfig;
+
+typedef struct {
+    i2c_port_t i2c_port_num;
+    i2c_config_t i2c_cfg;
+} ADCConfig;
 
 #endif //__ESCODEC_COMMON_H__
 
