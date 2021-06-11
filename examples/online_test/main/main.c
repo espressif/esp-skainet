@@ -18,12 +18,13 @@
 #define I2S_CHANNEL_NUM 2
 #endif
 
+static esp_afe_sr_iface_t *afe_handle = NULL;
+
 void feed_Task(void *arg)
 {
-    esp_afe_sr_iface_t *afe = &esp_afe_sr_2mic;
     esp_afe_sr_data_t *afe_data = arg;
-    int audio_chunksize = afe->get_feed_chunksize(afe_data);
-    int nch = afe->get_channel_num(afe_data);
+    int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
+    int nch = afe_handle->get_channel_num(afe_data);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * I2S_CHANNEL_NUM);
     assert(i2s_buff);
     size_t bytes_read;
@@ -51,18 +52,17 @@ void feed_Task(void *arg)
 
         }
 
-        afe->feed(afe_data, i2s_buff);
+        afe_handle->feed(afe_data, i2s_buff);
     }
-    afe->destroy(afe_data);
+    afe_handle->destroy(afe_data);
     vTaskDelete(NULL);
 }
 
 void detect_Task(void *arg)
 {
-    esp_afe_sr_iface_t *afe = &esp_afe_sr_2mic;
     esp_afe_sr_data_t *afe_data = arg;
-    int afe_chunksize = afe->get_fetch_chunksize(afe_data);
-    int nch = afe->get_channel_num(afe_data);
+    int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
+    int nch = afe_handle->get_channel_num(afe_data);
     int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
     assert(buff);
     static const esp_mn_iface_t *multinet = &MULTINET_MODEL;
@@ -72,13 +72,14 @@ void detect_Task(void *arg)
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
     int detect_flag = 0;
+
     while (1) {
-        int res = afe->fetch(afe_data, buff);
+        int res = afe_handle->fetch(afe_data, buff);
         if (res > 0) {
             detect_flag = 1;
             printf("wakeword detected\n");
-            afe->disable_wakenet(afe_data);
-            afe->disable_aec(afe_data);
+            afe_handle->disable_wakenet(afe_data);
+            afe_handle->disable_aec(afe_data);
         }
 
         if (detect_flag == 1) {
@@ -88,47 +89,45 @@ void detect_Task(void *arg)
                 if (command_id > -1) {
                     ets_printf("command_id: %d\n", command_id);
 #if defined CONFIG_EN_MULTINET1_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
-                    afe->enable_wakenet(afe_data);
-                    afe->enable_aec(afe_data);
+                    afe_handle->enable_wakenet(afe_data);
+                    afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
 #endif
                 }
 
                 if (command_id == -2) {
-                    afe->enable_wakenet(afe_data);
+                    afe_handle->enable_wakenet(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
                 }
             }
         }
     }
-    afe->destroy(afe_data);
+    afe_handle->destroy(afe_data);
     vTaskDelete(NULL);
 }
 
 void app_main()
 {
     codec_init();
-    esp_afe_sr_iface_t *afe_handle = &esp_afe_sr_2mic;
+#if CONFIG_IDF_TARGET_ESP32
+    afe_handle = &esp_afe_sr_1mic;
+#else 
+    afe_handle = &esp_afe_sr_2mic;
+#endif
     const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
     const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
     int afe_perferred_core = 0;
-    int afe_mode = 1;
+    int afe_mode = SR_MODE_STEREO_MEDIUM;
 #ifdef CONFIG_IDF_TARGET_ESP32
-    afe_mode = -1;
-    printf("ESP32 only support afe mode = -1\n");   
+    afe_mode = SR_MODE_MONO_MEDIUM_COST;
+    printf("ESP32 only support afe mode = SR_MODE_MONO_LOW_COST or SR_MODE_MONO_MEDIUM_COST\n");   
 #endif
-
+    printf("AFE mode: %d\n", afe_mode);
     esp_afe_sr_data_t *afe_data = afe_handle->create(afe_mode, afe_perferred_core);
     afe_handle->set_wakenet(afe_data, &WAKENET_MODEL, &WAKENET_COEFF);
     xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, afe_perferred_core);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
 }
-
-
-
-
-
-

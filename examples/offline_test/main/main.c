@@ -162,7 +162,7 @@ void app_main()
     // 
 
     // AFE & wakenet test
-    esp_afe_sr_data_t *afe_data = esp_afe->create(SR_MODE_MEDIUM, 0);
+    esp_afe_sr_data_t *afe_data = esp_afe->create(SR_MODE_MEDIUM, 2);
     esp_afe->set_wakenet(afe_data, wakenet, model_coeff_getter);
     xTaskCreatePinnedToCore(&feedTask, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 1);
     xTaskCreatePinnedToCore(&fetchTask, "fetch", 4 * 1024, (void*)afe_data, 5, NULL, 1);
