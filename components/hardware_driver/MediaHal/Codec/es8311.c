@@ -295,7 +295,7 @@ static void es8311_pcm_hw_params(uint32_t mclk, uint32_t lrck)
             default:
                 break;
         }
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD 
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD 
         datmp = 3;
 #endif
         regv |= (datmp) << 3;
@@ -507,7 +507,7 @@ static void es8311_Codec_Startup(uint32_t mclk_freq, uint32_t lrck_freq)
     es8311_priv->pcm_format = I2S_FMT;
     es8311_priv->pcm_resolution = LENGTH_16BIT;
     es8311_priv->master_slave_mode = SLAVE_MODE;
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD
     es8311_priv->mclk_src = FROM_SCLK_PIN;
 #else
     es8311_priv->mclk_src = FROM_MCLK_PIN;

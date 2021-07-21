@@ -34,7 +34,7 @@
 #include "driver/i2c.h"
 // #include "lock.h"
 // #include "InterruptionSal.h"
-#if defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD
+#if defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
 #include "esp32s3/rom/gpio.h"
 #endif
 #define HAL_TAG "MEDIA_HAL"
@@ -123,14 +123,14 @@ static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
     }
     return res;
 }
-#if defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
 void i2s_mclK_matrix_out(int i2s_num, int io_num)
 {
 #include "driver/gpio.h"
 #include "esp_rom_gpio.h"
-PIN_FUNC_SELECT(GPIO_PIN_MUX_REG[io_num], PIN_FUNC_GPIO);
-gpio_set_direction(io_num, GPIO_MODE_OUTPUT);
-esp_rom_gpio_connect_out_signal(io_num, i2s_num == 0 ? 23 : 21, 0, 0);
+    PIN_FUNC_SELECT(GPIO_PIN_MUX_REG[io_num], PIN_FUNC_GPIO);
+    gpio_set_direction(io_num, GPIO_MODE_OUTPUT);
+    esp_rom_gpio_connect_out_signal(io_num, i2s_num == 0 ? 23 : 21, 0, 0);
 }
 #endif
 static void i2s_mclk_matrix_out(int i2s_num, int gpio)
@@ -181,9 +181,16 @@ int MediaHalInit(void *config)
 #endif
 #if defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD
     i2s_mclk_matrix_out(0, 42);
-    // i2s_mclk_matrix_out(1, 20);
     i2s_mclK_matrix_out(1, 20);
 #endif
+
+#if defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+    #include "soc/usb_serial_jtag_reg.h"
+    CLEAR_PERI_REG_MASK(USB_SERIAL_JTAG_CONF0_REG, USB_SERIAL_JTAG_USB_PAD_ENABLE);
+    i2s_mclK_matrix_out(0, 42);
+    i2s_mclK_matrix_out(1, 20);
+#endif
+
 #if defined CONFIG_ESP_KORVO_MIX_B_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD
     i2s_mclk_matrix_out(1, 0);
 #endif
