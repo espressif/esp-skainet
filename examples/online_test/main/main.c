@@ -5,14 +5,17 @@
 
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
+#include "dl_lib_coefgetter_if.h"
+#include <sys/time.h>
 #include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
+#include "sdcard_init.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
 #include "MediaHal.h"
 #include "driver/i2s.h"
 
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD  || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
 #define I2S_CHANNEL_NUM 4
 #else
 #define I2S_CHANNEL_NUM 2
@@ -28,12 +31,17 @@ void feed_Task(void *arg)
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * I2S_CHANNEL_NUM);
     assert(i2s_buff);
     size_t bytes_read;
+    // FILE *fp = fopen("/sdcard/out", "w");
+    // if (fp == NULL) printf("can not open file\n");
 
     while (1) {
         i2s_read(I2S_NUM_1, i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
+        // FatfsComboWrite(i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), 1, fp);
+
+
         if (I2S_CHANNEL_NUM == 4) {
-#ifdef CONFIG_ESP32_S3_KORVO_V2_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
             for (int i = 0; i < audio_chunksize; i++) {
                 int16_t ref = i2s_buff[4 * i + 0];
                 i2s_buff[3 * i + 0] = i2s_buff[4 * i + 1];
@@ -51,6 +59,8 @@ void feed_Task(void *arg)
 #endif
 
         }
+
+        // FatfsComboWrite(se_ref, frame_size * nch * sizeof(int16_t), 1, fp);
 
         afe_handle->feed(afe_data, i2s_buff);
     }
@@ -72,7 +82,8 @@ void detect_Task(void *arg)
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
     int detect_flag = 0;
-
+    char *err_id = calloc(100, 1);
+    char *new_commands_str = "da kai dian deng,kai dian deng;guan bi dian deng,guan dian deng;guan deng;";
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
         if (res > 0) {
@@ -93,6 +104,10 @@ void detect_Task(void *arg)
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
+
+                    multinet->reset(model_data, new_commands_str, err_id);
+                    printf("err_phrase_id: %s\n", err_id);
+                    memset(err_id, 0, 100);
 #endif
                 }
 
@@ -120,7 +135,7 @@ void app_main()
     const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
     int afe_perferred_core = 0;
-    int afe_mode = SR_MODE_STEREO_MEDIUM;
+    int afe_mode = SR_MODE_STEREO_HIGH_PERF;
 #ifdef CONFIG_IDF_TARGET_ESP32
     afe_mode = SR_MODE_MONO_MEDIUM_COST;
     printf("ESP32 only support afe mode = SR_MODE_MONO_LOW_COST or SR_MODE_MONO_MEDIUM_COST\n");   
