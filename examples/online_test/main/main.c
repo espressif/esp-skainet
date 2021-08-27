@@ -95,11 +95,12 @@ void detect_Task(void *arg)
 
         if (detect_flag == 1) {
             int command_id = multinet->detect(model_data, buff);
+            printf("----\n");
 
             if (command_id >= -2) {
                 if (command_id > -1) {
                     ets_printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET1_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
@@ -135,10 +136,10 @@ void app_main()
     const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
     int afe_perferred_core = 0;
-    int afe_mode = SR_MODE_STEREO_HIGH_PERF;
+    int afe_mode = SR_MODE_LOW_COST;
 #ifdef CONFIG_IDF_TARGET_ESP32
-    afe_mode = SR_MODE_MONO_MEDIUM_COST;
-    printf("ESP32 only support afe mode = SR_MODE_MONO_LOW_COST or SR_MODE_MONO_MEDIUM_COST\n");   
+    afe_mode = SR_MODE_LOW_COST;
+    printf("ESP32 only support afe mode = SR_MODE_LOW_COST or SR_MODE_MEDIUM_COST\n");   
 #endif
     printf("AFE mode: %d\n", afe_mode);
     esp_afe_sr_data_t *afe_data = afe_handle->create(afe_mode, afe_perferred_core);
