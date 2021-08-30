@@ -10,6 +10,7 @@ set(COMPONENT_ADD_INCLUDEDIRS
 
 set(COMPONENT_REQUIRES
     esp-sr
+    led_strip
     hardware_driver
     )
 
