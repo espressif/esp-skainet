@@ -20,9 +20,13 @@ typedef struct {
 esp_err_t iot_dac_audio_play(const uint16_t* data, int length, TickType_t ticks_to_wait)
 {
     size_t bytes_write = 0;
+#if defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+    i2s_write(1, (const char*) data, length, &bytes_write, ticks_to_wait);
+    i2s_zero_dma_buffer(I2S_NUM_1);
+#else
     i2s_write(0, (const char*) data, length, &bytes_write, ticks_to_wait);
-
     i2s_zero_dma_buffer(I2S_NUM_0);
+#endif
     return ESP_OK;
 }
 

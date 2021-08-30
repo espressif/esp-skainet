@@ -67,6 +67,13 @@ extern "C" {
 #include "esp32_s3_korvo_v3_0_board.h"
 #endif
 
+#ifdef CONFIG_ESP32_S3_KORVO_V4_0_BOARD
+#include "esp32_s3_korvo_v4_0_board.h"
+#endif
+
+#ifdef CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+#include "esp32_s3_cube_v2_0_board.h"
+#endif
 
 #ifdef __cplusplus
 }
