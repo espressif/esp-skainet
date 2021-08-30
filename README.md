@@ -8,7 +8,7 @@ ESP-Skainet supports the development of wake word detection and speech commands 
 
 In general, the ESP-Skainet features will be supported, as shown below:
 
-![overview](img/skainet_overview.png)
+![overview](img/Skainet_diagram)
 
 ## Input Voice Stream
 
@@ -26,10 +26,14 @@ Espressif's speech command recognition model [MultiNet](https://github.com/espre
 
 Currently, Espressif **MultiNet** supports up to 100 Chinese or English speech commands, such as “打开空调” (Turn on the air conditioner) and “打开卧室灯” (Turn on the bedroom light). 
 
-## Acoustic Algorithm
+## Audio Front End
 
-Now, ESP-Skainet integrates AEC (Acoustic Echo Cancellation), AGC (automatic_gain_control), NS (Noise Suppression), VAD (Voice Activity Detection) and MASE (Mic Array Speech Enhancement).
+Espressif Audio Front End [AFE](https://github.com/espressif/esp-sr/tree/esp32s3_dev/audio_front_end) integrates AEC (Acoustic Echo Cancellation),  VAD (Voice Activity Detection),BSS (Blind Source Separation) and NS (Noise Suppression).    
 
+The  two-mic Audio Front-End (AFE) framework  have been qualified as a “Software Audio Front-End Solution” for [Amazon Alexa Built-in devices](https://developer.amazon.com/en-US/alexa/solution-providers/dev-kits#software-audio-front-end-dev-kits).
+![afe](img/esp_afe.png)    
+  
+  
 # Quick Start with ESP-Skainet
 
 ## Hardware Preparation
