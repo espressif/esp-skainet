@@ -8,7 +8,7 @@ ESP-Skainet 以最便捷的方式支持基于乐鑫的 ESP32 芯片的唤醒词�
 
 ESP-Skainet 的功能支持如下所示：
 
-![overview](img/skainet_overview.png)
+![overview](img/skainet_overview2.png)
 
 ## 输入音频
 
@@ -28,11 +28,7 @@ ESP-Skainet 的功能支持如下所示：
 
 ## 声学前端算法
 
-乐鑫[Audio Front-End(AFE)](https://github.com/espressif/esp-sr/tree/esp32s3_dev/audio_front_end)集成了回声消除 AEC(Acoustic Echo Cancellation)，盲源分离BSS((Blind Source Separation),自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 。  
-
-其中双麦AFE已经通过了Amazon的["Software Audio Front-End Solution"](https://developer.amazon.com/en-US/alexa/solution-providers/dev-kits#software-audio-front-end-dev-kits)认证．
-
-![afe](img/esp_afe.png)
+声学前端算法[Audio Front-End(AFE)]() 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Speech Enhancement)。
 
 # 快速开始
 
