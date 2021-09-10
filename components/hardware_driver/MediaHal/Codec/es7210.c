@@ -89,7 +89,7 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg1[] =
 //     { 0x07, 0x20 },
 // };
 
-// korvo-mix
+#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || CONFIG_ESP32_S3_CUBE_V2_0_BOARD
 static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
 {
     { 0x40, 0xC3 },
@@ -97,7 +97,7 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
     { 0x42, 0x70 },
     { 0x43, 0x1E },
     { 0x44, 0x1E },
-    { 0x45, 0x18 },
+    { 0x45, 0x10 },
     { 0x46, 0x1E },
     { 0x47, 0x08 },
     { 0x48, 0x08 },
@@ -105,6 +105,39 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
     { 0x4A, 0x08 },
     { 0x07, 0x20 },
 };
+#elif defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
+{
+    { 0x40, 0xC3 },
+    { 0x41, 0x70 },
+    { 0x42, 0x70 },
+    { 0x43, 0x1E },
+    { 0x44, 0x1E },
+    { 0x45, 0x1E },
+    { 0x46, 0x1E },
+    { 0x47, 0x08 },
+    { 0x48, 0x08 },
+    { 0x49, 0x08 },
+    { 0x4A, 0x08 },
+    { 0x07, 0x20 },
+};
+#else
+static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
+{
+    { 0x40, 0xC3 },
+    { 0x41, 0x70 },
+    { 0x42, 0x70 },
+    { 0x43, 0x1E },
+    { 0x44, 0x1E },
+    { 0x45, 0x1E },
+    { 0x46, 0x1E },
+    { 0x47, 0x08 },
+    { 0x48, 0x08 },
+    { 0x49, 0x08 },
+    { 0x4A, 0x08 },
+    { 0x07, 0x20 },
+};
+#endif
 
 
 //static const struct es7210_reg_config es7210_tdm_reg_mclk_cfg[] =

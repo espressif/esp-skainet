@@ -34,7 +34,7 @@
 #include "driver/i2c.h"
 // #include "lock.h"
 // #include "InterruptionSal.h"
-#if defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+#if defined CONFIG_ESP32_S3_CUSTOMER_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
 #include "esp32s3/rom/gpio.h"
 #endif
 #define HAL_TAG "MEDIA_HAL"
@@ -123,7 +123,7 @@ static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
     }
     return res;
 }
-#if defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+#if defined CONFIG_ESP32_S3_CUSTOMER_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
 void i2s_mclK_matrix_out(int i2s_num, int io_num)
 {
 #include "driver/gpio.h"
@@ -184,12 +184,23 @@ int MediaHalInit(void *config)
     i2s_mclK_matrix_out(1, 20);
 #endif
 
-#if defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
     #include "soc/usb_serial_jtag_reg.h"
     CLEAR_PERI_REG_MASK(USB_SERIAL_JTAG_CONF0_REG, USB_SERIAL_JTAG_USB_PAD_ENABLE);
     i2s_mclK_matrix_out(0, 42);
     i2s_mclK_matrix_out(1, 20);
 #endif
+
+#if defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+    #include "soc/usb_serial_jtag_reg.h"
+    i2s_mclK_matrix_out(1, 14);
+#endif
+
+#if CONFIG_ESP32_S3_CUSTOMER_BOARD
+    i2s_mclK_matrix_out(0, 48);
+    i2s_mclK_matrix_out(1, 20);
+#endif
+
 
 #if defined CONFIG_ESP_KORVO_MIX_B_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD
     i2s_mclk_matrix_out(1, 0);
@@ -198,6 +209,10 @@ int MediaHalInit(void *config)
     // I2C INIT
     I2CConfig  I2CCfg = I2C_CONFIG() ;
     I2cInit(&(I2CCfg.i2c_cfg), I2CCfg.i2c_port_num);
+#if USE_DUAL_I2C
+    I2CConfig  I2CCfg1 = I2C1_CONFIG() ;
+    I2cInit(&(I2CCfg1.i2c_cfg), I2CCfg1.i2c_port_num);
+#endif
 
 #if USE_CODEC
     ret |= MediaHalConfig.codec_init(config);
@@ -232,7 +247,8 @@ int MediaHalInit(void *config)
     gpio_config(&io_conf);
     gpio_set_level(GPIO_PA_EN, 1);
 #endif
-    printf("i2s init done!!!!\n");
+    printf("codec init done!!!!\n");
+
     return ret;
 }
 
