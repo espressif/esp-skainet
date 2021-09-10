@@ -6,9 +6,11 @@
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
 #include "dl_lib_coefgetter_if.h"
+
 #include <sys/time.h>
 #include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
+
 #include "sdcard_init.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
@@ -70,9 +72,12 @@ void feed_Task(void *arg)
 
 void detect_Task(void *arg)
 {
+    uint32_t c0,c1,c2=0;
+    int count =0;
     esp_afe_sr_data_t *afe_data = arg;
     int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
     int nch = afe_handle->get_channel_num(afe_data);
+    printf("%d %d\n", afe_chunksize, nch);
     int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
     assert(buff);
     static const esp_mn_iface_t *multinet = &MULTINET_MODEL;
@@ -84,32 +89,49 @@ void detect_Task(void *arg)
     int detect_flag = 0;
     char *err_id = calloc(100, 1);
     char *new_commands_str = "da kai dian deng,kai dian deng;guan bi dian deng,guan dian deng;guan deng;";
+    
+    FILE *fp=NULL;
+    fp=fopen("/sdcard/test.pcm", "w");
+    if (fp==NULL) {
+        printf("can not open the file\n");
+    }
+
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
-        if (res > 0) {
-            detect_flag = 1;
+        FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
+        if (res == AFE_FETCH_WWE_DETECTED) {
             printf("wakeword detected\n");
+        }
+        if (res == AFE_FETCH_CHANNEL_VERIFIED) {
+            detect_flag = 1;
             afe_handle->disable_wakenet(afe_data);
             afe_handle->disable_aec(afe_data);
-        }
+        } 
 
         if (detect_flag == 1) {
+            RSR(CCOUNT, c0);
             int command_id = multinet->detect(model_data, buff);
+            RSR(CCOUNT, c1);
+            c2 += c1-c0;
+            count++;
             printf("----\n");
 
             if (command_id >= -2) {
                 if (command_id > -1) {
                     ets_printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
-                    printf("\n-----------awaits to be waken up-----------\n");
+                    printf("CPU:  %f\n", c2*1.0/count/240/1000/32);
 
-                    multinet->reset(model_data, new_commands_str, err_id);
-                    printf("err_phrase_id: %s\n", err_id);
-                    memset(err_id, 0, 100);
-#endif
+// #if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+                    
+//                     printf("\n-----------awaits to be waken up-----------\n");
+
+//                     multinet->reset(model_data, new_commands_str, err_id);
+//                     printf("err_phrase_id: %s\n", err_id);
+//                     memset(err_id, 0, 100);
+// #endif
                 }
 
                 if (command_id == -2) {
@@ -127,6 +149,9 @@ void detect_Task(void *arg)
 void app_main()
 {
     codec_init();
+    sd_card_mount("/sdcard");
+    int ram_start_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    int dram_start_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
 #if CONFIG_IDF_TARGET_ESP32
     afe_handle = &esp_afe_sr_1mic;
 #else 
@@ -135,15 +160,19 @@ void app_main()
     const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
     const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
-    int afe_perferred_core = 0;
-    int afe_mode = SR_MODE_LOW_COST;
-#ifdef CONFIG_IDF_TARGET_ESP32
-    afe_mode = SR_MODE_LOW_COST;
-    printf("ESP32 only support afe mode = SR_MODE_LOW_COST or SR_MODE_MEDIUM_COST\n");   
-#endif
-    printf("AFE mode: %d\n", afe_mode);
-    esp_afe_sr_data_t *afe_data = afe_handle->create(afe_mode, afe_perferred_core);
-    afe_handle->set_wakenet(afe_data, &WAKENET_MODEL, &WAKENET_COEFF);
-    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, afe_perferred_core);
-    xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
+    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
+    afe_config.aec_init = false;
+    afe_config.vad_init = false;
+    afe_config.afe_perferred_core = 0;
+    afe_config.afe_mode = SR_MODE_LOW_COST;
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
+
+    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);
+    xTaskCreatePinnedToCore(&detect_Task, "detect", 5 * 1024, (void*)afe_data, 5, NULL, 0);
+    vTaskDelay(3000 / portTICK_PERIOD_MS);
+    int ram_left_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    int dram_left_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+    printf("DRAM start:%d left:%d, use:%d, PSRAM start:%d left:%d use:%d\n", dram_start_size, dram_left_size, dram_start_size-dram_left_size,
+                                                                     ram_start_size, ram_left_size, ram_start_size-ram_left_size-(dram_start_size-dram_left_size));
+
 }
