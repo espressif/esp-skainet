@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef _AUDIO_S3_CUBE_V2_0_BOARD_H_
-#define _AUDIO_S3_CUBE_V2_0_BOARD_H_
+#ifndef _AUDIO_S3_BOX_BOARD_H_
+#define _AUDIO_S3_BOX_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Board functions related */
-#define BOARD_INFO                  "ESP32_S3_CUBE_V2_0"
+#define BOARD_INFO                  "ESP32_S3_BOX"
 #define USE_CODEC                   1
 #define USE_ADC                     1
 #define CONFIG_CODEC_CHIP_IS_ES8311
@@ -44,21 +44,20 @@ extern "C" {
 #define IIC_DATA                    8
 
 /* PA */
-#define GPIO_PA_EN                  16
+#define GPIO_PA_EN                  46
 
 /* I2S1 gpios */
-#define IIS1_MCLK                   14
-#define IIS1_SCLK                   21
+#define IIS1_MCLK                   2
+#define IIS1_SCLK                   17
 #define IIS1_LCLK                   47
-#define IIS1_DSIN                   48
-#define IIS1_DOUT                   12
+#define IIS1_DSIN                   15
+#define IIS1_DOUT                   16
 
 #define I2S1_CONFIG(){ \
         .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX, \
         .sample_rate = 16000, \
         .communication_format = I2S_COMM_FORMAT_STAND_I2S, \
         .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT, \
-        .bits_per_channel = 0, \
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
         .dma_buf_count = 6, \
         .dma_buf_len = 160, \

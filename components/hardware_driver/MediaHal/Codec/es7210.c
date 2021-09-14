@@ -89,7 +89,7 @@ static const struct es7210_reg_config es7210_tdm_reg_common_cfg1[] =
 //     { 0x07, 0x20 },
 // };
 
-#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || CONFIG_ESP32_S3_BOX_BOARD
 static const struct es7210_reg_config es7210_tdm_reg_common_cfg2[] =
 {
     { 0x40, 0xC3 },

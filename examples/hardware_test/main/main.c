@@ -15,7 +15,7 @@
 #include "sdcard_init.h"
 #include "speech_commands.h"
 
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
 #define I2S_CHANNEL_NUM 4
 #else
 #define I2S_CHANNEL_NUM 2
@@ -56,7 +56,7 @@ void i2s_Task(void *arg)
     vTaskDelete(NULL);
 }
 
-#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
 #include "board.h"
 static xQueueHandle gpio_evt_queue = NULL;
 static void IRAM_ATTR gpio_isr_handler(void* arg)
@@ -109,7 +109,7 @@ void app_main()
     codec_init();
     sd_card_mount("/sdcard");
     MediaHalSetVolume(70);
-#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
     mute_init();
 #endif
     save_audio_rb = rb_init(BUFFER_PROCESS, 512 * 100, 1, NULL);

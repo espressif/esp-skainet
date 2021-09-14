@@ -64,7 +64,6 @@ extern "C" {
         .sample_rate = 16000, \
         .communication_format = I2S_COMM_FORMAT_STAND_I2S, \
         .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, \
-        .bits_per_channel = 0, \
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
         .dma_buf_count = 6, \
         .dma_buf_len = 60, \
@@ -77,7 +76,6 @@ extern "C" {
         .sample_rate = 16000, \
         .communication_format = I2S_COMM_FORMAT_STAND_I2S, \
         .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT, \
-        .bits_per_channel = 0, \
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
         .dma_buf_count = 6, \
         .dma_buf_len = 160, \

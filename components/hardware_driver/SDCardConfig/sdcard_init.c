@@ -305,7 +305,7 @@ int sd_card_mount(const char* basePath)
     // Card has been initialized, print its properties
     sdmmc_card_print_info(stdout, card);
     return 1;
-#elif defined CONFIG_ESP32_S3_CUBE_V2_0_BOARD
+#elif defined CONFIG_ESP32_S3_BOX_BOARD
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
         .max_files = 5,
