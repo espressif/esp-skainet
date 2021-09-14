@@ -12,10 +12,25 @@
 #include "driver/i2s.h"
 #include <driver/gpio.h>
 
-#include "residual.h"
-#include "household_food.h"
-#include "hazardous.h"
-#include "recyclable.h"
+// #include "ie_kaiji.h"
+#include "m_0.h"
+#include "m_1.h"
+#include "m_2.h"
+#include "m_3.h"
+#include "m_4.h"
+#include "m_5.h"
+#include "m_6.h"
+#include "m_7.h"
+#include "m_8.h"
+#include "m_9.h"
+#include "m_10.h"
+#include "m_11.h"
+#include "m_12.h"
+#include "m_13.h"
+#include "m_14.h"
+#include "m_15.h"
+#include "m_16.h"
+#include "m_17.h"
 #include "wake_up_prompt_tone.h"
 #include "speech_commands_action.h"
 
@@ -137,53 +152,66 @@ void led_Task(void * arg)
 }
 #endif
 
-esp_err_t iot_dac_audio_play(const uint16_t* data, int length, TickType_t ticks_to_wait)
+#if defined CONFIG_ESP32_S3_BOX_BOARD
+esp_err_t iot_dac_audio_play_8K(const uint16_t* data, int length, TickType_t ticks_to_wait)
 {
     size_t bytes_write = 0;
-    uint16_t *data_out = malloc(length * 2);
+    uint16_t *data_out = malloc(length * 8);
     for (int i = 0; i < length / 2; i++) {
-        data_out[2 * i] = data[i];
-        data_out[2 * i + 1] = data[i];
+        data_out[8 * i] = data[i];
+        data_out[8 * i + 1] = data[i];
+        data_out[8 * i + 2] = data[i];
+        data_out[8 * i + 3] = data[i];
+        data_out[8 * i + 4] = data[i];
+        data_out[8 * i + 5] = data[i];
+        data_out[8 * i + 6] = data[i];
+        data_out[8 * i + 7] = data[i];
     }
-    i2s_write(0, (const char*) data_out, length * 2, &bytes_write, ticks_to_wait);
+
+    i2s_write(I2S_NUM_1, (const char*) data_out, length * 8, &bytes_write, ticks_to_wait);
+
+    i2s_zero_dma_buffer(I2S_NUM_1);
     free(data_out);
-    i2s_zero_dma_buffer(I2S_NUM_0);
     return ESP_OK;
 }
+#else
+esp_err_t iot_dac_audio_play_8K(const uint16_t* data, int length, TickType_t ticks_to_wait)
+{
+    size_t bytes_write = 0;
+    i2s_write(I2S_NUM_0, (const char*) data, length, &bytes_write, ticks_to_wait);
+    i2s_zero_dma_buffer(I2S_NUM_0);
 
+    return ESP_OK;
+}
+#endif
 dac_audio_item_t playlist[] = {
-    {"residual", residual, sizeof(residual)},
-    {"household_food", household_food, sizeof(household_food)},
-    {"hazardous", hazardous, sizeof(hazardous)},
-    {"recyclable", recyclable, sizeof(recyclable)},
-    {"wake_up_prompt_tone", wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
+    // {"ie_kaiji.h", ie_kaiji, sizeof(ie_kaiji)},
+    {"wake_up_prompt_tone.h", wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
+    {"m_1.h", m_1, sizeof(m_1)},
+    {"m_2.h", m_2, sizeof(m_2)},
+    {"m_3.h", m_3, sizeof(m_3)},
+    {"m_4.h", m_4, sizeof(m_4)},
+    {"m_5.h", m_5, sizeof(m_5)},
+    {"m_6.h", m_6, sizeof(m_6)},
+    {"m_7.h", m_7, sizeof(m_7)},
+    {"m_8.h", m_8, sizeof(m_8)},
+    {"m_9.h", m_9, sizeof(m_9)},
+    {"m_10.h", m_10, sizeof(m_10)},
+    {"m_11.h", m_11, sizeof(m_11)},
+    {"m_12.h", m_12, sizeof(m_12)},
+    {"m_13.h", m_13, sizeof(m_13)},
+    {"m_14.h", m_14, sizeof(m_14)},
+    {"m_15.h", m_15, sizeof(m_15)},
+    {"m_16.h", m_16, sizeof(m_16)},
+    {"m_17.h", m_17, sizeof(m_17)},
 };
+
+void wake_up_action(void)
+{
+    iot_dac_audio_play_8K(playlist[0].data, playlist[0].length, portMAX_DELAY);
+}
 
 void speech_commands_action(int command_id)
 {
-    printf("Commands ID: %d.\n", command_id);
-    switch (command_id) {
-    case 0:
-        iot_dac_audio_play(playlist[0].data, playlist[0].length, portMAX_DELAY);
-        printf("干垃圾（Residual Waste）\n");
-        break;
-    case 1:
-        iot_dac_audio_play(playlist[1].data, playlist[1].length, portMAX_DELAY);
-        printf("湿垃圾（Household Food Waste）\n");
-        break;
-    case 2:
-        iot_dac_audio_play(playlist[2].data, playlist[2].length, portMAX_DELAY);
-        printf("有害垃圾（Hazardous Waste）\n");
-        break;
-    case 3:
-        iot_dac_audio_play(playlist[3].data, playlist[3].length, portMAX_DELAY);
-        printf("可回收垃圾（Recyclable Waste）\n");
-        break;
-    default:
-        break;
-    }
-}
-void wake_up_action(void)
-{
-    iot_dac_audio_play(playlist[4].data, playlist[4].length, portMAX_DELAY);
+    iot_dac_audio_play_8K(playlist[command_id + 1].data, playlist[command_id + 1].length, portMAX_DELAY);
 }

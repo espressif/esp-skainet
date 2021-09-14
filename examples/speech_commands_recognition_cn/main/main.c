@@ -104,21 +104,25 @@ void detect_Task(void *arg)
 
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
-        if (res > 0) {
-            detect_flag = 1;
+
+        if (res == AFE_FETCH_WWE_DETECTED) {
             play_voice = -1;
             printf("wakeword detected\n");
             printf("-----------LISTENING-----------\n");
+        }
+        if (res == AFE_FETCH_CHANNEL_VERIFIED) {
+            detect_flag = 1;
             afe_handle->disable_wakenet(afe_data);
             afe_handle->disable_aec(afe_data);
-        }
+        } 
 
-        if (detect_flag == 1 && play_voice != -1) {
+        if (detect_flag == 1 && play_voice == -2) {
             int command_id = multinet->detect(model_data, buff);
 
             if (command_id >= -2) {
                 if (command_id > -1) {
                     play_voice = command_id;
+                    printf("command_id: %d\n", command_id);
 #if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
@@ -152,20 +156,18 @@ void app_main()
 #else 
     afe_handle = &esp_afe_sr_2mic;
 #endif
-    const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
-    const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
-    int afe_perferred_core = 0;
-    int afe_mode = SR_MODE_LOW_COST;
-#ifdef CONFIG_IDF_TARGET_ESP32
-    afe_mode = SR_MODE_HIGH_PERF;
-    printf("ESP32 only support afe mode = SR_MODE_HIGH_PERF\n");   
+    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
+#if defined CONFIG_ESP32_S3_BOX_BOARD
+    afe_config.aec_init = false;
+    afe_config.vad_init = false;
 #endif
-    printf("AFE mode: %d\n", afe_mode);
-    esp_afe_sr_data_t *afe_data = afe_handle->create(afe_mode, afe_perferred_core);
-    afe_handle->set_wakenet(afe_data, &WAKENET_MODEL, &WAKENET_COEFF);
-    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, afe_perferred_core);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
+
+    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
     xTaskCreatePinnedToCore(&play_music, "play", 4 * 1024, NULL, 5, NULL, 1);
+#ifndef  CONFIG_ESP32_S3_BOX_BOARD
     xTaskCreatePinnedToCore(&led_Task, "led", 2 * 1024, NULL, 5, NULL, 0);
+#endif
 }

@@ -17,7 +17,7 @@
 #include "MediaHal.h"
 #include "driver/i2s.h"
 
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
 #define I2S_CHANNEL_NUM 4
 #else
 #define I2S_CHANNEL_NUM 2
@@ -33,17 +33,17 @@ void feed_Task(void *arg)
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * I2S_CHANNEL_NUM);
     assert(i2s_buff);
     size_t bytes_read;
-    // FILE *fp = fopen("/sdcard/out", "w");
-    // if (fp == NULL) printf("can not open file\n");
+    FILE *fp = fopen("/sdcard/out", "w");
+    if (fp == NULL) printf("can not open file\n");
 
     while (1) {
         i2s_read(I2S_NUM_1, i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
-        // FatfsComboWrite(i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), 1, fp);
+        FatfsComboWrite(i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), 1, fp);
 
 
         if (I2S_CHANNEL_NUM == 4) {
-#if defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD  || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
             for (int i = 0; i < audio_chunksize; i++) {
                 int16_t ref = i2s_buff[4 * i + 0];
                 i2s_buff[3 * i + 0] = i2s_buff[4 * i + 1];
@@ -90,15 +90,10 @@ void detect_Task(void *arg)
     char *err_id = calloc(100, 1);
     char *new_commands_str = "da kai dian deng,kai dian deng;guan bi dian deng,guan dian deng;guan deng;";
     
-    FILE *fp=NULL;
-    fp=fopen("/sdcard/test.pcm", "w");
-    if (fp==NULL) {
-        printf("can not open the file\n");
-    }
 
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
-        FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
+
         if (res == AFE_FETCH_WWE_DETECTED) {
             printf("wakeword detected\n");
         }
@@ -149,7 +144,6 @@ void detect_Task(void *arg)
 void app_main()
 {
     codec_init();
-    sd_card_mount("/sdcard");
     int ram_start_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
     int dram_start_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
 #if CONFIG_IDF_TARGET_ESP32
@@ -157,8 +151,6 @@ void app_main()
 #else 
     afe_handle = &esp_afe_sr_2mic;
 #endif
-    const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
-    const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
 
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     afe_config.aec_init = false;
@@ -174,5 +166,4 @@ void app_main()
     int dram_left_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
     printf("DRAM start:%d left:%d, use:%d, PSRAM start:%d left:%d use:%d\n", dram_start_size, dram_left_size, dram_start_size-dram_left_size,
                                                                      ram_start_size, ram_left_size, ram_start_size-ram_left_size-(dram_start_size-dram_left_size));
-
 }

@@ -62,9 +62,9 @@ extern "C" {
 
 #define I2S0_CONFIG(){ \
     .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX, \
-    .sample_rate = 16000, \
+    .sample_rate = 8000, \
     .bits_per_sample = 16, \
-    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, \
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, \
     .communication_format = I2S_COMM_FORMAT_I2S, \
     .dma_buf_count = 3, \
     .dma_buf_len = 300, \
