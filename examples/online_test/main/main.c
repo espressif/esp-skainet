@@ -143,6 +143,7 @@ void detect_Task(void *arg)
 
 void app_main()
 {
+    sd_card_mount("/sdcard");
     codec_init();
     int ram_start_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
     int dram_start_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);

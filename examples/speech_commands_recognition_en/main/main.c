@@ -59,12 +59,12 @@ void feed_Task(void *arg)
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * I2S_CHANNEL_NUM);
     assert(i2s_buff);
     size_t bytes_read;
-    // FILE *fp = fopen("/sdcard/out", "a+");
+    // FILE *fp = fopen("/sdcard/out", "w");
     // if (fp == NULL) printf("can not open file\n");
 
     while (1) {
         i2s_read(I2S_NUM_1, i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), &bytes_read, portMAX_DELAY);
-        // FatfsComboWrite(i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), 1, fp);
+            // FatfsComboWrite(i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), 1, fp);
 
         if (I2S_CHANNEL_NUM == 4) {
 #if defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD  || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
@@ -104,8 +104,7 @@ void detect_Task(void *arg)
     int chunk_num = multinet->get_samp_chunknum(model_data);
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
-    FILE *fp = fopen("/sdcard/out", "w");
-    if (fp == NULL) printf("can not open file\n");
+
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
 
@@ -121,15 +120,13 @@ void detect_Task(void *arg)
 
         if (detect_flag == 1) {
             int command_id = multinet->detect(model_data, buff);
-            FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
 
             if (command_id >= -2) {
                 if (command_id > -1) {
                     play_voice = command_id;
                     printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION_QUANT8 || defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
-                    afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
 #endif
@@ -137,7 +134,6 @@ void detect_Task(void *arg)
 
                 if (command_id == -2) {
                     afe_handle->enable_wakenet(afe_data);
-                    afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
                 }
@@ -150,8 +146,9 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-    sd_card_mount("/sdcard");
+    // sd_card_mount("/sdcard");
     codec_init();
+
 #if defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD || defined CONFIG_ESP32_KORVO_V1_1_BOARD
     led_init();
 #endif
@@ -169,10 +166,10 @@ void app_main()
 #endif
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
 
-    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);
-    xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
+    xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
+    xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
 #ifndef  CONFIG_ESP32_S3_BOX_BOARD
-    xTaskCreatePinnedToCore(&play_music, "play", 2 * 1024, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(&play_music, "play", 8 * 1024, NULL, 5, NULL, 1);
     xTaskCreatePinnedToCore(&led_Task, "led", 2 * 1024, NULL, 5, NULL, 0);
 #endif
 }
