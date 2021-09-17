@@ -1,4 +1,4 @@
-**# English Speech Commands Recognition**
+# English Speech Commands Recognition
 
 
 
@@ -7,79 +7,46 @@
 
 
 In this example, we have configured 32 command IDs to represent:
-
-0,tell me a joke
-
-1,sing a song
-
-2,play news channel
-
-3,turn on my soundbox
-
-4,turn off my soundbox
-
+```
+0,tell me a joke  
+1,sing a song  
+2,play news channel  
+3,turn on my soundbox  
+4,turn off my soundbox  
 5,highest volume
-
 6,lowest volume
-
 7,increase the volume
-
 8,decrese the volume
-
 9,turn on the tv
-
 10,turn off the tv
-
 11,make me a tea
-
 12,make me a coffee
-
 13,turn on the light
-
 14,turn off the light
-
 15,change the color to red
-
 16,change the color to green
-
 17,turn on all the lights
-
 18,turn off all the lights
-
 19,turn on the air conditioner
-
 20,turn off the air conditioner
-
 21,set the temperature to sixteen degrees
-
 22,set the temperature to seventeen degrees
-
 23,set the temperature to eighteen degrees
-
 24,set the temperature to nineteen degrees
-
 25,set the temperature to twenty degrees
-
 26,set the temperature to twenty one degrees
-
 27,set the temperature to twenty two degrees
-
 28,set the temperature to twenty three degrees
-
 29,set the temperature to twenty four degrees
-
 30,set the temperature to twenty five degrees
-
 31,set the temperature to twenty six degrees
+```
 
 
-
-**## How to use this example**
-
+## How to use this example
 
 
-**### Hardware Required**
-
+### Hardware Required
 
 
 \- This example can run on ESP32-S3-Korvo V4.0 or ESP-BOX. 
@@ -88,8 +55,7 @@ In this example, we have configured 32 command IDs to represent:
 
 
 
-**### Configure, Build and Flash**
-
+### Configure, Build and Flash
 
 
 ##### set-target 
