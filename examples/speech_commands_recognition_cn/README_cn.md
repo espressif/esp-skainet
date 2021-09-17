@@ -1,13 +1,26 @@
-# 垃圾分类例程 [[English]](./README.md)
+# 垃圾分类例程  
 
 （参考在上一级的 `examples` 目录下的 [README.md](../README.md) 文件来获取更多信息。）
 
-在这个示例中，我们配置了 4 个命令词 ID：
-
-* 湿垃圾
-* 干垃圾
-* 可回收垃圾
-* 有害垃圾
+在这个示例中，我们配置了 17 个命令词 ID：
+0. 打开空调
+1. 关闭空调
+2. 增大风速
+3. 减小风速
+4. 升高一度
+5. 降低一度
+6. 制热模式
+7. 制冷模式
+8. 节能模式
+9. 关闭节能模式
+10. 除湿模式
+11. 关闭除湿模式
+12. 睡眠模式
+13. 关闭睡眠模式
+14. 定时一小时
+15. 定时两小时
+16. 最大风速
+17. 最高风速
 
 我们已经通过 `menuconfig` 配置了 45 类常见的垃圾名称。
 
@@ -16,7 +29,7 @@
 ### Hardware Required
 ### 硬件需求
 
-- 这个示例能够在 ESP32-LyraT-Mini 开发板/ESP32-Korvo 开发板/ESP32-S3-Korvo 开发板上运行，关于开发板更多的信息，请参考 [ESP32-LyraT-Mini Getting Started Guide](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) 或者 [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md).
+- 这个示例能够在 ESP32-S3-Korvo-v4.0和ESP-BOX上运行.
 
 - 一只音箱
 
@@ -51,78 +64,35 @@ idf.py flash monitor
 以下是例程的上电打印输出:
 
 ```
-Quantized wakeNet5: wakeNet5_v1_hilexin_5_0.95_0.90, mode:0
-Quantized MN1
-I (198) MN: ---------------------SPEECH COMMANDS---------------------
-I (197) MN: Command ID0, phrase 0: wei sheng zhi
-I (197) MN: Command ID0, phrase 1: shi zhi jin
-I (207) MN: Command ID0, phrase 2: shi pin dai
-I (207) MN: Command ID0, phrase 3: can jin zhi
-I (217) MN: Command ID0, phrase 4: niao bu shi
-I (217) MN: Command ID0, phrase 5: mao sha
-I (227) MN: Command ID0, phrase 6: mao fa
-I (227) MN: Command ID0, phrase 7: yi ci xing can ju
-I (237) MN: Command ID0, phrase 8: jiu mao jin
-I (237) MN: Command ID0, phrase 9: tao ci zhi pin
-I (247) MN: Command ID0, phrase 10: bei ke
-I (247) MN: Command ID0, phrase 11: fa jiao
-I (257) MN: Command ID0, phrase 12: sao ba
-I (257) MN: Command ID0, phrase 13: da huo ji
-I (267) MN: Command ID1, phrase 14: gua zi ke
-I (267) MN: Command ID1, phrase 15: cha ye zha
-I (277) MN: Command ID1, phrase 16: ji rou
-I (277) MN: Command ID1, phrase 17: cai ye
-I (287) MN: Command ID1, phrase 18: gua guo pi
-I (287) MN: Command ID1, phrase 19: sheng fan sheng cai
-I (297) MN: Command ID1, phrase 20: zhong yao yao zha
-I (297) MN: Command ID1, phrase 21: bing gan
-I (307) MN: Command ID1, phrase 22: yu mi
-I (307) MN: Command ID1, phrase 23: ji gu tou
-I (317) MN: Command ID1, phrase 24: xi hong shi
-I (317) MN: Command ID1, phrase 25: hua sheng ke
-I (327) MN: Command ID2, phrase 26: niu kou dian chi
-I (327) MN: Command ID2, phrase 27: guo qi yao pin
-I (337) MN: Command ID2, phrase 28: lao shu yao
-I (337) MN: Command ID2, phrase 29: fei yao pin
-I (347) MN: Command ID2, phrase 30: fei you qi
-I (347) MN: Command ID2, phrase 31: you qi tong
-I (357) MN: Command ID2, phrase 32: ying guang deng
-I (367) MN: Command ID2, phrase 33: sha chong ji
-I (367) MN: Command ID3, phrase 34: su liao ping
-I (377) MN: Command ID3, phrase 35: yi la guan
-I (377) MN: Command ID3, phrase 36: kuai di zhi xiang
-I (387) MN: Command ID3, phrase 37: jiu bao zhi
-I (387) MN: Command ID3, phrase 38: guan tou he
-I (397) MN: Command ID3, phrase 39: ying su liao
-I (397) MN: Command ID3, phrase 40: bao zhuang zhi
-I (407) MN: Command ID3, phrase 41: jiu tie guo
-I (407) MN: Command ID3, phrase 42: lan qiu
-I (417) MN: Command ID3, phrase 43: bo li hu
-I (268) MN: ---------------------------------------------------------
+accelate model: 1
+MC Quantized wakeNet8: wakeNet8_v2_alexa_5_0.58_0.55, mode:2, p:3, (Sep 14 2021 11:03:51)
+Initial TWO-MIC auido front-end for speech recognition, mode:0, (Sep 14 2021 11:03:54)
+layer0 6 26
+layer1 8 64
+layer2 6 96
+layer3 6 128
+layer4 4 264
+SINGLE_RECOGNITION: V3.0 CN; core: 0; (Sep 15 2021 17:01:49)
+I (2348) MN: ---------------------SPEECH COMMANDS---------------------
+I (2358) MN: Command ID0, phrase 0: da kai kong tiao
+I (2368) MN: Command ID1, phrase 1: guan bi kong tiao
+I (2368) MN: Command ID2, phrase 2: zeng da feng su
+I (2378) MN: Command ID3, phrase 3: jian xiao feng su
+I (2378) MN: Command ID4, phrase 4: sheng gao yi du
+I (2388) MN: Command ID5, phrase 5: jiang di yi du
+I (2388) MN: Command ID6, phrase 6: zhi re mo shi
+I (2398) MN: Command ID7, phrase 7: zhi leng mo shi
+I (2408) MN: Command ID8, phrase 8: jie neng mo shi
+I (2408) MN: Command ID9, phrase 9: guan bi jie neng mo shi
+I (2418) MN: Command ID10, phrase 10: chu shi mo shi
+I (2418) MN: Command ID11, phrase 11: guan bi chu shi mo shi
+I (2428) MN: Command ID12, phrase 12: shui mian mo shi
+I (2438) MN: Command ID13, phrase 13: guan bi shui mian mo shi
+I (2438) MN: Command ID14, phrase 14: ding shi yi xiao shi
+I (2448) MN: Command ID15, phrase 15: ding shi liang xiao shi
+I (2448) MN: Command ID16, phrase 16: zui da feng su
+I (2458) MN: Command ID16, phrase 17: zui gao feng su
+I (2468) MN: ---------------------------------------------------------
 
 ------------detect start------------
 
-```
-
-然后，说“ “Hi Lexin" ([Ləsɪ:n]) ” 来唤醒开发板，唤醒后会打印：
-
-```
-wakeword DETECTED.
------------LISTENING-----------
-```
-同时，板子上的 LED 灯会亮起，直到进入下一次等待唤醒状态。
-
-然后，板子会进入侦听状态，等到用户说出垃圾的名称。
-
-比如，用户说出：“卫生纸”，
-
-```
------------LISTENING-----------
-phrase ID: 0, prob: 0.866630
-Commands ID: 0
-干垃圾（Residual Waste）
------------awaits to be waken up-----------
-
-```
-
-喇叭会播放对应的垃圾分类种类。
