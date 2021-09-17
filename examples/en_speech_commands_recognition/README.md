@@ -91,6 +91,3 @@ To ensure that the example is configured correctly, please check the version of 
 | wakenet    | wakeNet8_v2_alexa_5_0.58_0.55, mode:2, p:3, (Sep 14 2021 11:03:51) |
 | multinet   |     MN5Q8_v1_english_8_0.9_0.90, (Sep 15 2021 17:01:50)      |
 | AFE        | TWO-MIC auido front-end for speech recognition, mode:0, (Sep 14 2021 11:03:54) |
-
-
-
