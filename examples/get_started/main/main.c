@@ -1,12 +1,19 @@
+/*
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
+
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include "string.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
 #include "dl_lib_coefgetter_if.h"
-#include <sys/time.h>
 #include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
 #include "sdcard_init.h"
@@ -100,7 +107,7 @@ void detect_Task(void *arg)
             if (command_id >= -2) {
                 if (command_id > -1) {
                     ets_printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+#ifndef CONFIG_SR_MN_CN_MULTINET3_CONTINUOUS_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
@@ -124,26 +131,54 @@ void detect_Task(void *arg)
     vTaskDelete(NULL);
 }
 
+void spiffs_init(void)
+{
+    #include "esp_spiffs.h"
+    printf("Initializing SPIFFS\n");
+
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = "/spiffs",
+        .partition_label = NULL,
+        .max_files = 50,
+        .format_if_mount_failed = true
+    };
+
+    // Use settings defined above to initialize and mount SPIFFS filesystem.
+    // Note: esp_vfs_spiffs_register is an all-in-one convenience function.
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            printf("Failed to mount or format filesystem\n");
+        } else if (ret == ESP_ERR_NOT_FOUND) {
+            printf("Failed to find SPIFFS partition\n");
+        } else {
+            printf("Failed to initialize SPIFFS (%s)\n", esp_err_to_name(ret));
+        }
+        return;
+    }
+
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) {
+        printf("Failed to get SPIFFS partition information (%s)\n", esp_err_to_name(ret));
+    } else {
+        printf("Partition size: total: %d, used: %d\n", total, used);
+    }
+}
+
 void app_main()
 {
+    spiffs_init();
     codec_init();
 #if CONFIG_IDF_TARGET_ESP32
     afe_handle = &esp_afe_sr_1mic;
 #else 
     afe_handle = &esp_afe_sr_2mic;
 #endif
-    const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
-    const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
+    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
 
-    int afe_perferred_core = 0;
-    int afe_mode = SR_MODE_LOW_COST;
-#ifdef CONFIG_IDF_TARGET_ESP32
-    afe_mode = SR_MODE_LOW_COST;
-    printf("ESP32 only support afe mode = SR_MODE_LOW_COST or SR_MODE_MEDIUM_COST\n");   
-#endif
-    printf("AFE mode: %d\n", afe_mode);
-    esp_afe_sr_data_t *afe_data = afe_handle->create(afe_mode, afe_perferred_core);
-    afe_handle->set_wakenet(afe_data, &WAKENET_MODEL, &WAKENET_COEFF);
-    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, afe_perferred_core);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
+    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
 }

@@ -104,8 +104,8 @@ void detect_Task(void *arg)
     int chunk_num = multinet->get_samp_chunknum(model_data);
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
-    FILE *fp = fopen("/sdcard/out", "w");
-    if (fp == NULL) printf("can not open file\n");
+    // FILE *fp = fopen("/sdcard/out", "w");
+    // if (fp == NULL) printf("can not open file\n");
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
 
@@ -121,13 +121,13 @@ void detect_Task(void *arg)
 
         if (detect_flag == 1) {
             int command_id = multinet->detect(model_data, buff);
-            FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
+            // FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
 
             if (command_id >= -2) {
                 if (command_id > -1) {
                     play_voice = command_id;
                     printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+#ifndef CONFIG_SR_MN_CN_MULTINET3_CONTINUOUS_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
@@ -148,9 +148,46 @@ void detect_Task(void *arg)
     vTaskDelete(NULL);
 }
 
+void spiffs_init(void)
+{
+    #include "esp_spiffs.h"
+    printf("Initializing SPIFFS\n");
+
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = "/spiffs",
+        .partition_label = NULL,
+        .max_files = 50,
+        .format_if_mount_failed = true
+    };
+
+    // Use settings defined above to initialize and mount SPIFFS filesystem.
+    // Note: esp_vfs_spiffs_register is an all-in-one convenience function.
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            printf("Failed to mount or format filesystem\n");
+        } else if (ret == ESP_ERR_NOT_FOUND) {
+            printf("Failed to find SPIFFS partition\n");
+        } else {
+            printf("Failed to initialize SPIFFS (%s)\n", esp_err_to_name(ret));
+        }
+        return;
+    }
+
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) {
+        printf("Failed to get SPIFFS partition information (%s)\n", esp_err_to_name(ret));
+    } else {
+        printf("Partition size: total: %d, used: %d\n", total, used);
+    }
+}
+
 void app_main()
 {
-    sd_card_mount("/sdcard");
+    spiffs_init();
+    // sd_card_mount("/sdcard");
     codec_init();
 #if defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD || defined CONFIG_ESP32_KORVO_V1_1_BOARD
     led_init();
