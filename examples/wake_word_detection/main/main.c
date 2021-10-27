@@ -20,6 +20,7 @@
 #include "esp_mn_models.h"
 #include "MediaHal.h"
 #include "driver/i2s.h"
+#include "model_path.h"
 
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
 #define I2S_CHANNEL_NUM 4
@@ -126,7 +127,9 @@ void spiffs_init(void)
 
 void app_main()
 {
-    spiffs_init();
+#if defined CONFIG_MODEL_IN_SPIFFS
+    srmodel_spiffs_init();
+#endif
     codec_init();
 
 #if CONFIG_IDF_TARGET_ESP32

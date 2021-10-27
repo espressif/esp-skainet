@@ -11,7 +11,6 @@ set(COMPONENT_REQUIRES
     esp-sr
     led_strip
     hardware_driver
-    spiffs
     )
 
 register_component()

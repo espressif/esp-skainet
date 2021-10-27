@@ -21,6 +21,7 @@
 #include "esp_mn_models.h"
 #include "MediaHal.h"
 #include "driver/i2s.h"
+#include "model_path.h"
 
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
 #define I2S_CHANNEL_NUM 4
@@ -121,6 +122,7 @@ void detect_Task(void *arg)
 
                 if (command_id == -2) {
                     afe_handle->enable_wakenet(afe_data);
+                    afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
                 }
@@ -169,7 +171,9 @@ void spiffs_init(void)
 
 void app_main()
 {
-    spiffs_init();
+#if defined CONFIG_MODEL_IN_SPIFFS
+    srmodel_spiffs_init();
+#endif
     codec_init();
 #if CONFIG_IDF_TARGET_ESP32
     afe_handle = &esp_afe_sr_1mic;
