@@ -288,7 +288,7 @@ The ESP32-S3-Korvo-1 board features independent power supplies to the audio comp
 
 <center>
 
-|![ESP32-S3-Korvo-1 - Audio Power Supply](../../_static/esp32-s3-korvo-1-v4-audio-ps.png)| 
+|![ESP32-S3-Korvo-1 - Audio Power Supply](../../../_static/esp32-s3-korvo-1-v4-audio-ps.png)| 
 |:--:| 
 |ESP32-S3-Korvo-1 - Audio Power Supply|
 
