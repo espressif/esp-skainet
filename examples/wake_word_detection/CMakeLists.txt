@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(EXTRA_COMPONENT_DIRS ../../components)
+set(EXTRA_COMPONENT_DIRS
+    ../../components
+    )
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(get_started)
+project(wake_word_detection)

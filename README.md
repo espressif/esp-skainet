@@ -8,7 +8,7 @@ ESP-Skainet supports the development of wake word detection and speech commands 
 
 In general, the ESP-Skainet features will be supported, as shown below:
 
-![overview](img/skainet_overview.png)
+![overview](img/skainet_overview2.png)
 
 ## Input Voice Stream
 
@@ -26,10 +26,14 @@ Espressif's speech command recognition model [MultiNet](https://github.com/espre
 
 Currently, Espressif **MultiNet** supports up to 100 Chinese or English speech commands, such as “打开空调” (Turn on the air conditioner) and “打开卧室灯” (Turn on the bedroom light). 
 
-## Acoustic Algorithm
+## Audio Front End
 
-Now, ESP-Skainet integrates AEC (Acoustic Echo Cancellation), AGC (automatic_gain_control), NS (Noise Suppression), VAD (Voice Activity Detection) and MASE (Mic Array Speech Enhancement).
+Espressif Audio Front-End [AFE](https://github.com/espressif/esp-sr/tree/esp32s3_dev/audio_front_end) integrates AEC (Acoustic Echo Cancellation),  VAD (Voice Activity Detection),BSS (Blind Source Separation) and NS (Noise Suppression).    
 
+Our two-mic Audio Front-End (AFE) have been qualified as a “Software Audio Front-End Solution” for [Amazon Alexa Built-in devices](https://developer.amazon.com/en-US/alexa/solution-providers/dev-kits#software-audio-front-end-dev-kits).
+![afe](img/esp_afe.png)    
+  
+  
 # Quick Start with ESP-Skainet
 
 ## Hardware Preparation
@@ -51,7 +55,7 @@ If you have cloned this project without the `--recursive` option, please go to t
 
 ### ESP-IDF
 
-In this case, we take [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF.  Now we have supported ESP-IDF v4.0.    
+In this case, we take [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF.  Now we have supported ESP-IDF v4.0.
 
 *NOTE:* If you want to use ESP-IDF v3.2 or previous version, please refer to esp-skainet v0.2.0.
 

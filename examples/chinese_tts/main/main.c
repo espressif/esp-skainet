@@ -57,7 +57,7 @@ int app_main() {
     /*** 1. create esp tts handle ***/
     // method1: use pre-define xiaole voice lib.
     // This method is not recommended because the method may make app bin exceed the limit of esp32  
-    // esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
+    esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
 
     // method2: initial voice set from separate voice data partition
     const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
@@ -90,7 +90,6 @@ int app_main() {
 #endif
                 //printf("data:%d \n", len[0]);
             } while(len[0]>0);
-            i2s_zero_dma_buffer(0);
     }
     esp_tts_stream_reset(tts_handle);
 #ifdef SDCARD_OUTPUT_ENABLE

@@ -19,25 +19,11 @@
 
 ### 编译和烧写
 
-#### 1. 参考partition.csv中第二行添加voice data部分的分区列表:  
+#### 方法一：将voice data编译进入app bin,该方法为默认方法．
 
+##### 1)如果使用ESP32-S2，请确认IDF版本为v4.2或以上;如果使用ESP32-S3，请确认IDF版本为v4.2或以上; 执行以下命令设置编译目标芯片。
 ```
-# Name,  Type, SubType, Offset,  Size
-factory, app,  factory, 0x010000, 0xE0000
-voice_data, data,  fat, 0x100000, 3M
-```
-
-#### 2. 烧写voice data到指定分区:   
-
-```
-source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
-```
-
-#### 3. 编译app bin并烧写，然后运行终端监控查看打印：  
-
-##### 1)如果使用ESP32-S2，请手动将IDF版本切换到4.2或以上，再执行以下命令设置编译目标芯片。使用ESP32则可跳过该步骤
-```
-idf.py set-target esp32s2
+idf.py set-target esp32/esp32s2/esp32s3
 ```
 ##### 2)进入配置界面，选择合适的开发板
 ```
@@ -46,9 +32,53 @@ idf.py menuconfig
 ##### 3)编译烧录程序
 ```
 idf.py flash monitor -p /dev/ttyUSB0
+
+```
+参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.
+
+#### 方法二： 将voice data烧写到独立分区，可以有效降低app bin大小，方便用户OTA： 
+
+##### 1)参考partition.csv中第二行添加voice data部分的分区列表, 分区大小至少为3MB:  
+
+```
+# Name,  Type, SubType, Offset,  Size
+factory, app,  factory, 0x010000, 4M
+voice_data, data,  fat,         , 3M
 ```
 
-参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.
+##### 2)使用该目录下的flash_voicedata.sh脚本，烧写voice data到指定分区:   
+
+```
+source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
+```
+##### 3)修改[代码](./main/main.c)中voice data的初始化方法,选择method2
+```
+
+    // method1: use pre-define xiaole voice lib.
+    // This method is not recommended because the method may make app bin exceed the limit of esp32  
+    // esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
+
+    // method2: initial voice set from separate voice data partition
+    const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
+    if (part==0) { 
+        printf("Couldn't find voice data partition!\n"); 
+        return 0;
+    }
+    spi_flash_mmap_handle_t mmap;
+    uint16_t* voicedata;
+    esp_err_t err=esp_partition_mmap(part, 0, 3*1024*1024, SPI_FLASH_MMAP_DATA, (const void**)&voicedata, &mmap);
+    if (err != ESP_OK) {
+        printf("Couldn't map voice data partition!\n"); 
+        return 0;
+    }
+    esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
+
+```
+
+##### 4)按照方法一烧写app bin.
+
+
+
 
 ### 例程输出
 

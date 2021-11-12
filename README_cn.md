@@ -8,7 +8,7 @@ ESP-Skainet 以最便捷的方式支持基于乐鑫的 ESP32 芯片的唤醒词�
 
 ESP-Skainet 的功能支持如下所示：
 
-![overview](img/skainet_overview.png)
+![overview](img/skainet_overview2.png)
 
 ## 输入音频
 
@@ -26,9 +26,9 @@ ESP-Skainet 的功能支持如下所示：
 
 目前模型支持类似“打开空调”，“打开卧室灯”等中文命令词识别和"Turn on/off the light" 等英文命令词识别，自定义语音命令词最大个数为 100。   
 
-## 声学算法
+## 声学前端算法
 
-目前 ESP-Skainet 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Speech Enhancement)。
+声学前端算法[Audio Front-End(AFE)]() 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Speech Enhancement)。
 
 # 快速开始
 
