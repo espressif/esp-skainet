@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "driver/i2s.h"
 #include <driver/gpio.h>
 
@@ -108,10 +109,10 @@ void led_init(void)
     io_conf.mode = GPIO_MODE_OUTPUT;
     io_conf.pull_up_en = (gpio_pullup_t) 1;
 
-    uint64_t test = ((uint64_t)1 << LED_GPIO);
+    uint64_t test = ((uint64_t)1 << 22);
     io_conf.pin_bit_mask = test;
     gpio_config(&io_conf);
-    gpio_set_level(LED_GPIO, false);
+    gpio_set_level(22, false);
 #else
     init_ws2812();
 #endif

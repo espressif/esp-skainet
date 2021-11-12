@@ -194,7 +194,8 @@ void app_main()
 #endif
 
 #if CONFIG_IDF_TARGET_ESP32
-    afe_handle = &esp_afe_sr_1mic;
+    printf("This demo only support ESP32S3\n");
+    return;
 #else 
     afe_handle = &esp_afe_sr_2mic;
 #endif

@@ -110,15 +110,28 @@ void detect_Task(void *arg)
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
 
+#if CONFIG_IDF_TARGET_ESP32
+        if (res == AFE_FETCH_WWE_DETECTED) {
+            printf("wakeword detected\n");
+            play_voice = -1;
+            detect_flag = 1;
+            afe_handle->disable_wakenet(afe_data);
+            afe_handle->disable_aec(afe_data);
+            printf("-----------LISTENING-----------\n");
+        }
+#elif CONFIG_IDF_TARGET_ESP32S3
         if (res == AFE_FETCH_WWE_DETECTED) {
             printf("wakeword detected\n");
             printf("-----------LISTENING-----------\n");
         }
+
         if (res == AFE_FETCH_CHANNEL_VERIFIED) {
             play_voice = -1;
             detect_flag = 1;
             afe_handle->disable_wakenet(afe_data);
+            afe_handle->disable_aec(afe_data);
         } 
+#endif
 
         if (detect_flag == 1) {
             int command_id = multinet->detect(model_data, buff);
@@ -147,42 +160,6 @@ void detect_Task(void *arg)
     }
     afe_handle->destroy(afe_data);
     vTaskDelete(NULL);
-}
-
-void spiffs_init(void)
-{
-    #include "esp_spiffs.h"
-    printf("Initializing SPIFFS\n");
-
-    esp_vfs_spiffs_conf_t conf = {
-        .base_path = "/spiffs",
-        .partition_label = NULL,
-        .max_files = 50,
-        .format_if_mount_failed = true
-    };
-
-    // Use settings defined above to initialize and mount SPIFFS filesystem.
-    // Note: esp_vfs_spiffs_register is an all-in-one convenience function.
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
-
-    if (ret != ESP_OK) {
-        if (ret == ESP_FAIL) {
-            printf("Failed to mount or format filesystem\n");
-        } else if (ret == ESP_ERR_NOT_FOUND) {
-            printf("Failed to find SPIFFS partition\n");
-        } else {
-            printf("Failed to initialize SPIFFS (%s)\n", esp_err_to_name(ret));
-        }
-        return;
-    }
-
-    size_t total = 0, used = 0;
-    ret = esp_spiffs_info(NULL, &total, &used);
-    if (ret != ESP_OK) {
-        printf("Failed to get SPIFFS partition information (%s)\n", esp_err_to_name(ret));
-    } else {
-        printf("Partition size: total: %d, used: %d\n", total, used);
-    }
 }
 
 void app_main()
