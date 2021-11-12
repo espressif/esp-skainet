@@ -38,9 +38,9 @@ Our two-mic Audio Front-End (AFE) have been qualified as a “Software Audio Fro
 
 ## Hardware Preparation
 
-To run ESP-Skainet, you need to have an ESP32 development board which integrates an audio input module . We use [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-Korvo V1.1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) in examples.
+To run ESP-Skainet, you need to have an ESP32 or ESP32-S3 development board which integrates an audio input module . We use [ESP32-LyraT-Mini](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/get-started-esp32-lyrat-mini.html) or [ESP32-Korvo V1.1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) or [ESP32-S3-Korvo-1 V4.0](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32s3/user-guide-korvo-1.md) in examples.
 
-On how to configure ESP32 module for your applications, please refer to the README.md of each example.
+On how to configure your applications, please refer to the README.md of each example.
 
 ## Software Preparation
 
@@ -55,9 +55,7 @@ If you have cloned this project without the `--recursive` option, please go to t
 
 ### ESP-IDF
 
-In this case, we take [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF.  Now we have supported ESP-IDF v4.0.
-
-*NOTE:* If you want to use ESP-IDF v3.2 or previous version, please refer to esp-skainet v0.2.0.
+In this case, we take [ESP-IDF v4.4](https://github.com/espressif/esp-idf/tree/v4.4) as the test version. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF. 
 
 For details on how to set up the ESP-IDF, please refer to [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/`esp-idf/en/stable/get-started-cmake/index.html)
 
