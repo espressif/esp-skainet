@@ -21,6 +21,7 @@
 #include "MediaHal.h"
 #include "driver/i2s.h"
 #include "speech_commands_action.h"
+#include "model_path.h"
 
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
 #define I2S_CHANNEL_NUM 4
@@ -104,30 +105,43 @@ void detect_Task(void *arg)
     int chunk_num = multinet->get_samp_chunknum(model_data);
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
-    FILE *fp = fopen("/sdcard/out", "w");
-    if (fp == NULL) printf("can not open file\n");
+    // FILE *fp = fopen("/sdcard/out", "w");
+    // if (fp == NULL) printf("can not open file\n");
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
 
+#if CONFIG_IDF_TARGET_ESP32
+        if (res == AFE_FETCH_WWE_DETECTED) {
+            printf("wakeword detected\n");
+            play_voice = -1;
+            detect_flag = 1;
+            afe_handle->disable_wakenet(afe_data);
+            afe_handle->disable_aec(afe_data);
+            printf("-----------LISTENING-----------\n");
+        }
+#elif CONFIG_IDF_TARGET_ESP32S3
         if (res == AFE_FETCH_WWE_DETECTED) {
             printf("wakeword detected\n");
             printf("-----------LISTENING-----------\n");
         }
+
         if (res == AFE_FETCH_CHANNEL_VERIFIED) {
             play_voice = -1;
             detect_flag = 1;
             afe_handle->disable_wakenet(afe_data);
+            afe_handle->disable_aec(afe_data);
         } 
+#endif
 
         if (detect_flag == 1) {
             int command_id = multinet->detect(model_data, buff);
-            FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
+            // FatfsComboWrite(buff, afe_chunksize * sizeof(int16_t), 1, fp);
 
             if (command_id >= -2) {
                 if (command_id > -1) {
                     play_voice = command_id;
                     printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+#ifndef CONFIG_SR_MN_CN_MULTINET3_CONTINUOUS_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
@@ -150,7 +164,10 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-    sd_card_mount("/sdcard");
+#if defined CONFIG_MODEL_IN_SPIFFS
+    srmodel_spiffs_init();
+#endif
+    // sd_card_mount("/sdcard");
     codec_init();
 #if defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD || defined CONFIG_ESP32_KORVO_V1_1_BOARD
     led_init();

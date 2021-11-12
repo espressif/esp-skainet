@@ -1,12 +1,19 @@
+/*
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
+
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include "string.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
 #include "dl_lib_coefgetter_if.h"
-#include <sys/time.h>
 #include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
 #include "sdcard_init.h"
@@ -14,6 +21,7 @@
 #include "esp_mn_models.h"
 #include "MediaHal.h"
 #include "driver/i2s.h"
+#include "model_path.h"
 
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD
 #define I2S_CHANNEL_NUM 4
@@ -86,12 +94,27 @@ void detect_Task(void *arg)
     char *new_commands_str = "da kai dian deng,kai dian deng;guan bi dian deng,guan dian deng;guan deng;";
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
-        if (res > 0) {
-            detect_flag = 1;
+#if CONFIG_IDF_TARGET_ESP32
+        if (res == AFE_FETCH_WWE_DETECTED) {
             printf("wakeword detected\n");
+            detect_flag = 1;
             afe_handle->disable_wakenet(afe_data);
             afe_handle->disable_aec(afe_data);
+            printf("-----------LISTENING-----------\n");
         }
+#elif CONFIG_IDF_TARGET_ESP32S3
+        if (res == AFE_FETCH_WWE_DETECTED) {
+            printf("wakeword detected\n");
+            printf("-----------LISTENING-----------\n");
+        }
+
+        if (res == AFE_FETCH_CHANNEL_VERIFIED) {
+            play_voice = -1;
+            detect_flag = 1;
+            afe_handle->disable_wakenet(afe_data);
+            afe_handle->disable_aec(afe_data);
+        } 
+#endif
 
         if (detect_flag == 1) {
             int command_id = multinet->detect(model_data, buff);
@@ -100,7 +123,7 @@ void detect_Task(void *arg)
             if (command_id >= -2) {
                 if (command_id > -1) {
                     ets_printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
+#ifndef CONFIG_SR_MN_CN_MULTINET3_CONTINUOUS_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
@@ -114,6 +137,7 @@ void detect_Task(void *arg)
 
                 if (command_id == -2) {
                     afe_handle->enable_wakenet(afe_data);
+                    afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
                 }
@@ -126,24 +150,18 @@ void detect_Task(void *arg)
 
 void app_main()
 {
+#if defined CONFIG_MODEL_IN_SPIFFS
+    srmodel_spiffs_init();
+#endif
     codec_init();
 #if CONFIG_IDF_TARGET_ESP32
     afe_handle = &esp_afe_sr_1mic;
 #else 
     afe_handle = &esp_afe_sr_2mic;
 #endif
-    const esp_wn_iface_t *wakenet = &WAKENET_MODEL;
-    const model_coeff_getter_t *model_coeff_getter = &WAKENET_COEFF;
+    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
 
-    int afe_perferred_core = 0;
-    int afe_mode = SR_MODE_LOW_COST;
-#ifdef CONFIG_IDF_TARGET_ESP32
-    afe_mode = SR_MODE_LOW_COST;
-    printf("ESP32 only support afe mode = SR_MODE_LOW_COST or SR_MODE_MEDIUM_COST\n");   
-#endif
-    printf("AFE mode: %d\n", afe_mode);
-    esp_afe_sr_data_t *afe_data = afe_handle->create(afe_mode, afe_perferred_core);
-    afe_handle->set_wakenet(afe_data, &WAKENET_MODEL, &WAKENET_COEFF);
-    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, afe_perferred_core);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
+    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
 }

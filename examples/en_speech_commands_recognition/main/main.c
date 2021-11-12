@@ -21,6 +21,7 @@
 #include "MediaHal.h"
 #include "driver/i2s.h"
 #include "speech_commands_action.h"
+#include "model_path.h"
 
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
 #define I2S_CHANNEL_NUM 4
@@ -144,8 +145,47 @@ void detect_Task(void *arg)
     vTaskDelete(NULL);
 }
 
+void spiffs_init(void)
+{
+    #include "esp_spiffs.h"
+    printf("Initializing SPIFFS\n");
+
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = "/spiffs",
+        .partition_label = NULL,
+        .max_files = 50,
+        .format_if_mount_failed = true
+    };
+
+    // Use settings defined above to initialize and mount SPIFFS filesystem.
+    // Note: esp_vfs_spiffs_register is an all-in-one convenience function.
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            printf("Failed to mount or format filesystem\n");
+        } else if (ret == ESP_ERR_NOT_FOUND) {
+            printf("Failed to find SPIFFS partition\n");
+        } else {
+            printf("Failed to initialize SPIFFS (%s)\n", esp_err_to_name(ret));
+        }
+        return;
+    }
+
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) {
+        printf("Failed to get SPIFFS partition information (%s)\n", esp_err_to_name(ret));
+    } else {
+        printf("Partition size: total: %d, used: %d\n", total, used);
+    }
+}
+
 void app_main()
 {
+#if defined CONFIG_MODEL_IN_SPIFFS
+    srmodel_spiffs_init();
+#endif
     // sd_card_mount("/sdcard");
     codec_init();
 
@@ -154,7 +194,8 @@ void app_main()
 #endif
 
 #if CONFIG_IDF_TARGET_ESP32
-    afe_handle = &esp_afe_sr_1mic;
+    printf("This demo only support ESP32S3\n");
+    return;
 #else 
     afe_handle = &esp_afe_sr_2mic;
 #endif
