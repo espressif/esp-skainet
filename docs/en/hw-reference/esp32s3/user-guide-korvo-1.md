@@ -1,5 +1,4 @@
 # ESP32-S3-Korvo-1 v4.0 <!-- omit in toc -->
-
 - [1. Getting Started](#1-getting-started)
   - [1.1 Overview](#11-overview)
   - [1.2 Block Diagram](#12-block-diagram)
@@ -8,7 +7,7 @@
   - [1.5 Contents and Packaging](#15-contents-and-packaging)
     - [1.5.1 Retail Orders](#151-retail-orders)
     - [1.5.2 Wholesale Orders](#152-wholesale-orders)
-  - [1.6 Default Firmware and Voice Control](#16-default-firmware-and-voice-control)
+  - [1.6 Default Firmware and Function Test](#16-default-firmware-and-function-test)
 - [2. Start Application Development](#2-start-application-development)
   - [2.1 Required Hardware](#21-required-hardware)
   - [2.2 Optional Hardware](#22-optional-hardware)
@@ -30,7 +29,7 @@
 
 This user guide will help you get started with ESP32-S3-Korvo-1 v4.0 and will also provide more in-depth information.
 
-The ESP32-S3-Korvo-1 is an AI development board produced by [Espressif](https://espressif.com). It is based on the [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3) SoC and [ESP-Skainet](https://www.espressif.com/en/solutions/audio-solutions/esp-skainet/overview), Espressif’s speech recognition SDK. It features a three-microphone array which is suitable for far-field voice pick-up with low-power consumption. The ESP32-S3-Korvo-1 board supports voice wake-up and offline speech command recognition in Chinese and English languages. With ESP-Skainet, you can develop a variety of speech recognition applications, such as smart displays, smart plugs, smart switches, etc.
+The ESP32-S3-Korvo-1 is an AI development board produced by [Espressif](https://espressif.com). It is based on the [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3) SoC and [ESP-Skainet](https://www.espressif.com/en/solutions/audio-solutions/esp-skainet/overview), Espressif’s speech recognition SDK. It features a three-microphone array which is suitable for far-field voice pick-up with low power consumption. The ESP32-S3-Korvo-1 board supports voice wake-up and offline speech command recognition in Chinese and English languages. With ESP-Skainet, you can develop a variety of speech recognition applications, such as smart displays, smart plugs, smart switches, etc.
 
 <center>
 
@@ -46,7 +45,6 @@ The document consists of the following major sections:
 -   [Getting started](#1-getting-started): Introduction of the board, block diagram, description of key components, contents and packaging, as well as quick guide to use the board.
 -   [Start Application Development](#2-start-application-development): Hardware and software setup instructions to flash firmware onto the board.
 -   [Hardware Reference](#3-hardware-reference): More detailed information about the board's hardware.
--   [Hardware Revision Details](#4-hardware-revision-details): Revision history, known issues, and links to user guides for previous versions (if any) of the board.
 -   [Related Documents](#5-related-documents): Links to related documentation.
 
 # 1. Getting Started
@@ -84,7 +82,7 @@ The key components of the board are described in an anti-clockwise direction sta
 
 | No. | Key Component|       Description |
 |-----|--------------------------|--|
-| 1   | ESP32-S3-WROOM-1         | The ESP32-S3-WROOM-1 module embeds the ESP32-S3R8 chip variant that provides Wi-Fi and Bluetooth 5 (LE) connectivity, as well as dedicated vector instructions for accelerating neural network computing and signal processing. On top of the integrated 8 MB PSRAM offered by the SoC, the module also comes with 16 MB external flash, allowing for fast data access. |
+| 1   | ESP32-S3-WROOM-1         | The ESP32-S3-WROOM-1 module embeds the ESP32-S3R8 chip variant that provides Wi-Fi and Bluetooth 5 (LE) connectivity, as well as dedicated vector instructions for accelerating neural network computing and signal processing. On top of the integrated 8 MB PSRAM offered by the SoC, the module also comes with 16 MB flash, allowing for fast data access. |
 | 2   | PDM Interface (reserved) | Reserved FPC connector for connecting the sub board to use three digital microphones having a pulse-density modulated (PDM) output.|
 | 3   | 5 V to 3.3 V LDO         | Power regulator that converts a 5 V supply into a 3.3 V output for the module.|
 | 4   | 5 V Power On LED         | The LED (red) turns on when the USB power is connected to the board and the **Power Switch** is toggled to "ON". |
@@ -92,12 +90,12 @@ The key components of the board are described in an anti-clockwise direction sta
 | 6   | Battery Socket           | Two-pin socket to connect a Li-ion battery. The battery serves as an alternative power supply to the **USB Power Port** for charging the board. Make sure to use a Li-ion battery that has protection circuit and fuse. The recommended specifications of the battery: capacity > 1000 mAh, output voltage 3.7 V, input voltage 4.2 V – 5 V. Please verify if polarity on the battery plug matches polarity of the socket as marked on the board’s soldermask besides the socket. |
 | 7   | Battery Charger Chip     | 1 A linear Li-Ion battery charger (AP5056), used for charging a battery connected to the **Battery Socket**. The power source for charging is the **USB Power Port**.|
 | 8   | Battery Green LED        | When the USB power is connected to the board and a battery is not connected, the green LED turns on. If a battery is connected and fully charged, the green LED turns on.  |
-| 9   | Battery Red LED          | When the USB power is connected to the board and a battery is not connected, the red LED blinks. If a battery is connected, the red LED turns on, indicating that the battery is being charged. |
+| 9   | Battery Red LED          | When the USB power is connected to the board and a battery is not connected, the red LED blinks. If a battery is connected, the red LED turns on, indicating that the battery is being charged. When the battery is fully charged, the red LED turns off. |
 | 10  | USB Power Port           | A Micro-USB port used for power supply to the board.|
 | 11  | USB-to-UART Bridge       | Single USB-to-UART bridge chip provides transfer rates up to 3 Mbps. |
 | 12  | FPC Connector            | Connects the main board and the sub board. |
 | 13  | USB-to-UART Port         | A Micro-USB port used for communication with the chip via the on-board USB-to-UART bridge. |
-| 14  | Reset Button             | Press this button to reset the system. |
+| 14  | Reset Button             | Press this button to reset ESP32-S3. |
 | 15  | Boot Button              | Download button. Holding down **Boot** and then pressing **Reset** initiates Firmware Download mode for downloading firmware through the serial port. |
 | 16  | MicroSD Card Slot        | Used for inserting a MicroSD card to expand memory capacity. SPI mode is supported. |
 | 17  | Audio_VCC33              | Power regulator that converts a 5 V supply into a 3.3 V output for the audio. |
@@ -139,7 +137,7 @@ The key components of the board are described from top to bottom view.
 
 ## 1.5 Contents and Packaging
 
-### 1.5.1 Retail orders
+### 1.5.1 Retail Orders
 
 If you order a few samples, each board comes in an individual package in either antistatic bag or any packaging depending on your retailer. Each package contains:
 
@@ -159,11 +157,11 @@ If you order in bulk, the boards come in large cardboard boxes.
 
 For wholesale orders, please go to <https://www.espressif.com/en/contact-us/sales-questions>.
 
-## 1.6 Default Firmware and Voice Control
+## 1.6 Default Firmware and Function Test
 
-Each ESP32-S3-Korvo-1 board comes with pre-built [default firmware](https://github.com/espressif/esp-skainet/tree/master/tools/default_firmware_esp32s3-korvo-1) that allows you to experience voice wake-up and speech command recognition. Please note that only Chinese wake word and speech commands are supported in the default firmware.
+Each ESP32-S3-Korvo-1 board comes with pre-built [default firmware](https://github.com/espressif/esp-skainet/tree/master/tools/default_firmware_esp32s3-korvo-1) that allows you to test its functions including voice wake-up and speech command recognition. Please note that only Chinese wake word and speech commands are supported in the default firmware.
 
-To control your board with voice wake-up and speech commands, you need the following hardware:
+To test the board's functions, you need the following hardware:
 
 -   1 x ESP32-S3-Korvo-1
 -   1 x USB 2.0 cable (Standard-A to Micro-B), for USB power supply
@@ -199,7 +197,7 @@ This section provides instructions on how to do hardware/software setup and flas
 
 -   1 x ESP32-S3-Korvo-1
 -   2 x USB 2.0 cables (Standard-A to Micro-B), one for USB power supply, the other for flashing firmware on to the board
--   4-ohm, 3-watt speaker or headphones with a 3.5 mm jack. If you use a speaker, it is recommended to choose one no more than 3 watts and fitted with JST PH 2.0 2-Pin plug. In case you do not have this type of plug it is also fine to use Dupont female jumper wires during development.
+-   4-ohm, 3-watt speaker or headphones with a 3.5 mm jack. If you use a speaker, it is recommended to choose one no more than 3 watts and fitted with JST PH 2.0 2-Pin plugs are needed. In case you do not have this type of plug it is also fine to use Dupont female jumper wires during development.
 -   Computer running Windows, Linux, or macOS
 
 ## 2.2 Optional Hardware
@@ -231,7 +229,7 @@ Now the board should be ready for software setup.
 
 ## 2.5 Software Setup
 
-After hardware setup, you can proceed with preparation of development tools. Go to the guide to ESP-Skainet --\> Section [Software Preparation](https://github.com/espressif/esp-skainet/blob/master/README.md#software-preparation), which will walk you through the following steps:
+After hardware setup, you can proceed with preparation of development tools. Go to the guide to [ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md) --\> Section [Software Preparation](https://github.com/espressif/esp-skainet/blob/master/README.md#software-preparation), which will walk you through the following steps:
 
 1.  [Set up ESP-IDF](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-idf) which provides a common framework to develop applications for ESP32-S3 in C language.
 2.  [Get ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-skainet) to run Espressif's voice assistant. In ESP-Skainet, you may use [ESP-SR](https://github.com/espressif/esp-sr/blob/master/README.md) to call APIs for specific applications, including wake word detection, speech command recognition, and acoustic algorithm.
@@ -239,7 +237,7 @@ After hardware setup, you can proceed with preparation of development tools. Go 
 
 > **Note**
 >
-> Espressif provides the **Off-line Wake Word Customization** service which allows you to customize wake words. For the detailed process, please refer to [Espressif Speech Wake Word Customization Process](https://github.com/espressif/esp-sr/blob/master/wake_word_engine/ESP_Wake_Words_Customization.md).
+> Espressif provides the **Off-line Wake Word Customization** service which allows you to customize wake words. For the detailed process, please refer to [Espressif Speech Wake Word Customization Process](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/ESP_Wake_Words_Customization.md).
 
 # 3. Hardware Reference
 
@@ -300,7 +298,7 @@ The ESP32-S3-Korvo-1 board features independent power supplies to the audio comp
 The board provides two mutually exclusive audio outputs:
 
 1.  Speaker output: The speaker output is enabled if headphones are not plugged in.
-2.  Headpone output: Once headphones are plugged in, speaker output is disabled and headphone output is enabled.
+2.  Headphone output: Once headphones are plugged in, speaker output is disabled and headphone output is enabled.
 
 # 4. Hardware Revision Details
 
@@ -326,10 +324,10 @@ This is the first revision of this board released.
 ## 5.4 Dimensions
 
 -   [ESP32-S3-Korvo Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.pdf) (PDF)
--   [ESP32-Korvo-Mic Top Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211014.pdf) (PDF)
--   [ESP32-Korvo-Mic Bottom Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211014.pdf) (PDF)
+-   [ESP32-Korvo-Mic Top Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.pdf) (PDF)
+-   [ESP32-Korvo-Mic Bottom Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.pdf) (PDF)
 -   [ESP32-S3-Korvo Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
--   [ESP32-Korvo-Mic Top Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211014.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
--   [ESP32-Korvo-Mic Bottom Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211014.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+-   [ESP32-Korvo-Mic Top Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+-   [ESP32-Korvo-Mic Bottom Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
 
 For further design documentation for the board, please contact us at [<sales@espressif.com>](sales@espressif.com).
