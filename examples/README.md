@@ -1,4 +1,4 @@
-**# Examples [[中文]](./README_cn.md)**
+# Examples [[中文]](./README_cn.md)
 
 
 
@@ -6,22 +6,19 @@ This directory contains a range of examples in ESP-Skainet projects. These examp
 
 
 
-**# Example Layout**
+# Example Layout
 
 
 
 The following examples are currently available:
 
-| Example Name                                                 | Latest Models  | Boards                          |
-| ------------------------------------------------------------ | -------------- | ------------------------------- |
-| [cn_speech_commands_recognition](./cn_speech_commands_recognition) | Multinet3<br/> | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
-| [en_speech_commands_recognition](./en_speech_commands_recognition_en) | Multinet5      | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
-| [wake_word_detection](./wake_word_detection)                 | Wakenet8       | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
+|                          Example Name                               |   Latest Models   |               Boards            |
+| :------------------------------------------------------------ | :------------------------: | :------------------------------- |
+| [cn_speech_commands_recognition](./cn_speech_commands_recognition) | MultiNet3<br/> | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
+| [en_speech_commands_recognition](./en_speech_commands_recognition_en) | MultiNet5      | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
+| [wake_word_detection](./wake_word_detection)                 | WakeNet8       | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
 
 
 
-**# Contributing Examples**
-
-
-
+# Contributing Examples
 If you have any examples you want to share with us or you think may interest us, please check the [Contributions Guide](https://esp-idf.readthedocs.io/en/latest/contribute/index.html) and get in touch with us.
