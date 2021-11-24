@@ -84,7 +84,7 @@ idf.py -b 2000000 flash monitor
 
 ### Modify speech commands
 
-For English MultiNet, we use international phonetic alphabet as unit. [multinet_g2p.py](../../tool/multinet_g2p.py) is used to convert English phrase into phonemes which can be recognized by multinet．　
+For English MultiNet, we use international phonetic alphabet as unit. [multinet_g2p.py](../../components/esp-sr/tool/multinet_g2p.py) is used to convert English phrase into phonemes which can be recognized by multinet．　
 Now, the MultiNet support two methods to modify speech commands.　
 
 #### 1.menuconfig (before compilation)
@@ -117,4 +117,4 @@ To ensure that the example is configured correctly, please check the version of 
 | ---------- | :----------------------------------------------------------: |
 | wakenet    | wakeNet8_v2_hiesp_5_0.57_0.55 or wakeNet8Q8_v2_hiesp_5_0.58_0.55 |
 | multinet   | MN5Q8_v1_english_8_0.9_0.90 |
-| AFE        | TWO-MIC auido front-end for speech recognition |
+| AFE        | TWO-MIC auido front-end for speech recognition | 
