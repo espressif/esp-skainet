@@ -345,9 +345,50 @@ int sd_card_mount(const char* basePath)
     // Card has been initialized, print its properties
     sdmmc_card_print_info(stdout, card);
     return 1;
+#elif defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
+    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = false,
+        .max_files = 5,
+        .allocation_unit_size = 16 * 1024
+    };
+    sdmmc_card_t* card;
+    ESP_LOGI("APP_TAG", "Using SDMMC peripheral");
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+
+    // This initializes the slot without card detect (CD) and write protect (WP) signals.
+    // Modify slot_config.gpio_cd and slot_config.gpio_wp if your board has these signals.
+    // sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT_KORVO_V2();
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+
+    // To use 1-line SD mode, uncomment the following line:
+    slot_config.width = 1;
+
+    slot_config.clk = GPIO_NUM_15;
+    slot_config.cmd = GPIO_NUM_7;
+    slot_config.d0 = GPIO_NUM_4;
+    slot_config.d1 = -1;
+    slot_config.d2 = -1;
+    slot_config.d3 = -1;
+
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE("APP_TAG", "Failed to mount filesystem. "
+                     "If you want the card to be formatted, set format_if_mount_failed = true.");
+        } else {
+            ESP_LOGE("APP_TAG", "Failed to initialize the card (%s). "
+                     "Make sure SD card lines have pull-up resistors in place.", esp_err_to_name(ret));
+        }
+        return -1;
+    }
+    // Card has been initialized, print its properties
+    sdmmc_card_print_info(stdout, card);
+    return 1;
 #else
     esp_err_t ret = 0;
     ESP_LOGW("APP_TAG", "SD card is not currently supported");
+    return ret;
 #endif
 
 }

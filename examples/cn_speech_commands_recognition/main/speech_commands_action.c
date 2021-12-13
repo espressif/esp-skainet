@@ -153,7 +153,7 @@ void led_Task(void * arg)
 }
 #endif
 
-#if defined CONFIG_ESP32_S3_BOX_BOARD
+#if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
 esp_err_t iot_dac_audio_play_8K(const uint16_t* data, int length, TickType_t ticks_to_wait)
 {
     size_t bytes_write = 0;

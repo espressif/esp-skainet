@@ -295,7 +295,7 @@ static void es8311_pcm_hw_params(uint32_t mclk, uint32_t lrck)
             default:
                 break;
         }
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_A_V1_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
         datmp = 3;
 #endif
         regv |= (datmp) << 3;

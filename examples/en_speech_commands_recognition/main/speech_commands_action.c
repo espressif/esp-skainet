@@ -55,7 +55,7 @@ typedef struct {
     int length;
 } dac_audio_item_t;
 
-#if defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
+#if defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
 #include "led_strip.h"
 #include "driver/rmt.h"
 #define EXAMPLE_CHASE_SPEED_MS (10)

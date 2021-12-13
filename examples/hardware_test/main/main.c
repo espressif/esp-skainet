@@ -85,7 +85,7 @@ void mute_init()
 
     io_conf.intr_type = GPIO_INTR_POSEDGE;
     //bit mask of the pins, use GPIO4/5 here
-    io_conf.pin_bit_mask = GPIO_INPUT_IO_MUTE;
+    io_conf.pin_bit_mask = -1;
     //set as input mode
     io_conf.mode = GPIO_MODE_INPUT;
     //enable pull-up mode

@@ -75,6 +75,10 @@ extern "C" {
 #include "esp32_s3_box_board.h"
 #endif
 
+#ifdef CONFIG_ESP32_S3_KORVO2_V3_BOARD
+#include "esp32_s3_korvo2_v3_board.h"
+#endif
+
 #ifdef __cplusplus
 }
 #endif
