@@ -1,9 +1,12 @@
-# ESP32-S3-Korvo-1 v4.0 <!-- omit in toc -->
+# ESP32-S3-Korvo-1 v5.0 <!-- omit in toc -->
+
+[中文](../../../zh_CN/hw-reference/esp32s3/user-guide-korvo-1.md)
+
 - [1. Getting Started](#1-getting-started)
   - [1.1 Overview](#11-overview)
   - [1.2 Block Diagram](#12-block-diagram)
-  - [1.3 Components on the ESP32-S3-Korvo](#13-components-on-the-esp32-s3-korvo)
-  - [1.4 Components on the ESP32-Korvo-Mic](#14-components-on-the-esp32-korvo-mic)
+  - [1.3 Components on the ESP32-S3-Korvo-1 Main Board](#13-components-on-the-esp32-s3-korvo-1-main-board)
+  - [1.4 Components on the ESP32-Korvo-Mic Sub Board](#14-components-on-the-esp32-korvo-mic-sub-board)
   - [1.5 Contents and Packaging](#15-contents-and-packaging)
     - [1.5.1 Retail Orders](#151-retail-orders)
     - [1.5.2 Wholesale Orders](#152-wholesale-orders)
@@ -19,7 +22,7 @@
   - [3.2 Notes on Power Distribution](#32-notes-on-power-distribution)
     - [3.2.1 Power Supply over USB and from Battery](#321-power-supply-over-usb-and-from-battery)
     - [3.2.2 Independent Module and Audio Power Supply](#322-independent-module-and-audio-power-supply)
-  - [3.3 Selecting of the Audio Output](#33-selecting-of-the-audio-output)
+  - [3.3 Selecting of Audio Output](#33-selecting-of-audio-output)
 - [4. Hardware Revision Details](#4-hardware-revision-details)
 - [5. Related Documents](#5-related-documents)
   - [5.1 Datasheet](#51-datasheet)
@@ -27,7 +30,11 @@
   - [5.3 PCB Layout](#53-pcb-layout)
   - [5.4 Dimensions](#54-dimensions)
 
-This user guide will help you get started with ESP32-S3-Korvo-1 v4.0 and will also provide more in-depth information.
+This user guide will help you get started with ESP32-S3-Korvo-1 v5.0 and will also provide more in-depth information.
+
+> **Notice**
+>
+> If you use ESP32-S3-Korvo-1 v4.0, please follow this guide. The differences between v5.0 and v4.0 are described in Section [Hardware Revision Details](#4-hardware-revision-details).
 
 The ESP32-S3-Korvo-1 is an AI development board produced by [Espressif](https://espressif.com). It is based on the [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3) SoC and [ESP-Skainet](https://www.espressif.com/en/solutions/audio-solutions/esp-skainet/overview), Espressif’s speech recognition SDK. It features a three-microphone array which is suitable for far-field voice pick-up with low power consumption. The ESP32-S3-Korvo-1 board supports voice wake-up and offline speech command recognition in Chinese and English languages. With ESP-Skainet, you can develop a variety of speech recognition applications, such as smart displays, smart plugs, smart switches, etc.
 
@@ -45,17 +52,19 @@ The document consists of the following major sections:
 -   [Getting started](#1-getting-started): Introduction of the board, block diagram, description of key components, contents and packaging, as well as quick guide to use the board.
 -   [Start Application Development](#2-start-application-development): Hardware and software setup instructions to flash firmware onto the board.
 -   [Hardware Reference](#3-hardware-reference): More detailed information about the board's hardware.
+-   [Hardware Revision Details](#4-hardware-revision-details): Hardware revision history, known issues, and links to user guides for previous versions (if any) of the board.
 -   [Related Documents](#5-related-documents): Links to related documentation.
+
 
 # 1. Getting Started
 
 ## 1.1 Overview
 
-The ESP32-S3-Korvo-1 board consists of two parts: the main board (ESP32-S3-Korvo) that integrates the ESP32-S3-WROOM-1 module, function buttons, SD card slot, speaker and USB connectors; and the sub board (ESP32-Korvo-Mic, which is also used as the sub board in [ESP32-Korvo v1.1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)) that contains a three-microphone array, function buttons, and addressable LEDs. The main board and sub board are connected via FPC cable.
+The ESP32-S3-Korvo-1 board consists of two parts: the main board (ESP32-S3-Korvo-1) that integrates the ESP32-S3-WROOM-1 module, function buttons, SD card slot, speaker and USB connectors; and the sub board (ESP32-Korvo-Mic, which is also used as the sub board in [ESP32-Korvo v1.1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md)) that contains a three-microphone array, function buttons, and addressable LEDs. The main board and sub board are connected via FPC cable.
 
 ## 1.2 Block Diagram
 
-The block diagram below presents main components of the ESP32-S3-Korvo main board (on the left) and the ESP32-Korvo-Mic sub board (on the right), as well as the interconnections between components.
+The block diagram below presents main components of the ESP32-S3-Korvo-1 main board (on the left) and the ESP32-Korvo-Mic sub board (on the right), as well as the interconnections between components.
 
 <center>
 
@@ -67,16 +76,15 @@ The block diagram below presents main components of the ESP32-S3-Korvo main boar
 
 The following sections will describe the key components on the main board and the sub board, respectively.
 
-## 1.3 Components on the ESP32-S3-Korvo
+## 1.3 Components on the ESP32-S3-Korvo-1 Main Board
 
 <center>
 
-| ![ESP32-S3-Korvo - front](../../../_static/esp32-s3-korvo-annotated-photo.png) | 
+| ![ESP32-S3-Korvo-1 - front](../../../_static/esp32-s3-korvo-annotated-photo.png) | 
 |:--:| 
-|ESP32-S3-Korvo - front|
+|ESP32-S3-Korvo-1 - front|
 
 </center>
-
 
 The key components of the board are described in an anti-clockwise direction starting from the ESP32-S3-WROOM-1 module.
 
@@ -88,7 +96,7 @@ The key components of the board are described in an anti-clockwise direction sta
 | 4   | 5 V Power On LED         | The LED (red) turns on when the USB power is connected to the board and the **Power Switch** is toggled to "ON". |
 | 5   | Power Switch             | Toggling it to “ON” powers on the board; toggling it to “OFF” powers off the board. |
 | 6   | Battery Socket           | Two-pin socket to connect a Li-ion battery. The battery serves as an alternative power supply to the **USB Power Port** for charging the board. Make sure to use a Li-ion battery that has protection circuit and fuse. The recommended specifications of the battery: capacity > 1000 mAh, output voltage 3.7 V, input voltage 4.2 V – 5 V. Please verify if polarity on the battery plug matches polarity of the socket as marked on the board’s soldermask besides the socket. |
-| 7   | Battery Charger Chip     | 1 A linear Li-Ion battery charger (AP5056), used for charging a battery connected to the **Battery Socket**. The power source for charging is the **USB Power Port**.|
+| 7   | Battery Charger Chip     | 1 A linear Li-ion battery charger (AP5056), used for charging a battery connected to the **Battery Socket**. The power source for charging is the **USB Power Port**.|
 | 8   | Battery Green LED        | When the USB power is connected to the board and a battery is not connected, the green LED turns on. If a battery is connected and fully charged, the green LED turns on.  |
 | 9   | Battery Red LED          | When the USB power is connected to the board and a battery is not connected, the red LED blinks. If a battery is connected, the red LED turns on, indicating that the battery is being charged. When the battery is fully charged, the red LED turns off. |
 | 10  | USB Power Port           | A Micro-USB port used for power supply to the board.|
@@ -106,25 +114,25 @@ The key components of the board are described in an anti-clockwise direction sta
 | 22  | Codec_3V3 (NC)           | Alternative power supply to the Codec chip. It is not connected or used by default. |
 | 23  | Audio Codec Chip         | The audio codec chip, [ES8311](http://www.everest-semi.com/pdf/ES8311%20PB.pdf), is a low power mono audio codec. It consists of 1-channel ADC, 1-channel DAC, low noise pre-amplifier, headphone driver, digital sound effects, analog mixing and gain functions. It is interfaced with the **ESP32-S3-WROOM-1** module over I2S and I2C buses to provide audio processing in hardware independently from the audio application. |
 
-## 1.4 Components on the ESP32-Korvo-Mic
+## 1.4 Components on the ESP32-Korvo-Mic Sub Board
 
 <center>
 
-| ![ESP32-Korvo-Mic - top view](../../../_static/esp32-s3-korvo-mic-annotated-top.png) | 
+| ![ESP32-Korvo-Mic - front](../../../_static/esp32-s3-korvo-mic-annotated-top.png) | 
 |:--:| 
-|ESP32-Korvo-Mic - top view|
+|ESP32-Korvo-Mic - front|
 
 </center>
 
 <center>
 
-| ![ESP32-Korvo-Mic - bottom view](../../../_static/esp32-s3-korvo-mic-annotated-btm.png) | 
+| ![ESP32-Korvo-Mic - back](../../../_static/esp32-s3-korvo-mic-annotated-btm.png) | 
 |:--:| 
-|ESP32-Korvo-Mic - bottom view|
+|ESP32-Korvo-Mic - back|
 
 </center>
 
-The key components of the board are described from top to bottom view.
+The key components of the board are described from front to back.
 
 | Key Component      | Description |
 |--------------------|----|
@@ -141,7 +149,7 @@ The key components of the board are described from top to bottom view.
 
 If you order a few samples, each board comes in an individual package in either antistatic bag or any packaging depending on your retailer. Each package contains:
 
--   1 x ESP32-S3-Korvo main board
+-   1 x ESP32-S3-Korvo-1 main board
 -   1 x ESP32-Korvo-Mic sub board
 -   1 x FPC cable
 -   8 x screws
@@ -159,7 +167,7 @@ For wholesale orders, please go to <https://www.espressif.com/en/contact-us/sale
 
 ## 1.6 Default Firmware and Function Test
 
-Each ESP32-S3-Korvo-1 board comes with pre-built [default firmware](https://github.com/espressif/esp-skainet/tree/master/tools/default_firmware_esp32s3-korvo-1) that allows you to test its functions including voice wake-up and speech command recognition. Please note that only Chinese wake word and speech commands are supported in the default firmware.
+Each ESP32-S3-Korvo-1 board comes with pre-built [default firmware](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/default_firmware_ESP32-S3-Korvo-1) that allows you to test its functions including voice wake-up and speech command recognition. Please note that only Chinese wake word and speech commands are supported in the default firmware.
 
 To test the board's functions, you need the following hardware:
 
@@ -171,7 +179,7 @@ Before powering up your board, please make sure that it is in good condition wit
 1.  Connect the board to a power supply through the **USB Power Port** using a USB cable. The **Battery Green LED** should turn on. Assuming that a battery is not connected, the **Battery Red LED** will blink.
 2.  Toggle the **Power Switch** to **ON**. The red **5 V Power On LED** should turn on.
 3.  Press the **Reset Button** on the main board.
-4.  Activate the board with the default Chinese wake word “Hi, 乐鑫” (meaning "Hi, Espressif"). When the wake word is detected, the 12 RGB LEDs on the sub board glow white one by one, indicating that the board is waiting for a speech command.
+4.  Activate the board with the default Chinese wake word “Hi 乐鑫” (meaning "Hi Espressif"). When the wake word is detected, the 12 RGB LEDs on the sub board glow white one by one, indicating that the board is waiting for a speech command.
 5.  Say a command to control your board. The table below provides a list of default Chinese speech commands.
 
 | Default Chinese Speech Commands | Meaning                  | Response             |
@@ -203,9 +211,9 @@ This section provides instructions on how to do hardware/software setup and flas
 ## 2.2 Optional Hardware
 
 -   1 x MicroSD card
--   1 x Li-ion Battery
+-   1 x Li-ion battery
 
-> **Note**
+> **Notice**
 >
 > Be sure to use a Li-ion battery that has built-in protection circuit.
 
@@ -225,19 +233,20 @@ Prepare the board for loading of the first sample application:
 3.  Connect the board with the computer through the **USB-to-UART Port** using a USB cable.
 4.  Connect a speaker to the **Speaker Output**, or connect headphones to the **Headphone Output**.
 
-Now the board should be ready for software setup.
+Now the board is ready for software setup.
 
 ## 2.5 Software Setup
 
-After hardware setup, you can proceed with preparation of development tools. Go to the guide to [ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md) --\> Section [Software Preparation](https://github.com/espressif/esp-skainet/blob/master/README.md#software-preparation), which will walk you through the following steps:
+After hardware setup, you can proceed with preparation of development tools. Go to the [guide to ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md) --\> Section [Software Preparation](https://github.com/espressif/esp-skainet/blob/master/README.md#software-preparation), which will walk you through the following steps:
 
-1.  [Set up ESP-IDF](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-idf) which provides a common framework to develop applications for ESP32-S3 in C language.
-2.  [Get ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-skainet) to run Espressif's voice assistant. In ESP-Skainet, you may use [ESP-SR](https://github.com/espressif/esp-sr/blob/master/README.md) to call APIs for specific applications, including wake word detection, speech command recognition, and acoustic algorithm.
+1.  [Get ESP-Skainet](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-skainet) to run Espressif's voice assistant. In ESP-Skainet, you may use [ESP-SR](https://github.com/espressif/esp-sr/blob/master/README.md) to call APIs for specific applications, including wake word detection, speech command recognition, and acoustic algorithm.
+2.  [Set up ESP-IDF](https://github.com/espressif/esp-skainet/blob/master/README.md#esp-idf) which provides a common framework to develop applications for ESP32-S3 in C language.
 3.  [Build, flash and run ESP-Skainet examples](https://github.com/espressif/esp-skainet/blob/master/README.md#examples).
 
 > **Note**
 >
 > Espressif provides the **Off-line Wake Word Customization** service which allows you to customize wake words. For the detailed process, please refer to [Espressif Speech Wake Word Customization Process](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/ESP_Wake_Words_Customization.md).
+
 
 # 3. Hardware Reference
 
@@ -270,7 +279,6 @@ The main power supply is 5 V and provided over a USB. The secondary power supply
 </center>
 
 
-
 ### 3.2.2 Independent Module and Audio Power Supply
 
 The ESP32-S3-Korvo-1 board features independent power supplies to the audio components and the ESP32-S3-WROOM-1 module. This should reduce noise in the audio signal from module components and improve overall performance of the components.
@@ -283,7 +291,6 @@ The ESP32-S3-Korvo-1 board features independent power supplies to the audio comp
 
 </center>
 
-
 <center>
 
 |![ESP32-S3-Korvo-1 - Audio Power Supply](../../../_static/esp32-s3-korvo-1-v4-audio-ps.png)| 
@@ -293,7 +300,7 @@ The ESP32-S3-Korvo-1 board features independent power supplies to the audio comp
 </center>
 
 
-## 3.3 Selecting of the Audio Output
+## 3.3 Selecting of Audio Output
 
 The board provides two mutually exclusive audio outputs:
 
@@ -302,7 +309,22 @@ The board provides two mutually exclusive audio outputs:
 
 # 4. Hardware Revision Details
 
-This is the first revision of this board released.
+Compared to ESP32-S3-Korvo-1 v4.0, ESP32-S3-Korvo-1 v5.0 has two changes in hardware: 1) marking on the main board，2) location of J1 on the main board. The changes are described in detail below:
+
+1.  Marking on the (back of) main board: ESP32-S3-Korvo-1 v5.0 has marking "ESP32-S3-Korvo-1 V5.0" on the main board, while ESP32-S3-Korvo-1 v4.0 has marking "ESP32-S3-Korvo V4.0" on the main board.
+
+| ESP32-S3-Korvo-1 V5.0 Marking      | ESP32-S3-Korvo V4.0 Marking |
+|--------------------|----|
+|  ![ESP32-S3-Korvo-1 V5.0 Marking](../../../_static/esp32-s3-korvo-1-v5-marking.png) |![ESP32-S3-Korvo V4.0 Marking](../../../_static/esp32-s3-korvo-1-v4-marking.png) |
+
+2.  The J1 component on the ESP32-S3-Korvo-1 v5.0 main board is moved a little to the right. This does not affect the performance of the board.
+
+| J1 Location on the ESP32-S3-Korvo-1 v5.0 Main Board    |  J1 Location on the ESP32-S3-Korvo-1 v4.0 Main Board  |
+|--------------------|----|
+|  ![J1 Location on the ESP32-S3-Korvo-1 v5.0 Main Board](../../../_static/esp32-s3-korvo-1-v5-pcb-j1.png) |![J1 Location on the ESP32-S3-Korvo-1 v4.0 Main Board](../../../_static/esp32-s3-korvo-1-v4-pcb-j1.png) |
+
+3.  The **main board schematics**, **main board PCB layout diagrams**, **main board dimension diagrams**, **main board dimension source files** are updated because of the two hardware changes. (See [Related Documents](#5-related-documents)).
+
 
 # 5. Related Documents
 
@@ -313,21 +335,25 @@ This is the first revision of this board released.
 
 ## 5.2 Schematic
 
--   [ESP32-S3-Korvo Schematic](https://dl.espressif.com/dl/schematics/sch_esp32-s3-korvo_v5_20211020.pdf) (PDF)
--   [ESP32-Korvo-Mic Schematic](https://dl.espressif.com/dl/schematics/SCH_ESP32-KORVO-MIC_V1_1_20200316A.pdf) (PDF)
+-   [ESP32-S3-Korvo-1 v5.0 Main Board Schematic](https://dl.espressif.com/dl/schematics/SCH_ESP32-S3-Korvo-1_V6_20211201.pdf) (PDF)
+-   [ESP32-S3-Korvo-1 v4.0 Main Board Schematic](https://dl.espressif.com/dl/schematics/sch_esp32-s3-korvo_v5_20211020.pdf) (PDF)
+-   [ESP32-Korvo-Mic Sub Board Schematic](https://dl.espressif.com/dl/schematics/SCH_ESP32-KORVO-MIC_V1_1_20200316A.pdf) (PDF)
 
 ## 5.3 PCB Layout
 
--   [ESP32-S3-Korvo PCB layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-S3-KORVO_V4_20210719AE.pdf) (PDF)
+-   [ESP32-S3-Korvo-1 v5.0 Main Board PCB Layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-S3-Korvo-1_V5_20211201.pdf) (PDF)
+-   [ESP32-S3-Korvo-1 v4.0 Main Board PCB Layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-S3-KORVO_V4_20210719AE.pdf) (PDF)
 -   [ESP32-Korvo-Mic PCB layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-Korvo-Mic_V1_1_20200316AA.pdf) (PDF)
 
 ## 5.4 Dimensions
 
--   [ESP32-S3-Korvo Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.pdf) (PDF)
--   [ESP32-Korvo-Mic Top Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.pdf) (PDF)
--   [ESP32-Korvo-Mic Bottom Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.pdf) (PDF)
--   [ESP32-S3-Korvo Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
--   [ESP32-Korvo-Mic Top Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
--   [ESP32-Korvo-Mic Bottom Dimensions source file](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+-   [ESP32-S3-Korvo-1 v5.0 Main Board Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-1_V5_mb_20211207.pdf) (PDF)
+-   [ESP32-S3-Korvo-1 v4.0 Main Board Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.pdf) (PDF)
+-   [ESP32-Korvo-Mic Sub Board Front Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.pdf) (PDF)
+-   [ESP32-Korvo-Mic Sub Board Back Dimensions](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.pdf) (PDF)
+-   [ESP32-S3-Korvo-1 v5.0 Main Board Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-1_V5_mb_20211207.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+-   [ESP32-S3-Korvo-1 v4.0 Main Board Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+-   [ESP32-Korvo-Mic Sub Board Front Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+-   [ESP32-Korvo-Mic Sub Board Back Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
 
 For further design documentation for the board, please contact us at [<sales@espressif.com>](sales@espressif.com).
