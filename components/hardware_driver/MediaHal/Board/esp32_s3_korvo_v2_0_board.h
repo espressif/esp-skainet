@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+#include "driver/i2s.h"
+
 /* Board functions related */
 #define BOARD_INFO                  "ESP32_S3_KORVO_V2_0"
 #define USE_CODEC                   1

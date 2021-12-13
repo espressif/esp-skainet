@@ -34,7 +34,7 @@
 #include "driver/i2c.h"
 // #include "lock.h"
 // #include "InterruptionSal.h"
-#if defined CONFIG_ESP32_S3_CUSTOMER_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
+#if defined CONFIG_ESP32_S3_CUSTOMER_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || CONFIG_ESP32_S3_KORVO2_V4_BOARD
 #include "esp32s3/rom/gpio.h"
 #endif
 #define HAL_TAG "MEDIA_HAL"
@@ -123,7 +123,7 @@ static int I2cInit(i2c_config_t *conf, int i2cMasterPort)
     }
     return res;
 }
-#if defined CONFIG_ESP32_S3_CUSTOMER_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD
+#if defined CONFIG_ESP32_S3_CUSTOMER_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
 void i2s_mclK_matrix_out(int i2s_num, int io_num)
 {
 #include "driver/gpio.h"
@@ -191,9 +191,9 @@ int MediaHalInit(void *config)
     i2s_mclK_matrix_out(1, 20);
 #endif
 
-#if defined CONFIG_ESP32_S3_BOX_BOARD
+#if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
     #include "soc/usb_serial_jtag_reg.h"
-    i2s_mclK_matrix_out(1, 2);
+    i2s_mclK_matrix_out(1, 16);
 #endif
 
 #if CONFIG_ESP32_S3_CUSTOMER_BOARD

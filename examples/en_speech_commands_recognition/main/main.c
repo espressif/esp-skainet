@@ -23,7 +23,7 @@
 #include "speech_commands_action.h"
 #include "model_path.h"
 
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
 #define I2S_CHANNEL_NUM 4
 #else
 #define I2S_CHANNEL_NUM 2
@@ -209,8 +209,10 @@ void app_main()
 
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
-#ifndef  CONFIG_ESP32_S3_BOX_BOARD
-    xTaskCreatePinnedToCore(&play_music, "play", 8 * 1024, NULL, 5, NULL, 1);
+#if defined  CONFIG_ESP32_S3_KORVO_V4_0_BOARD
     xTaskCreatePinnedToCore(&led_Task, "led", 2 * 1024, NULL, 5, NULL, 0);
+#endif
+#ifndef  CONFIG_ESP32_S3_BOX_BOARD
+    xTaskCreatePinnedToCore(&play_music, "play", 4 * 1024, NULL, 5, NULL, 1);
 #endif
 }
