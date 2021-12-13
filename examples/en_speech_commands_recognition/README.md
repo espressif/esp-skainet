@@ -49,7 +49,7 @@ In this example, we have configured 32 command IDs to represent:
 ### Hardware Required
 
 
-\- This example can run on ESP32-S3-Korvo V4.0 or ESP-BOX. 
+\- This example can run on ESP32-S3-Korvo-1 or ESP-BOX. 
 
 \- A Speaker
 

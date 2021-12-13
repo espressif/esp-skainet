@@ -13,7 +13,7 @@ This example is used to test performance of wakenet.(the word word engine of Esp
 ### Hardware Required
 
 
-\- This example can run on ESP32-S3-Korvo V4.0 or ESP-BOX. 
+This example can run on ESP32-Korvo or ESP32-S3-Korvo-1 board. For more information about [ESP32-Korvo Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) and [ESP32-S3-Korvo-1 Getting Started Guide](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32s3/user-guide-korvo-1.md) for more information.
 
 ### Configure, Build and Flash
 

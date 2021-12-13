@@ -31,7 +31,7 @@
 ### Hardware Required
 ### 硬件需求
 
-- 这个示例能够在 ESP32-S3-Korvo-v4.0和ESP-BOX上运行.
+- 这个示例能够在 ESP32-S3-Korvo-1和ESP-BOX上运行.
 
 - 一只音箱
 

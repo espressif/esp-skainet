@@ -9,9 +9,10 @@ The following examples are currently available:
 
 | Example Name                                                 | Latest Models  | Boards                          |
 | ------------------------------------------------------------ | -------------- | ------------------------------- |
-| [cn_speech_commands_recognition](./cn_speech_commands_recognition) | Multinet3<br/> | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
-| [en_speech_commands_recognition](./en_speech_commands_recognition) | Multinet5      | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
-| [wake_word_detection](./wake_word_detection)                 | Wakenet8       | ESP32-S3-Korvo-v4.0<br/>ESP-BOX |
+| [cn_speech_commands_recognition](./cn_speech_commands_recognition) | Multinet3<br/> | ESP32-S3-Korvo-1<br/>ESP-BOX |
+| [en_speech_commands_recognition](./en_speech_commands_recognition) | Multinet5      | ESP32-S3-Korvo-1<br/>ESP-BOX |
+| [wake_word_detection](./wake_word_detection)                       | Wakenet8       | ESP32-S3-Korvo-1<br/>ESP-BOX |
+| [chinese_tts](./chinese_tts)                                       | esp-tts-v1     | ESP32-S3-Korvo-1<br/>ESP-BOX |
 
 # 贡献示例
 
