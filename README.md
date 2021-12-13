@@ -62,11 +62,11 @@ For details on how to set up the ESP-IDF, please refer to [Getting Started Guide
 # Examples
 The folder of [examples](examples) contains sample applications demonstrating the API features of ESP-Skainet.
 
-Please start with the [get_started](./examples/get_started)  example.
+Please start with the [wake_word_detection](./examples/wake_word_detection)  example.
 
-1. Navigate to one example folder `esp-skainet/examples/get_started).
+1. Navigate to one example folder `esp-skainet/examples/wake_word_detection).
 ```
-cd esp-skainet/examples/get_started
+cd esp-skainet/examples/wake_word_detection
 ```
 
 2. Compile and flash the project.
