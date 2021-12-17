@@ -105,6 +105,11 @@ void detect_Task(void *arg)
     int chunk_num = multinet->get_samp_chunknum(model_data);
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
+    char *new_commands_str = "TkN nN jc LiT;SWgp eF jc LiT;TkN nN jc FaN;SWgp eF jc FaN;";
+    char err_id[128];
+    multinet->reset(model_data, new_commands_str, err_id);
+    esp_mn_state_t mn_state;
+    esp_mn_results_t *mn_result;
 
     while (1) {
         int res = afe_handle->fetch(afe_data, buff);
@@ -119,25 +124,29 @@ void detect_Task(void *arg)
             afe_handle->disable_wakenet(afe_data);
         } 
 
-        if (detect_flag == 1) {
-            int command_id = multinet->detect(model_data, buff);
-
-            if (command_id >= -2) {
-                if (command_id > -1) {
-                    play_voice = command_id;
-                    printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION_QUANT8 || defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
-                    afe_handle->enable_wakenet(afe_data);
-                    detect_flag = 0;
-                    printf("\n-----------awaits to be waken up-----------\n");
-#endif
+        if (detect_flag == 1 ) {
+            mn_state = multinet->detect(model_data, buff);
+            if (mn_state==ESP_MN_STATE_DETECTED) {
+                mn_result = multinet->get_results(model_data);
+                
+                for (int i=0; i<mn_result->num; i++) {
+                    printf("phrase id:%d command_id:%d prob:%f\n", mn_result->phrase_id[i], mn_result->command_id[i], mn_result->prob[i]);
                 }
 
-                if (command_id == -2) {
+                if (mn_result->num==0) {
+                    printf("Can not recognize any commands, continue to detect...");
+                    continue;
+                } else {
                     afe_handle->enable_wakenet(afe_data);
+                    afe_handle->enable_aec(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
                 }
+            } else if (mn_state==ESP_MN_STATE_TIMEOUT) {
+                afe_handle->enable_wakenet(afe_data);
+                afe_handle->enable_aec(afe_data);
+                detect_flag = 0;
+                printf("\n-----------awaits to be waken up-----------\n");
             }
         }
     }
