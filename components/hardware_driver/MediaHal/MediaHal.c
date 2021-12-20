@@ -191,7 +191,12 @@ int MediaHalInit(void *config)
     i2s_mclK_matrix_out(1, 20);
 #endif
 
-#if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
+#if defined CONFIG_ESP32_S3_BOX_BOARD
+    #include "soc/usb_serial_jtag_reg.h"
+    i2s_mclK_matrix_out(1, 2);
+#endif
+
+#if defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
     #include "soc/usb_serial_jtag_reg.h"
     i2s_mclK_matrix_out(1, 16);
 #endif
@@ -200,7 +205,6 @@ int MediaHalInit(void *config)
     i2s_mclK_matrix_out(0, 48);
     i2s_mclK_matrix_out(1, 20);
 #endif
-
 
 #if defined CONFIG_ESP_KORVO_MIX_B_V1_0_BOARD || defined CONFIG_ESP_KORVO_MIX_B_V2_0_BOARD
     i2s_mclk_matrix_out(1, 0);
