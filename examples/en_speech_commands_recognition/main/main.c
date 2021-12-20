@@ -107,7 +107,7 @@ void detect_Task(void *arg)
     printf("------------detect start------------\n");
     char *new_commands_str = "TkN nN jc LiT;SWgp eF jc LiT;TkN nN jc FaN;SWgp eF jc FaN;";
     char err_id[128];
-    multinet->reset(model_data, new_commands_str, err_id);
+//    multinet->reset(model_data, new_commands_str, err_id);
     esp_mn_state_t mn_state;
     esp_mn_results_t *mn_result;
 
@@ -134,7 +134,7 @@ void detect_Task(void *arg)
                 }
 
                 if (mn_result->num==0) {
-                    printf("Can not recognize any commands, continue to detect...");
+                    printf("Can not recognize any commands, continue to detect...\n");
                     continue;
                 } else {
                     afe_handle->enable_wakenet(afe_data);
@@ -210,10 +210,10 @@ void app_main()
 #endif
 
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
-#if defined CONFIG_ESP32_S3_BOX_BOARD
-    afe_config.aec_init = false;
-    afe_config.vad_init = false;
-#endif
+//#if defined CONFIG_ESP32_S3_BOX_BOARD
+//    afe_config.aec_init = false;
+//    afe_config.vad_init = false;
+//#endif
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
 
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
