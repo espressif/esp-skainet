@@ -57,24 +57,26 @@ int app_main() {
     /*** 1. create esp tts handle ***/
     // method1: use pre-define xiaole voice lib.
     // This method is not recommended because the method may make app bin exceed the limit of esp32  
-    esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
+    //esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
 
     // method2: initial voice set from separate voice data partition
-    /*
-    const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
-    if (part==0) { 
+    
+    const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, "voice_data");
+    if (part==NULL) { 
         printf("Couldn't find voice data partition!\n"); 
         return 0;
+    } else {
+        printf("voice_data paration size:%d\n", part->size);
     }
     spi_flash_mmap_handle_t mmap;
     uint16_t* voicedata;
-    esp_err_t err=esp_partition_mmap(part, 0, 3*1024*1024, SPI_FLASH_MMAP_DATA, (const void**)&voicedata, &mmap);
+    esp_err_t err=esp_partition_mmap(part, 0, part->size, SPI_FLASH_MMAP_DATA, &voicedata, &mmap);
     if (err != ESP_OK) {
         printf("Couldn't map voice data partition!\n"); 
         return 0;
     }
     esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
-    */
+    
 
     esp_tts_handle_t *tts_handle=esp_tts_create(voice);
 

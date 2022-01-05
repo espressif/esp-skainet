@@ -1,6 +1,6 @@
 #!/bin/bash
 port="/dev/ttyUSB0"
-baud=$((921600/2))
+baud=$((2000000))
 file="$1"
 
 if [ -z "$1" ]; then
@@ -18,5 +18,5 @@ fi
 
 python ${IDF_PATH}/components/esptool_py/esptool/esptool.py \
 		--port $port --baud $baud --before default_reset --after hard_reset write_flash \
-		--flash_mode dio --flash_freq 40m --flash_size detect 0x100000 "$file"
+		--flash_mode dio --flash_freq 40m --flash_size detect 0x410000 "$file"
 
