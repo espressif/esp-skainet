@@ -29,25 +29,17 @@
 ## 如何使用例程
 
 ### Hardware Required
-### 硬件需求
+### 额外硬件需求
 
-- 这个示例能够在 ESP32-S3-Korvo-1和ESP-BOX上运行.
-
-- 一只音箱
+- 一只外接喇叭(4~6 欧姆)
 
 ### 配置工程
 
 * 根据使用的开发板模组选择对应的 `sdkconfig`
-  
-  - 比如， 使用 ESP32， 运行 `cp sdkconfig_esp32.defaults sdkconfig`
-
-  - 比如， 使用 ESP32-S3， 运行 `cp sdkconfig_esp32s3r8_8+4.defaults sdkconfig`
 
 * 进入 `idf.py menuconfig`
 
 * 通过 `Serial Flasher Options`设置串口信息
-
-* 通过`ESP Speech Recognition`添加或更改垃圾名称
 
 ### 编译和烧写
 

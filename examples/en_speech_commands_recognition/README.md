@@ -46,14 +46,9 @@ In this example, we have configured 32 command IDs to represent:
 ## How to use this example
 
 
-### Hardware Required
-
-
-\- This example can run on ESP32-S3-Korvo-1 or ESP-BOX. 
+### Additional Hardware Required
 
 \- A Speaker
-
-
 
 ### Configure, Build and Flash
 
@@ -68,8 +63,10 @@ idf.py set-target esp32s3
 
 Select the default sdkconfig according to the development board module
 
+For example:  
+
 ```
-cp sdkconfig_esp32s3r8_8+4.defaults sdkconfig
+cp sdkconfig.defaults.esp32s3 sdkconfig
 ```
 
 ##### build&flash
@@ -84,7 +81,7 @@ idf.py -b 2000000 flash monitor
 
 ### Modify speech commands
 
-For English MultiNet, we use international phonetic alphabet as unit. [multinet_g2p.py](../../components/esp-sr/tool/multinet_g2p.py) is used to convert English phrase into phonemes which can be recognized by multinet．　
+For English MultiNet, we use international phonetic alphabet as unit. [multinet_g2p.py](https://github.com/espressif/esp-sr/blob/release/v1.0/tool/multinet_g2p.py) is used to convert English phrase into phonemes which can be recognized by multinet．　
 Now, the MultiNet support two methods to modify speech commands.　
 
 #### 1.menuconfig (before compilation)
