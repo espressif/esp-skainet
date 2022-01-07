@@ -98,11 +98,9 @@ void detect_Task(void *arg)
                 if (command_id > -1) {
                     play_voice = command_id;
                     printf("command_id: %d\n", command_id);
-#if defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION_QUANT8 || defined CONFIG_EN_MULTINET5_SINGLE_RECOGNITION || defined CONFIG_EN_MULTINET3_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET2_SINGLE_RECOGNITION || defined CONFIG_CN_MULTINET3_SINGLE_RECOGNITION
                     afe_handle->enable_wakenet(afe_data);
                     detect_flag = 0;
                     printf("\n-----------awaits to be waken up-----------\n");
-#endif
                 }
 
                 if (command_id == -2) {
