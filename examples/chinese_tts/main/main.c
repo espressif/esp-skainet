@@ -22,9 +22,14 @@
 
 struct RingBuf *urat_rb=NULL;
 
-int app_main() {
+int app_main()
+{
+#if defined CONFIG_ESP32_S3_EYE_BOARD
+    printf("Not Support esp32-s3-eye board\n");
+    return 0;
+#endif
+
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
-ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #ifdef SDCARD_OUTPUT_ENABLE
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     FILE* fp=fopen("/sdcard/URAT.pcm", "w+");

@@ -329,7 +329,7 @@ esp_err_t bsp_get_feed_data(int16_t *buffer, int buffer_len)
     for (int i = 0; i < audio_chunksize; i++) {
         int16_t ref = buffer[4 * i + 0];
         buffer[2 * i + 0] = buffer[4 * i + 1];
-        buffer[2 * i + 2] = ref;
+        buffer[2 * i + 1] = ref;
     }
 
     return ret;
