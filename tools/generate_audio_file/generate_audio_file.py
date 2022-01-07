@@ -10,15 +10,15 @@ def get_wave_array_str(filename, target_bits):
         i = 0
         while (1):
             data = f.read(1)
-            if (data == ''):
+            if len(data) == 0:
                 break
-            val = struct.unpack("B", data)
+            if len(data) == 1:
+                val = struct.unpack("B", data)
             array_str += "%0#4x, "%(val)
             if (i + 1) % 16 == 0:
                 array_str += "\n"
             i = i + 1
     return array_str
-
 
 def gen_wave_table(wav_file_list, scale_bits = 8):
     for wav in wav_file_list:
