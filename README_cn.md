@@ -4,7 +4,7 @@ ESP-Skainet 是乐鑫推出的智能语音助手，目前支持唤醒词识别�
 
 # 概述
 
-ESP-Skainet 以最便捷的方式支持基于乐鑫的 ESP32 芯片的唤醒词识别和命令词识别应用程序的开发。使用 ESP-Skainet，您可以轻松构建唤醒词识别和命令词识别应用程序。
+ESP-Skainet 以最便捷的方式支持基于乐鑫的 ESP32系列 芯片的唤醒词识别和命令词识别应用程序的开发。使用 ESP-Skainet，您可以轻松构建唤醒词识别和命令词识别应用程序。
 
 ESP-Skainet 的功能支持如下所示：
 
@@ -16,15 +16,15 @@ ESP-Skainet 的功能支持如下所示：
 
 ## 唤醒词识别 
 
-唤醒词模型 [WakeNet](https://github.com/espressif/esp-sr/tree/master/wake_word_engine/README_cn.md)，致力于提供一个低资源消耗的的高性能模型，支持类似“Alexa”，“天猫精灵”，“小爱同学”等唤醒词的识别。  
+唤醒词模型 [WakeNet](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/README_cn.md)，致力于提供一个低资源消耗的的高性能模型，支持类似“Alexa”，“天猫精灵”，“小爱同学”等唤醒词的识别。  
 
-目前乐鑫免费开放“Hi，乐鑫”， “你好小智”， “你好小鑫”， “hi，Jeson”唤醒词。如果用户需要其它唤醒词，乐鑫提供有唤醒词定制服务，具体可参考 [乐鑫语音唤醒词定制流程](https://github.com/espressif/esp-sr/tree/master/wake_word_engine/乐鑫语音唤醒词定制流程.md)。
+目前乐鑫免费开放“Hi，乐鑫”， “你好小智”， “你好小鑫”， “Hi，ESP”唤醒词。如果用户需要其它唤醒词，乐鑫提供有唤醒词定制服务，具体可参考 [乐鑫语音唤醒词定制流程](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/乐鑫语音唤醒词定制流程.md)。
 
 ## 语音命令词识别
 
-命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/tree/master/speech_command_recognition/README_cn.md) ，致力于提供一个灵活的离线语音命词识别框架。用户可方便根据需求自定义语音命令，无需重新训练模型。  
+命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/blob/master/docs/speech_command_recognition/README_cn.md) ，致力于提供一个灵活的离线语音命词识别框架。用户可方便根据需求自定义语音命令，无需重新训练模型。  
 
-目前模型支持类似“打开空调”，“打开卧室灯”等中文命令词识别和"Turn on/off the light" 等英文命令词识别，自定义语音命令词最大个数为 100。   
+目前模型支持类似“打开空调”，“打开卧室灯”等中文命令词识别和"Turn on/off the light" 等英文命令词识别，自定义语音命令词最大个数为 200。   
 
 ## 声学前端算法
 
@@ -59,7 +59,7 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 
 ### ESP-IDF
 
-在本工程中，我们建议使用 [ESP-IDF v3.3.1](https://github.com/espressif/esp-idf/tree/v3.3.1) 版本。如果您之前已经搭建过 ESP-IDF 环境并且不想更改现有的变量，可以将 IDF_PATH 环境变量配置为新的 ESP-IDF 的路径 . 目前支持到ESP-IDF v4.0  
+在本工程中，我们建议使用 [ESP-IDF v4.4](https://github.com/espressif/esp-idf/tree/release/v4.4) 版本。如果您之前已经搭建过 ESP-IDF 环境并且不想更改现有的变量，可以将 IDF_PATH 环境变量配置为新的 ESP-IDF 的路径 . 目前支持到ESP-IDF v4.0  
 
 
   *注意:* 如果使用ESP-IDFv3.2及之前版本，建议参考esp-skainet v0.2.0
