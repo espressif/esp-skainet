@@ -2,7 +2,6 @@
 #include <freertos/task.h>
 #include <soc/rmt_struct.h>
 #include <esp_system.h>
-#include <nvs_flash.h>
 #include <driver/gpio.h>
 #include <stdio.h>
 #include <driver/rmt.h>

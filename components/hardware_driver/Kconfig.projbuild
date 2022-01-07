@@ -2,32 +2,25 @@ menu "Audio Media HAL"
 
 choice AUDIO_BOARD
     prompt "Audio hardware board"
-    default ESP_LYRAT_MINI_V1_1_BOARD
+    default ESP32_S3_KORVO_1_V4_0_BOARD
     help
-        Select an audio board to use with the ESP-ADF
+        Select an audio board to use
 
-config ESP_LYRAT_MINI_V1_1_BOARD
-    bool "ESP32-Lyrat Mini V1.1"
 config ESP32_KORVO_V1_1_BOARD
-    bool "ESP32-Korvo V1.1"
-config ESP32_S2_KALUGA_1_V1_2_BOARD
-    bool "ESP32-S2-Kaluga-1 v1.2"
+    bool "ESP32-Korvo"
+    depends on IDF_TARGET_ESP32
 config ESP32_S3_BOX_BOARD
     bool "ESP32-S3-Box"
-config ESP32_S3_KORVO_V4_0_BOARD
-    bool "ESP32-S3-Korvo V4.0"
-config ESP32_S3_KORVO2_V3_BOARD
-    bool "ESP32-S3-Korvo-2 V3.0"
-endchoice
-
-choice MIC_ARRAY_TYPE
-    prompt "Mic-array type"
-    depends on ESP32_KORVO_V1_1_BOARD || ESP32_S3_KORVO_V1_0_BOARD || ESP_KORVO_MIX_A_V1_0_BOARD || ESP32_S3_KORVO_V2_0_BOARD || ESP_KORVO_MIX_B_V2_0_BOARD || ESP32_S3_KORVO_V3_0_BOARD
-
-config 2_MIC_LINEAR_ARRAY
-	bool "2-mic linear array"
-config 3_MIC_CIRCULAR_ARRAY
-	bool "3-mic circular array"
+    depends on IDF_TARGET_ESP32S3
+config ESP32_S3_KORVO_1_V4_0_BOARD
+    bool "ESP32-S3-Korvo-1"
+    depends on IDF_TARGET_ESP32S3
+config ESP32_S3_KORVO_2_V3_0_BOARD
+    bool "ESP32-S3-Korvo-2"
+    depends on IDF_TARGET_ESP32S3
+config ESP32_S3_EYE_BOARD
+    bool "ESP32-S3-EYE"
+    depends on IDF_TARGET_ESP32S3
 endchoice
 
 endmenu

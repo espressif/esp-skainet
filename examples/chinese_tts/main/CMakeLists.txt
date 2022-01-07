@@ -10,6 +10,7 @@ set(COMPONENT_ADD_INCLUDEDIRS
 set(COMPONENT_REQUIRES
     esp-sr
     hardware_driver
+    sr_ringbuf
     player
     )
 

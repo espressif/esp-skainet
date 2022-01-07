@@ -1,11 +1,11 @@
 #!/bin/bash
-port="/dev/ttyUSB0"
+port="/dev/ttyUSB1"
 baud=$((2000000))
 file="$1"
 
 if [ -z "$1" ]; then
 	echo "Flashes a wave file to the partition for the speech recognition thing to parse it."
-	echo "Usage: $0 file.wav [/dev/ttyUSB0 [115200]]"
+	echo "Usage: $0 file.wav [/dev/ttyUSB1 [115200]]"
 	exit 0
 fi
 

@@ -6,15 +6,14 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "driver/i2s.h"
-#include "MediaHal.h"
 #include "esp_tts.h"
 #include "esp_tts_voice_xiaole.h"
 #include "esp_tts_voice_template.h"
 #include "esp_tts_player.h"
+#include "esp_board_init.h"
 #include "ringbuf.h"
 
 #include "tts_urat.h"
-#include "sdcard_init.h"
 
 #include "wav_encoder.h"
 #include "esp_partition.h"
@@ -23,29 +22,11 @@
 
 struct RingBuf *urat_rb=NULL;
 
-// i2s play
-int iot_dac_audio_play(const uint8_t* data, int length, TickType_t ticks_to_wait)
-{
-    size_t bytes_write = 0;
-#ifdef CONFIG_ESP_LYRAT_V4_3_BOARD
-    short *out=malloc(length*sizeof(short));
-    short *in=(short*)data;
-    for(int i=0; i<length/2; i++) {
-        out[i*2]=data[i];
-        out[i*2+1]=data[i];
-    }
-    i2s_write(0, (const char*) out, length*2, &bytes_write, ticks_to_wait);
-#else
-    i2s_write(0, (const char*) data, length, &bytes_write, ticks_to_wait);
-#endif
-    return ESP_OK;
-}
-
 int app_main() {
-    codec_init(); 
-
+    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #ifdef SDCARD_OUTPUT_ENABLE
-    sd_card_mount("/sdcard");
+    ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     FILE* fp=fopen("/sdcard/URAT.pcm", "w+");
     if(fp==NULL)
         printf("can not open file!\n");
@@ -90,7 +71,7 @@ int app_main() {
 #ifdef SDCARD_OUTPUT_ENABLE
                 wav_encoder_run(wav_encoder, pcm_data, len[0]*2);
 #else
-                iot_dac_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
+                esp_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
 #endif
                 //printf("data:%d \n", len[0]);
             } while(len[0]>0);
@@ -124,7 +105,7 @@ int app_main() {
 #ifdef SDCARD_OUTPUT_ENABLE
                     FatfsComboWrite(pcm_data, 1, len[0]*2, fp);
 #else
-                    iot_dac_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
+                    esp_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
 #endif
                 } while(len[0]>0);
                 i2s_zero_dma_buffer(0);

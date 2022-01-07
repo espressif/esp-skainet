@@ -15,18 +15,11 @@
 #include "dl_lib_coefgetter_if.h"
 #include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
-#include "sdcard_init.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
-#include "MediaHal.h"
+#include "esp_board_init.h"
 #include "driver/i2s.h"
 #include "model_path.h"
-
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD || defined CONFIG_ESP32_S3_KORVO_V1_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
-#define I2S_CHANNEL_NUM 4
-#else
-#define I2S_CHANNEL_NUM 2
-#endif
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
@@ -36,31 +29,13 @@ void feed_Task(void *arg)
     esp_afe_sr_data_t *afe_data = arg;
     int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
     int nch = afe_handle->get_channel_num(afe_data);
-    int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * I2S_CHANNEL_NUM);
+    int feed_channel = esp_get_feed_channel();
+    int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
     size_t bytes_read;
 
     while (1) {
-        i2s_read(I2S_NUM_1, i2s_buff, audio_chunksize * I2S_CHANNEL_NUM * sizeof(int16_t), &bytes_read, portMAX_DELAY);
-
-        if (I2S_CHANNEL_NUM == 4) {
-#if defined CONFIG_ESP32_S3_KORVO_V2_0_BOARD || defined CONFIG_ESP32_S3_KORVO_V3_0_BOARD  || defined CONFIG_ESP32_S3_KORVO_V4_0_BOARD || defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_KORVO2_V3_BOARD
-            for (int i = 0; i < audio_chunksize; i++) {
-                int16_t ref = i2s_buff[4 * i + 0];
-                i2s_buff[3 * i + 0] = i2s_buff[4 * i + 1];
-                i2s_buff[3 * i + 1] = i2s_buff[4 * i + 3];
-                i2s_buff[3 * i + 2] = ref;
-            }
-#endif
-
-#ifdef CONFIG_ESP32_KORVO_V1_1_BOARD
-            for (int i = 0; i < audio_chunksize; i++) {
-                int16_t ref = i2s_buff[4 * i + 0];
-                i2s_buff[2 * i + 0] = i2s_buff[4 * i + 1];
-                i2s_buff[2 * i + 1] = ref;
-            }
-#endif
-        }
+        esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
     }
@@ -94,9 +69,10 @@ void app_main()
 #if defined CONFIG_MODEL_IN_SPIFFS
     srmodel_spiffs_init();
 #endif
-    codec_init();
+    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
+    // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
-#if CONFIG_IDF_TARGET_ESP32
+#if CONFIG_IDF_TARGET_ESP32 || defined CONFIG_ESP32_S3_EYE_BOARD
     afe_handle = &esp_afe_sr_1mic;
 #else 
     afe_handle = &esp_afe_sr_2mic;
