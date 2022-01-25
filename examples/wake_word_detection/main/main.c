@@ -72,12 +72,7 @@ void app_main()
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
-#if CONFIG_IDF_TARGET_ESP32 || defined CONFIG_ESP32_S3_EYE_BOARD
-    afe_handle = &esp_afe_sr_1mic;
-#else 
-    afe_handle = &esp_afe_sr_2mic;
-#endif
-
+    afe_handle = &ESP_AFE_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
     xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);

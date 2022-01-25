@@ -112,6 +112,6 @@ To ensure that the example is configured correctly, please check the version of 
 
 | model name |                           version                            |
 | ---------- | :----------------------------------------------------------: |
-| wakenet    | wakeNet8_v2_hiesp_5_0.57_0.55 or wakeNet8Q8_v2_hiesp_5_0.58_0.55 |
-| multinet   | MN5Q8_v1_english_8_0.9_0.90 |
+| wakenet    | wakeNet8_v3h8_hiesp_5_0.60_0.616 or wakeNet8Q8_v2_hiesp_5_0.58_0.55 |
+| multinet   | MN5Q8_v2_english_8_0.9_0.90 |
 | AFE        | TWO-MIC auido front-end for speech recognition | 
