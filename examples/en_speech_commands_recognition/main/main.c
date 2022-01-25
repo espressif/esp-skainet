@@ -83,7 +83,7 @@ void detect_Task(void *arg)
 
         if (res == AFE_FETCH_WWE_DETECTED) {
             printf("wakeword detected\n");
-            printf("-----------LISTENING-----------\n");
+            printf("-----------listening-----------\n");
         }
         if (res == AFE_FETCH_CHANNEL_VERIFIED) {
             play_voice = -1;
@@ -92,22 +92,26 @@ void detect_Task(void *arg)
         } 
 
         if (detect_flag == 1) {
-            int command_id = multinet->detect(model_data, buff);
+            esp_mn_state_t mn_state = multinet->detect(model_data, buff);
 
-            if (command_id >= -2) {
-                if (command_id > -1) {
-                    play_voice = command_id;
-                    printf("command_id: %d\n", command_id);
-                    afe_handle->enable_wakenet(afe_data);
-                    detect_flag = 0;
-                    printf("\n-----------awaits to be waken up-----------\n");
-                }
+            if (mn_state == ESP_MN_STATE_DETECTING) {
+                continue;
+            }
 
-                if (command_id == -2) {
-                    afe_handle->enable_wakenet(afe_data);
-                    detect_flag = 0;
-                    printf("\n-----------awaits to be waken up-----------\n");
+            if (mn_state == ESP_MN_STATE_DETECTED) {
+                esp_mn_results_t *mn_result = multinet->get_results(model_data);
+                for (int i = 0; i < mn_result->num; i++) {
+                    printf("TOP %d, command_id: %d, phrase_id: %d, prob: %f\n", 
+                    i+1, mn_result->command_id[i], mn_result->phrase_id[i], mn_result->prob[i]);
                 }
+                printf("-----------listening-----------\n");
+            }
+
+            if (mn_state == ESP_MN_STATE_TIMEOUT) {
+                afe_handle->enable_wakenet(afe_data);
+                detect_flag = 0;
+                printf("\n-----------awaits to be waken up-----------\n");
+                continue;
             }
         }
     }
@@ -131,11 +135,7 @@ void app_main()
     printf("This demo only support ESP32S3\n");
     return;
 #else 
-#if defined CONFIG_ESP32_S3_EYE_BOARD
-    afe_handle = &esp_afe_sr_1mic;
-#else
-    afe_handle = &esp_afe_sr_2mic;
-#endif
+    afe_handle = &ESP_AFE_HANDLE;
 #endif
 
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
