@@ -12,7 +12,6 @@
 
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
-#include "dl_lib_coefgetter_if.h"
 #include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
 #include "esp_mn_iface.h"
@@ -21,9 +20,11 @@
 #include "driver/i2s.h"
 #include "speech_commands_action.h"
 #include "model_path.h"
+#include "esp_process_sdkconfig.h"
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
+srmodel_list_t *models = NULL;
 static int play_voice = -2;
 
 void play_music(void *arg)
@@ -69,30 +70,35 @@ void detect_Task(void *arg)
     esp_afe_sr_data_t *afe_data = arg;
     int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
     int nch = afe_handle->get_channel_num(afe_data);
-    int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
-    assert(buff);
-    static const esp_mn_iface_t *multinet = &MULTINET_MODEL;
-    model_iface_data_t *model_data = multinet->create(&MULTINET_COEFF, 5760);
+    char *mn_name = esp_srmodel_filter(models, ESP_MN_PREFIX, ESP_MN_ENGLISH);
+    printf("multinet:%s\n", mn_name);
+    esp_mn_iface_t *multinet = esp_mn_handle_from_name(mn_name);
+    model_iface_data_t *model_data = multinet->create(mn_name, 5760);
     int mu_chunksize = multinet->get_samp_chunksize(model_data);
     int chunk_num = multinet->get_samp_chunknum(model_data);
+    esp_mn_commands_update_from_sdkconfig(multinet, model_data); // Add speech commands from sdkconfig
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
 
     while (1) {
-        int res = afe_handle->fetch(afe_data, buff);
-
-        if (res == AFE_FETCH_WWE_DETECTED) {
-            printf("wakeword detected\n");
-            printf("-----------listening-----------\n");
+        afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
+        if (!res || res->ret_value == ESP_FAIL) {
+            printf("fetch error!\n");
+            break;
         }
-        if (res == AFE_FETCH_CHANNEL_VERIFIED) {
+
+        if (res->wakeup_state == WAKENET_DETECTED) {
+            printf("WAKEWORD DETECTED\n");
+        } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
             play_voice = -1;
             detect_flag = 1;
-            afe_handle->disable_wakenet(afe_data);
-        } 
+            printf("AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+            // afe_handle->disable_wakenet(afe_data);
+            // afe_handle->disable_aec(afe_data);
+        }
 
         if (detect_flag == 1) {
-            esp_mn_state_t mn_state = multinet->detect(model_data, buff);
+            esp_mn_state_t mn_state = multinet->detect(model_data, res->data);
 
             if (mn_state == ESP_MN_STATE_DETECTING) {
                 continue;
@@ -121,9 +127,7 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-#if defined CONFIG_MODEL_IN_SPIFFS
-    srmodel_spiffs_init();
-#endif
+    models = esp_srmodel_init();
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
@@ -135,10 +139,11 @@ void app_main()
     printf("This demo only support ESP32S3\n");
     return;
 #else 
-    afe_handle = &ESP_AFE_HANDLE;
+    afe_handle = &ESP_AFE_SR_HANDLE;
 #endif
 
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
+    afe_config.wakenet_model_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);;
 #if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_EYE_BOARD
     afe_config.aec_init = false;
 #endif
