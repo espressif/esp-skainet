@@ -20,7 +20,7 @@
 
 //#define SDCARD_OUTPUT_ENABLE
 
-struct RingBuf *urat_rb=NULL;
+ringbuf_handle_t urat_rb=NULL;
 
 int app_main()
 {
@@ -38,6 +38,8 @@ int app_main()
 
     //sample rate:16000Hz, int16, mono
     void * wav_encoder=wav_encoder_open("/sdcard/prompt.wav", 16000, 16, 1);
+    void * urat_wav_encoder=wav_encoder_open("/sdcard/URAT.wav", 16000, 16, 1);
+
 #endif
 
     /*** 1. create esp tts handle ***/
@@ -87,17 +89,17 @@ int app_main()
 #endif
 
     /*** 3. play urat input text ***/
-    urat_rb = rb_init(BUFFER_PROCESS+1, URAT_BUF_LEN, 1, NULL);  // urat ringbuf init
+    urat_rb = rb_create(URAT_BUF_LEN, 1);  // urat ringbuf init
     char data[URAT_BUF_LEN+1];
     char in;
     int data_len=0;
 
-    xTaskCreatePinnedToCore(&uartTask, "urat", 3 * 1024, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(&uartTask, "urat", 6 * 1024, NULL, 5, NULL, 0);
     char *prompt2="\n请输入短语:";
     printf("%s\n", prompt2);
  
     while (1) {
-        rb_read(urat_rb, (uint8_t *)&in, 1, portMAX_DELAY);
+        rb_read(urat_rb, &in, 1, portMAX_DELAY);
 
         if(in=='\n') {
             // start to run tts
@@ -108,7 +110,7 @@ int app_main()
                 do {
                     short *pcm_data=esp_tts_stream_play(tts_handle, len, 3);
 #ifdef SDCARD_OUTPUT_ENABLE
-                    FatfsComboWrite(pcm_data, 1, len[0]*2, fp);
+                    wav_encoder_run(urat_wav_encoder, pcm_data, len[0]*2);
 #else
                     esp_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
 #endif
@@ -127,6 +129,9 @@ int app_main()
             data_len=0;
         }
     }
+#ifdef SDCARD_OUTPUT_ENABLE
+    wav_encoder_close(urat_wav_encoder);
+#endif
 
     return 0;
 }

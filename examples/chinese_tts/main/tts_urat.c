@@ -15,7 +15,7 @@
 #include "driver/uart.h"
 
 #define TAG "TTS_URAT"
-extern struct RingBuf *urat_rb;
+extern ringbuf_handle_t urat_rb;
 
 void uartTask(void *arg)
 {
@@ -66,7 +66,7 @@ void uartTask(void *arg)
                     char buf;
                     if (read(fd, &buf, 1) > 0) {
                         ESP_LOGI("", "%c", buf);
-                        rb_write(urat_rb, (uint8_t *)&buf, 1, portMAX_DELAY);
+                        rb_write(urat_rb, &buf, 1, portMAX_DELAY);
 
                         if (buf=='\n') {
                             data[len]='\0';
