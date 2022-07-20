@@ -15,28 +15,9 @@
 * 通过 `Serial Flasher Options`设置串口信息
 
 
-### 编译和烧写
+### 编译和烧写, 将voice data烧写到独立分区，可以有效降低app bin大小，方便用户OTA： 
 
-#### 方法一：将voice data编译进入app bin,该方法为默认方法．
-
-##### 1)如果使用ESP32-S2，请确认IDF版本为v4.2或以上;如果使用ESP32-S3，请确认IDF版本为v4.4或以上; 执行以下命令设置编译目标芯片。
-```
-idf.py set-target esp32/esp32s2/esp32s3
-```
-##### 2)进入配置界面，选择合适的开发板
-```
-idf.py menuconfig
-```
-##### 3)编译烧录程序
-```
-idf.py flash monitor -p /dev/ttyUSB0
-
-```
-参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.
-
-#### 方法二： 将voice data烧写到独立分区，可以有效降低app bin大小，方便用户OTA： 
-
-##### 1)参考partition.csv中第二行添加voice data部分的分区列表, 分区大小至少为3MB:  
+##### 1)参考partition.csv中第二行添加voice data部分的分区列表, 分区大小为voice data的尺寸:  
 
 ```
 # Name,  Type, SubType, Offset,  Size
@@ -45,16 +26,17 @@ voice_data, data,  fat,         , 3M
 ```
 
 ##### 2)使用该目录下的flash_voicedata.sh脚本，烧写voice data到指定分区:   
+目前支持两种声音，　任选一个进行烧写:
+ - esp_tts_voice_data_xiaole.dat: 2900K
+ - esp_tts_voice_data_xiaoxin.dat: 2800K, 该voice data专为数字播报优化
 
 ```
 source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
-```
-##### 3)修改[代码](./main/main.c)中voice data的初始化方法,选择method2
-```
 
-    // method1: use pre-define xiaole voice lib.
-    // This method is not recommended because the method may make app bin exceed the limit of esp32  
-    // esp_tts_voice_t *voice=&esp_tts_voice_xiaole;
+source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaoxin.dat  /dev/ttyUSB0
+```
+##### 3)[代码](./main/main.c)中voice data的初始化方法如下：
+```
 
     // method2: initial voice set from separate voice data partition
     const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
@@ -73,7 +55,10 @@ source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tt
 
 ```
 
-##### 4)按照方法一烧写app bin.
+##### 4)烧写app bin.
+```
+idf.py flash monitor
+```
 
 
 

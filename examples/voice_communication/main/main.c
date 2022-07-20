@@ -127,9 +127,11 @@ void debug_pcm_save_Task(void *arg)
 void app_main()
 {
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
+#if DEBUG_SAVE_PCM
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
+#endif
 
-    afe_handle = &ESP_AFE_VOIP_HANDLE;
+    afe_handle = &ESP_AFE_VC_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     afe_config.vad_init = false;
     afe_config.wakenet_init = false;

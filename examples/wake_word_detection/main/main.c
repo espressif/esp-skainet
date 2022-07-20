@@ -74,7 +74,7 @@ void app_main()
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
-    srmodel_list_t *models = esp_srmodel_init();
+    srmodel_list_t *models = esp_srmodel_init("model");
     if (models!=NULL) {
         for (int i=0; i<models->num; i++) {
             printf("Load: %s\n", models->model_name[i]);
