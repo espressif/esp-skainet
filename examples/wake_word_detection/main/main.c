@@ -9,11 +9,8 @@
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
-#include "dl_lib_coefgetter_if.h"
-#include "esp_afe_sr_iface.h"
 #include "esp_afe_sr_models.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
@@ -53,33 +50,46 @@ void detect_Task(void *arg)
     printf("------------detect start------------\n");
 
     while (1) {
-        int res = afe_handle->fetch(afe_data, buff);
+        afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
+        if (!res || res->ret_value == ESP_FAIL) {
+            printf("fetch error!\n");
+            break;
+        }
 
-        if (res == AFE_FETCH_WWE_DETECTED) {
+        if (res->wakeup_state == WAKENET_DETECTED) {
             printf("wakeword detected\n");
             printf("-----------LISTENING-----------\n");
         }
     }
     afe_handle->destroy(afe_data);
+    if (buff) {
+        free(buff);
+        buff = NULL;
+    }
     vTaskDelete(NULL);
 }
 
 void app_main()
 {
-#if defined CONFIG_MODEL_IN_SPIFFS
-    srmodel_spiffs_init();
-#endif
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
-#if CONFIG_IDF_TARGET_ESP32 || defined CONFIG_ESP32_S3_EYE_BOARD
-    afe_handle = &esp_afe_sr_1mic;
-#else 
-    afe_handle = &esp_afe_sr_2mic;
-#endif
+    srmodel_list_t *models = esp_srmodel_init("model");
+    if (models!=NULL) {
+        for (int i=0; i<models->num; i++) {
+            printf("Load: %s\n", models->model_name[i]);
+        }
+    }
+    char *wn_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);
 
+    afe_handle = &ESP_AFE_SR_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
+    afe_config.memory_alloc_mode = AFE_MEMORY_ALLOC_MORE_PSRAM;
+    afe_config.wakenet_init = true;
+    afe_config.wakenet_model_name = wn_name;
+    afe_config.voice_communication_init = false;
+
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
-    xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)afe_data, 5, NULL, 0);
+    xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
 }

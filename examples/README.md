@@ -3,7 +3,7 @@
 
 
 This directory contains a range of examples in ESP-Skainet projects. These examples exist to demonstrate the functionality of ESP-Skainet and to provide the source codes that can be copied and adapted to during the development of your projects.
-
+The ESP32-S3 chip and boards are recommended. New algotithms and models will be deployed on the ESP32-S3 chip first.
 
 
 # Example Layout

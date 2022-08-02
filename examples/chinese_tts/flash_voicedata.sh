@@ -1,5 +1,5 @@
 #!/bin/bash
-port="/dev/ttyUSB0"
+port="/dev/ttyUSB1"
 baud=$((2000000))
 file="$1"
 
