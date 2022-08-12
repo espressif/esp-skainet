@@ -30,8 +30,6 @@
   - [5.3. PCB 布局图](#53-pcb-布局图)
   - [5.4. 尺寸图](#54-尺寸图)
 
-
-
 本指南将帮助您快速上手 ESP32-S3-Korvo-1 v5.0，并提供该款开发板的详细信息。
 
 > **注意**
@@ -62,11 +60,11 @@ ESP32-S3-Korvo-1 是[乐鑫](https://www.espressif.com/zh-hans/home)推出的一
 
 ## 1.1. 概述
 
-ESP32-S3-Korvo-1 开发板包含两部分：一块主板 ESP32-S3-Korvo-1，配置 ESP32-S3-WROOM-1 模组、功能按键、SD 卡槽、扬声器接口和 USB 接口等；一块子板 ESP32-Korvo-Mic（也是 [ESP32-Korvo v1.1](https://github.com/espressif/esp-skainet/blob/master/docs/zh_CN/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) 的子板），配置三麦克风阵列，功能按键，可寻址 LED 等。主板和子板通过 FPC 排线连接。
+ESP32-S3-Korvo-1 开发板包含两部分：一块主板 ESP32-S3-Korvo-1，配置 ESP32-S3-WROOM-1 模组、功能按键、SD 卡槽、扬声器接口和 USB 接口等；一块子板 ESP32-Korvo-Mic（也是 [ESP32-Korvo v1.1](https://github.com/espressif/esp-skainet/blob/master/docs/zh_CN/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md) 的子板），配置三麦克风阵列、功能按键、可寻址 LED 等。主板和子板通过 FPC 排线连接。
 
 ## 1.2. 功能框图
 
-功能框图显示了主板 ESP32-S3-Korvo-1（左侧） 和子板 ESP32-Korvo-Mic（右侧）的主要组件，以及组件之间的连接方式。
+功能框图显示了主板 ESP32-S3-Korvo-1（左侧）和子板 ESP32-Korvo-Mic（右侧）的主要组件，以及组件之间的连接方式。
 
 <center>
 
@@ -169,7 +167,11 @@ ESP32-S3-Korvo-1 开发板包含两部分：一块主板 ESP32-S3-Korvo-1，配�
 
 ## 1.6. 默认固件和功能测试
 
-ESP32-S3-Korvo-1 出厂即烧录[默认固件](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/default_firmware_ESP32-S3-Korvo-1)，方便您立即上手使用开发板，体验语音唤醒和语音命令识别的功能。请注意默认固件仅支持中文唤醒词和语音命令。
+ESP32-S3-Korvo-1 出厂即烧录[默认固件](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/default_firmware_ESP32-S3-Korvo-1)，方便您立即上手使用开发板，体验语音唤醒和语音命令识别的功能。
+
+> **注意**
+>
+> 请注意，默认固件仅支持中文唤醒词和语音命令。您也可以参考 [esp-skainet/examples](https://github.com/espressif/esp-skainet/tree/master/examples) 配置使用英语唤醒词和语音命令。如需配置英语唤醒词和语音命令，请首先按照[第 2 节](#2-start-application-development)中的步骤进行操作。
 
 使用开发板前，您需要准备以下硬件：
 
@@ -207,7 +209,7 @@ ESP32-S3-Korvo-1 出厂即烧录[默认固件](https://github.com/espressif/esp-
 
 -  1 套 ESP32-S3-Korvo-1 开发板
 -  2 根 USB 2.0 数据线（标准 A 型转 Micro-B 型），一根用来给开发板接入电源，一根用来向开发板烧录固件。
--  4 欧姆、3 瓦特扬声器，或 3.5 mm 插头的耳机。若使用扬声器，建议功率不超过 3 瓦特，另外需要接口为 JST PH 2.0 毫米 2 针的插头，若没有此插头，可使用杜邦母跳线。
+-  4 欧姆、3 瓦特扬声器，或 3.5 mm 插头的耳机。若使用扬声器，建议功率不超过 3 瓦特，另外需要接口为 JST PH 2.0 mm 2 针的插头，若没有此插头，可使用杜邦母跳线。
 -  1 台电脑（Windows、Linux 或 macOS）
 
 ## 2.2. 可选硬件
