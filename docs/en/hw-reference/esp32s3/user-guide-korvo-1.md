@@ -167,7 +167,11 @@ For wholesale orders, please go to <https://www.espressif.com/en/contact-us/sale
 
 ## 1.6 Default Firmware and Function Test
 
-Each ESP32-S3-Korvo-1 board comes with pre-built [default firmware](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/default_firmware_ESP32-S3-Korvo-1) that allows you to test its functions including voice wake-up and speech command recognition. Please note that only Chinese wake word and speech commands are supported in the default firmware.
+Each ESP32-S3-Korvo-1 board comes with pre-built [default firmware](https://github.com/espressif/esp-skainet/blob/master/tools/default_firmware/default_firmware_ESP32-S3-Korvo-1) that allows you to test its functions including voice wake-up and speech command recognition.
+
+> **Notice**
+>
+> Please note that only Chinese wake word and Chinese speech commands are supported in the default firmware. You can also configure to use English wake words and speech commands in [esp-skainet/examples](https://github.com/espressif/esp-skainet/tree/master/examples). To do so, please first follow the steps in [Section 2](#2-start-application-development).
 
 To test the board's functions, you need the following hardware:
 
