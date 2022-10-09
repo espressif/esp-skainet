@@ -20,6 +20,8 @@
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
+static esp_afe_sr_data_t *afe_data = NULL;
+static volatile int task_flag = 0;
 
 void feed_Task(void *arg)
 {
@@ -31,12 +33,15 @@ void feed_Task(void *arg)
     assert(i2s_buff);
     size_t bytes_read;
 
-    while (1) {
+    while (task_flag) {
         esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
     }
-    afe_handle->destroy(afe_data);
+    if (i2s_buff) {
+        free(i2s_buff);
+        i2s_buff = NULL;
+    }
     vTaskDelete(NULL);
 }
 
@@ -49,7 +54,7 @@ void detect_Task(void *arg)
     assert(buff);
     printf("------------detect start------------\n");
 
-    while (1) {
+    while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (!res || res->ret_value == ESP_FAIL) {
             printf("fetch error!\n");
@@ -61,7 +66,6 @@ void detect_Task(void *arg)
             printf("-----------LISTENING-----------\n");
         }
     }
-    afe_handle->destroy(afe_data);
     if (buff) {
         free(buff);
         buff = NULL;
@@ -89,7 +93,17 @@ void app_main()
     afe_config.wakenet_model_name = wn_name;
     afe_config.voice_communication_init = false;
 
-    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
+    afe_data = afe_handle->create_from_config(&afe_config);
+    
+    task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
+
+    // // You can call afe_handle->destroy to destroy AFE.
+    // task_flag = 0;
+
+    // printf("destroy\n");
+    // afe_handle->destroy(afe_data);
+    // afe_data = NULL;
+    // printf("successful\n");
 }
