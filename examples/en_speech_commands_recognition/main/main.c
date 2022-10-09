@@ -24,12 +24,14 @@
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
+static esp_afe_sr_data_t *afe_data = NULL;
+static volatile int task_flag = 0;
 srmodel_list_t *models = NULL;
 static int play_voice = -2;
 
 void play_music(void *arg)
 {
-    while (1) {
+    while (task_flag) {
         switch (play_voice) {
         case -2:
             vTaskDelay(10);
@@ -44,6 +46,7 @@ void play_music(void *arg)
             break;
         }
     }
+    vTaskDelete(NULL);
 }
 
 void feed_Task(void *arg)
@@ -56,12 +59,15 @@ void feed_Task(void *arg)
     assert(i2s_buff);
     size_t bytes_read;
 
-    while (1) {
+    while (task_flag) {
         esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
     }
-    afe_handle->destroy(afe_data);
+    if (i2s_buff) {
+        free(i2s_buff);
+        i2s_buff = NULL;
+    }
     vTaskDelete(NULL);
 }
 
@@ -80,7 +86,7 @@ void detect_Task(void *arg)
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
 
-    while (1) {
+    while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (!res || res->ret_value == ESP_FAIL) {
             printf("fetch error!\n");
@@ -121,7 +127,11 @@ void detect_Task(void *arg)
             }
         }
     }
-    afe_handle->destroy(afe_data);
+    if (model_data) {
+        multinet->destroy(model_data);
+        model_data = NULL;
+    }
+    printf("detect exit\n");
     vTaskDelete(NULL);
 }
 
@@ -149,6 +159,7 @@ void app_main()
 #endif
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
 
+    task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
 #if defined  CONFIG_ESP32_S3_KORVO_V4_0_BOARD
@@ -157,4 +168,12 @@ void app_main()
 #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD  || CONFIG_ESP32_S3_BOX_BOARD
     xTaskCreatePinnedToCore(&play_music, "play", 4 * 1024, NULL, 5, NULL, 1);
 #endif
+
+    // // You can call afe_handle->destroy to destroy AFE.
+    // task_flag = 0;
+
+    // printf("destroy\n");
+    // afe_handle->destroy(afe_data);
+    // afe_data = NULL;
+    // printf("successful\n");
 }
