@@ -33,6 +33,8 @@ FILE * file_save[FILES_MAX] = {NULL};
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
+static esp_afe_sr_data_t *afe_data = NULL;
+static volatile int task_flag = 0;
 
 void feed_Task(void *arg)
 {
@@ -44,7 +46,7 @@ void feed_Task(void *arg)
     assert(i2s_buff);
     size_t bytes_read;
 
-    while (1) {
+    while (task_flag) {
         esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
@@ -57,7 +59,6 @@ void feed_Task(void *arg)
         rb_write(rb_debug[0], i2s_buff, audio_chunksize * nch * sizeof(int16_t), 0);
     #endif
     }
-    afe_handle->destroy(afe_data);
     if (i2s_buff) {
         free(i2s_buff);
         i2s_buff = NULL;
@@ -74,7 +75,7 @@ void detect_Task(void *arg)
     assert(buff);
     printf("------------detect start------------\n");
 
-    while (1) {
+    while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (res && res->ret_value != ESP_FAIL) {
             memcpy(buff, res->data, afe_chunksize * sizeof(int16_t));
@@ -88,7 +89,6 @@ void detect_Task(void *arg)
         #endif
         }
     }
-    afe_handle->destroy(afe_data);
     if (buff) {
         free(buff);
         buff = NULL;
@@ -102,7 +102,7 @@ void debug_pcm_save_Task(void *arg)
     int size = 4 * 2 * 32 * 16;   // It's 32ms for 4 channels, 4k bytes
     int16_t *buf_temp = heap_caps_calloc(1, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 
-    while (1) {
+    while (task_flag) {
         for (int i = 0; i < FILES_MAX; i++) {
             if (file_save[i] != NULL) {
                 if (rb_bytes_filled(rb_debug[i]) > size) {
@@ -137,7 +137,7 @@ void app_main()
     afe_config.wakenet_init = false;
     afe_config.voice_communication_init = true;
 
-    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
+    afe_data = afe_handle->create_from_config(&afe_config);
     if (afe_data == NULL) {
         printf("create_from_config fail!\n");
         return;
@@ -155,6 +155,15 @@ void app_main()
     xTaskCreatePinnedToCore(&debug_pcm_save_Task, "debug_pcm_save", 2 * 1024, NULL, 5, NULL, 1);
 #endif
 
+    task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
+
+    // // You can call afe_handle->destroy to destroy AFE.
+    // task_flag = 0;
+
+    // printf("destroy\n");
+    // afe_handle->destroy(afe_data);
+    // afe_data = NULL;
+    // printf("successful\n");
 }
