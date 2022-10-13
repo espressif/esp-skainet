@@ -95,6 +95,7 @@ void detect_Task(void *arg)
 
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("WAKEWORD DETECTED\n");
+	    multinet->clean(model_data);
         } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
             play_voice = -1;
             detect_flag = 1;

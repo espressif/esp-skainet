@@ -103,6 +103,7 @@ void detect_Task(void *arg)
 #elif CONFIG_IDF_TARGET_ESP32S3
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("WAKEWORD DETECTED\n");
+	    multinet->clean(model_data);  // clean all status of multinet
         } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
             play_voice = -1;
             detect_flag = 1;
@@ -172,11 +173,12 @@ void app_main()
     xTaskCreatePinnedToCore(&play_music, "play", 2 * 1024, NULL, 5, NULL, 1);
 #endif
 
-    // // You can call afe_handle->destroy to destroy AFE.
-    // task_flag = 0;
-
-    // printf("destroy\n");
-    // afe_handle->destroy(afe_data);
-    // afe_data = NULL;
-    // printf("successful\n");
+    // You can call afe_handle->destroy to destroy AFE.
+//    vTaskDelay(2000 / portTICK_PERIOD_MS);
+//    task_flag = 0;
+//
+//    printf("destroy\n");
+//    afe_handle->destroy(afe_data);
+//    afe_data = NULL;
+//    printf("successful\n");
 }
