@@ -1,0 +1,46 @@
+menu "USB MIC Configuration"
+
+    choice 
+        prompt "Num Of Channel"
+        default THREE_CHANNEL
+
+        config ONE_CHANNEL
+            bool "One Channel config"
+        config TWO_CHANNEL
+            bool "Two Channels config"
+        config THREE_CHANNEL
+            bool "THREE Channels config"
+        config FOUR_CHANNEL
+            bool "Four Channels config"
+    endchoice
+
+
+    choice 
+        prompt "Mic Bit Depth"
+        default BIT_DEPTH_16
+
+        config BIT_DEPTH_16
+            bool "16 bits"
+        
+    endchoice
+
+    choice 
+        prompt "Mic Sampling Rate"
+        default SAMPLING_RATE_16K
+
+        config SAMPLING_RATE_16K
+            bool "16000 sampling rate"
+        
+        config SAMPLING_RATE_48K
+            bool "48000 sampling rate"
+
+    endchoice
+
+    config TINYUSB_DEBUG_LEVEL
+        int "Tinyusb debug level"
+        default 0
+        range 0 3
+        help
+           Tinyusb debug level.
+
+endmenu
