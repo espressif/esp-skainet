@@ -49,7 +49,7 @@
 #include "tusb_config.h"
 #include "usb_descriptors.h"
 #include "sdkconfig.h"
-#include "usb_mic_recorde.h"
+#include "usb_mic_recorder.h"
 
 #define USBD_STACK_SIZE     4096
 #define TAG  "aduio"
@@ -117,7 +117,7 @@ static void usb_phy_init(void)
 }
 
 /*------------- MAIN -------------*/
-ringbuf_handle_t mic_recorde_init()
+ringbuf_handle_t mic_recorder_init()
 {
     usb_phy_init();
 

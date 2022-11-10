@@ -22,7 +22,7 @@
 #include "model_path.h"
 #include "ringbuf.h"
 
-#include "usb_mic_recorde.h"
+#include "usb_mic_recorder.h"
 
 static ringbuf_handle_t rb_debug = NULL;
 
@@ -53,6 +53,7 @@ void feed_Task(void *arg)
             rb_read(rb_debug, destry_buff, audio_chunksize * nch * sizeof(int16_t), 0);
         }
         rb_write(rb_debug, i2s_buff, audio_chunksize * nch * sizeof(int16_t), 0);
+        
     }
     if (i2s_buff) {
         free(i2s_buff);
@@ -99,7 +100,7 @@ void app_main()
         return;
     }
 
-    rb_debug = mic_recorde_init();
+    rb_debug = mic_recorder_init();
 
     task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void *)afe_data, 5, NULL, 0);
