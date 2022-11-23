@@ -157,6 +157,11 @@ void app_main()
     afe_config.wakenet_model_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);;
 #if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_EYE_BOARD
     afe_config.aec_init = false;
+    #if defined CONFIG_ESP32_S3_EYE_BOARD
+        afe_config.pcm_config.total_ch_num = 2;
+        afe_config.pcm_config.mic_num = 1;
+        afe_config.pcm_config.ref_num = 1;
+    #endif
 #endif
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
 
