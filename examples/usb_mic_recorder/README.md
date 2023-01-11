@@ -18,4 +18,4 @@ idf.py flash
 
 When you plug the usb port into your computer(**Linux only**), it will display the MicNode sound card device.  
 Please select MicNode sound card device.  
-![MicNode](img/MicNode.png)
+![MicNode](../../img/MicNode.png)
