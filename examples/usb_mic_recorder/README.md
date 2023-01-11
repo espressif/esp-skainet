@@ -9,7 +9,7 @@ Supported Development Boards
 
 ## How To USE
 
-### 1. compile and flash project
+### 1. complie and flash project
 `
 idf.py flash
 ` 
