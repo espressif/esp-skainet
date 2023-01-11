@@ -9,7 +9,7 @@ Supported Development Boards
 
 ## How To USE
 
-### 1. complie and flash project
+### 1. compile and flash project
 `
 idf.py flash
 ` 
@@ -17,5 +17,5 @@ idf.py flash
 ### 2. select sound card device
 
 When you plug the usb port into your computer(**Linux only**), it will display the MicNode sound card device.  
-Please select MicNode sound card device.
+Please select MicNode sound card device.  
 ![MicNode](img/MicNode.png)
