@@ -1,15 +1,13 @@
-set(COMPONENT_SRCS
+set(srcs
     ringbuf.c
     EspAudioAlloc.c
     lock.c
     ringbuf.c
     )
 
-set(COMPONENT_ADD_INCLUDEDIRS 
+set(include_dirs 
     ./
     )
 
-register_component()
-
-
-
+idf_component_register(SRCS ${srcs}
+                       INCLUDE_DIRS ${include_dirs})

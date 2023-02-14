@@ -1,19 +1,14 @@
-set(COMPONENT_SRCS
+set(srcs
     esp_skainet_player.c
     ./esp_tts_wav/wav_encoder.c
     ./esp_tts_wav/wav_decoder.c
     )
 
-set(COMPONENT_ADD_INCLUDEDIRS 
+set(include_dirs 
     ./
     ./esp_tts_wav
     )
 
-set(COMPONENT_REQUIRES
-    hardware_driver
-    )
-
-register_component()
-
-
-
+idf_component_register(SRCS ${srcs}
+                       INCLUDE_DIRS ${include_dirs}
+                       REQUIRES hardware_driver)

@@ -1,14 +1,9 @@
-set(COMPONENT_SRCS
-    main.c
-    )
-
-set(COMPONENT_REQUIRES
+set(requires
     esp-sr
     hardware_driver
     sr_ringbuf
     )
 
-register_component()
-
-
+idf_component_register(SRCS main.c
+                       REQUIRES ${requires})
 
