@@ -1,19 +1,15 @@
-set(COMPONENT_SRCS
+set(srcs
     main.c
     speech_commands_action.c
     )
 
-set(COMPONENT_ADD_INCLUDEDIRS 
-    include
-    )
-
-set(COMPONENT_REQUIRES
+set(requires
     esp-sr
     led_strip
     hardware_driver
     )
 
-register_component()
-
-
+idf_component_register(SRCS ${srcs}
+                       INCLUDE_DIRS include
+                       REQUIRES ${requires})
 

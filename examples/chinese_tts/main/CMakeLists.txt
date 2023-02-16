@@ -1,20 +1,20 @@
-set(COMPONENT_SRCS
+set(srcs
     main.c
     tts_urat.c
     )
 
-set(COMPONENT_ADD_INCLUDEDIRS 
+set(include_dirs 
     include
     )
 
-set(COMPONENT_REQUIRES
+set(requires
     esp-sr
     hardware_driver
     sr_ringbuf
     player
     )
 
-register_component()
-
-
+idf_component_register(SRCS ${srcs}
+                       INCLUDE_DIRS ${include_dirs}
+                       REQUIRES ${requires})
 
