@@ -1,0 +1,68 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  SKAINET_PATH: "$CI_PROJECT_DIR"
+  BATCH_BUILD: "1"
+  V: "0"
+  IDF_CI_BUILD: "1"
+
+before_script:
+  # add gitlab ssh key
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo -n $GITLAB_KEY > ~/.ssh/id_rsa_base64
+  - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+  - chmod 600 ~/.ssh/id_rsa
+  - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - git --version
+  - git submodule update --init --recursive --force
+
+.build_all_examples_script: &build_all_examples_script
+  - for EXAMPLE in $EXAMPLES; do
+  - cd $CI_PROJECT_DIR/examples/$EXAMPLE
+  - echo Building $EXAMPLE
+  - idf.py fullclean
+  - idf.py set-target esp32
+  - idf.py build
+  - idf.py fullclean
+  - idf.py set-target esp32s3
+  - idf.py build
+  - echo Build Complete for $EXAMPLE
+  - done
+
+.build_template:
+  stage: build
+  tags:
+    - build
+  variables:
+    EXAMPLES: "chinese_tts"
+  script:
+    - *build_all_examples_script
+
+build_idf_v4.4:
+  extends: .build_template
+  image: espressif/idf:release-v4.4
+
+push_to_github:
+  stage: deploy
+  only:
+    - master
+    - /^release\/v/
+#  when: on_success
+  image: $CI_DOCKER_REGISTRY/esp32-ci-env
+  variables:
+    GIT_STRATEGY: clone
+  before_script:
+    - echo "skip default before_script"
+  script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -n $GH_PUSH_KEY > ~/.ssh/id_rsa_base64
+    - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+    - git remote remove github &>/dev/null || true
+    - git remote add github git@github.com:espressif/esp-box.git
+    - ${SKAINET_PATH}/tools/ci/push_to_github.sh
