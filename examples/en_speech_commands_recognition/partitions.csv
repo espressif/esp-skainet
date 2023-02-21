@@ -2,4 +2,3 @@
 # Name,  Type, SubType, Offset,  Size
 factory, app,  factory, 0x010000, 2048k
 model,  data, spiffs,         , 5168K,
-fmf
