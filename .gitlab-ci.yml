@@ -24,7 +24,7 @@ before_script:
   - cd $CI_PROJECT_DIR/examples/$EXAMPLE
   - echo Building $EXAMPLE
   - idf.py fullclean
-  - idf.py set-target esp32s3
+  - idf.py set-target $IDF_TARGET
   - idf.py build
   - echo Build Complete for $EXAMPLE
   - done
@@ -35,6 +35,7 @@ before_script:
     - build
   variables:
     EXAMPLES: "chinese_tts cn_speech_commands_recognition en_speech_commands_recognition wake_word_detection voice_communication usb_mic_recorder"
+    IDF_TARGET: "esp32s3"
   script:
     - *build_all_examples_script
 
@@ -48,7 +49,7 @@ push_to_github:
     - master
     - /^release\/v/
 #  when: on_success
-  image: $CI_DOCKER_REGISTRY/esp32-ci-env
+  image: $CI_DOCKER_REGISTRY/esp-env
   variables:
     GIT_STRATEGY: clone
   before_script:
