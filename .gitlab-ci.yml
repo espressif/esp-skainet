@@ -24,9 +24,6 @@ before_script:
   - cd $CI_PROJECT_DIR/examples/$EXAMPLE
   - echo Building $EXAMPLE
   - idf.py fullclean
-  - idf.py set-target esp32
-  - idf.py build
-  - idf.py fullclean
   - idf.py set-target esp32s3
   - idf.py build
   - echo Build Complete for $EXAMPLE
@@ -37,7 +34,7 @@ before_script:
   tags:
     - build
   variables:
-    EXAMPLES: "chinese_tts"
+    EXAMPLES: "chinese_tts cn_speech_commands_recognition en_speech_commands_recognition wake_word_detection voice_communication usb_mic_recorder"
   script:
     - *build_all_examples_script
 
