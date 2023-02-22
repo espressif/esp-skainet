@@ -18,6 +18,7 @@ before_script:
   - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - git --version
   - git submodule update --init --recursive --force
+  - pip install idf_build_apps
 
 .build_all_examples_script: &build_all_examples_script
   - cd $SKAINET_PATH

@@ -39,3 +39,5 @@ idf_component_register(
     REQUIRES
         fatfs
         spiffs)
+
+component_compile_options(-w)

@@ -15,7 +15,7 @@
 
 typedef struct
 {
-	struct RingBuf *player_queue;
+	QueueHandle_t player_queue;
 	int rb_size;
 	int frame_size;
 	char **file_list;
@@ -28,13 +28,12 @@ typedef struct
 }esp_skainet_player_handle_t;
 
 
-int esp_skainet_stream_in_task(void *arg)
+void esp_skainet_stream_in_task(void *arg)
 {
 	esp_skainet_player_handle_t *player=arg;
 	unsigned char* buffer=malloc(player->frame_size*sizeof(unsigned char)*2);
 	void * wav_decoder=NULL;
 	int cur_file_num=0;
-	char *file_name= "/sdcard/1.wav";
 	printf("create stream in\n");
 	int count=0;
 	int channels=CODEC_CHANNEL;
@@ -115,7 +114,7 @@ int esp_skainet_stream_in_task(void *arg)
 				free(buffer);
 				if (wav_decoder!=NULL) 
 					wav_decoder_close(wav_decoder);
-				return 0;
+				return ;
 
 			default: // exit
 			    // printf("delay\n");
@@ -125,7 +124,7 @@ int esp_skainet_stream_in_task(void *arg)
     }
 }
 
-int esp_skainet_stream_out_task(void *arg)
+void esp_skainet_stream_out_task(void *arg)
 {
 	esp_skainet_player_handle_t *player=arg;
 	unsigned char* buffer=malloc(player->frame_size*sizeof(unsigned char));
@@ -155,7 +154,7 @@ int esp_skainet_stream_out_task(void *arg)
 				
 			case 4: // exit
 				free(buffer);
-				return 0;
+				return ;
 
 			default: // exit
 				i2s_zero_dma_buffer(0);
@@ -167,7 +166,7 @@ int esp_skainet_stream_out_task(void *arg)
 
 
 
-int file_list_scan(void *handle, char *path)
+int file_list_scan(void *handle, const char *path)
 {
 	esp_skainet_player_handle_t *player=handle;
     struct dirent *ret;
@@ -226,8 +225,8 @@ void *esp_skainet_player_create(int ringbuf_size, unsigned int core_num)
 	for (int i=0; i<player->max_file_num; i++)
 		player->file_list[i]=calloc(FATFS_PATH_LENGTH_MAX, sizeof(char));
 
-	xTaskCreatePinnedToCore(&esp_skainet_stream_in_task, "stream_in", 2 * 1024, (void*)player, 5, NULL, core_num);
-	xTaskCreatePinnedToCore(&esp_skainet_stream_out_task, "stream_out", 2 * 1024, (void*)player, 5, NULL, core_num);
+	xTaskCreatePinnedToCore(esp_skainet_stream_in_task, "stream_in", 2 * 1024, (void*)player, 5, NULL, core_num);
+	xTaskCreatePinnedToCore(esp_skainet_stream_out_task, "stream_out", 2 * 1024, (void*)player, 5, NULL, core_num);
 
 	return player;
 }

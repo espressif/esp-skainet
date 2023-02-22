@@ -64,12 +64,6 @@ typedef struct {
 led_strip_t *strip = NULL;
 void led_Task(void *arg)
 {
-    int start_led = 1;
-    uint32_t red = 0;
-    uint32_t green = 0;
-    uint32_t blue = 0;
-    uint16_t hue = 0;
-    uint16_t start_rgb = 0;
     rmt_config_t config = RMT_DEFAULT_CONFIG_TX(19, RMT_TX_CHANNEL);
     // set counter clock to 40MHz
     config.clk_div = 2;
@@ -147,40 +141,40 @@ void led_Task(void * arg)
 #endif
 
 dac_audio_item_t playlist[] = {
-    // {"ie_kaiji.h", ie_kaiji, sizeof(ie_kaiji)},
-    {"wake_up_prompt_tone", wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
-    {"me_tell_me_a_joke", me_tell_me_a_joke, sizeof(me_tell_me_a_joke)},
-    {"me_sing_a_song", me_sing_a_song, sizeof(me_sing_a_song)},
-    {"me_play_news_channel", me_play_news_channel, sizeof(me_play_news_channel)},
-    {"me_turn_on_my_soundbox", me_turn_on_my_soundbox, sizeof(me_turn_on_my_soundbox)},
-    {"me_turn_off_my_soundbox", me_turn_off_my_soundbox, sizeof(me_turn_off_my_soundbox)},
-    {"me_highest_volume", me_highest_volume, sizeof(me_highest_volume)},
-    {"me_lowest_volume", me_lowest_volume, sizeof(me_lowest_volume)},
-    {"me_increase_volume", me_increase_volume, sizeof(me_increase_volume)},
-    {"me_decrease_the_volume", me_decrease_the_volume, sizeof(me_decrease_the_volume)},
-    {"me_turn_on_the_TV", me_turn_on_the_TV, sizeof(me_turn_on_the_TV)},
-    {"me_turn_off_the_TV", me_turn_off_the_TV, sizeof(me_turn_off_the_TV)},
-    {"me_make_me_a_tea", me_make_me_a_tea, sizeof(me_make_me_a_tea)},
-    {"me_make_me_a_coffee", me_make_me_a_coffee, sizeof(me_make_me_a_coffee)},
-    {"me_turn_on_the_light", me_turn_on_the_light, sizeof(me_turn_on_the_light)},
-    {"me_turn_off_the_light", me_turn_off_the_light, sizeof(me_turn_off_the_light)},
-    {"me_red_color", me_red_color, sizeof(me_red_color)},
-    {"me_green_color", me_green_color, sizeof(me_green_color)},
-    {"me_turn_on_all_the_light", me_turn_on_all_the_light, sizeof(me_turn_on_all_the_light)},
-    {"me_turn_off_all_the_light", me_turn_off_all_the_light, sizeof(me_turn_off_all_the_light)},
-    {"me_turn_on_the_air_conditioner", me_turn_on_the_air_conditioner, sizeof(me_turn_on_the_air_conditioner)},
-    {"me_turn_off_the_air_conditioner", me_turn_off_the_air_conditioner, sizeof(me_turn_off_the_air_conditioner)},
-    {"me_16_degress", me_16_degress, sizeof(me_16_degress)},
-    {"me_17_degrees", me_17_degrees, sizeof(me_17_degrees)},
-    {"me_18_degrees", me_18_degrees, sizeof(me_18_degrees)},
-    {"me_19_degrees", me_19_degrees, sizeof(me_19_degrees)},
-    {"me_20_degrees", me_20_degrees, sizeof(me_20_degrees)},
-    {"me_21_degrees", me_21_degrees, sizeof(me_21_degrees)},
-    {"me_22_degrees", me_22_degrees, sizeof(me_22_degrees)},
-    {"me_23_degrees", me_23_degrees, sizeof(me_23_degrees)},
-    {"me_24_degrees", me_24_degrees, sizeof(me_24_degrees)},
-    {"me_25_degrees", me_25_degrees, sizeof(me_25_degrees)},
-    {"me_26_degrees", me_26_degrees, sizeof(me_26_degrees)},
+    // {"ie_kaiji.h", (uint16_t*)ie_kaiji, sizeof(ie_kaiji)},
+    {"wake_up_prompt_tone", (uint16_t*)wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
+    {"me_tell_me_a_joke", (uint16_t*)me_tell_me_a_joke, sizeof(me_tell_me_a_joke)},
+    {"me_sing_a_song", (uint16_t*)me_sing_a_song, sizeof(me_sing_a_song)},
+    {"me_play_news_channel", (uint16_t*)me_play_news_channel, sizeof(me_play_news_channel)},
+    {"me_turn_on_my_soundbox", (uint16_t*)me_turn_on_my_soundbox, sizeof(me_turn_on_my_soundbox)},
+    {"me_turn_off_my_soundbox", (uint16_t*)me_turn_off_my_soundbox, sizeof(me_turn_off_my_soundbox)},
+    {"me_highest_volume", (uint16_t*)me_highest_volume, sizeof(me_highest_volume)},
+    {"me_lowest_volume", (uint16_t*)me_lowest_volume, sizeof(me_lowest_volume)},
+    {"me_increase_volume", (uint16_t*)me_increase_volume, sizeof(me_increase_volume)},
+    {"me_decrease_the_volume", (uint16_t*)me_decrease_the_volume, sizeof(me_decrease_the_volume)},
+    {"me_turn_on_the_TV", (uint16_t*)me_turn_on_the_TV, sizeof(me_turn_on_the_TV)},
+    {"me_turn_off_the_TV", (uint16_t*)me_turn_off_the_TV, sizeof(me_turn_off_the_TV)},
+    {"me_make_me_a_tea", (uint16_t*)me_make_me_a_tea, sizeof(me_make_me_a_tea)},
+    {"me_make_me_a_coffee", (uint16_t*)me_make_me_a_coffee, sizeof(me_make_me_a_coffee)},
+    {"me_turn_on_the_light", (uint16_t*)me_turn_on_the_light, sizeof(me_turn_on_the_light)},
+    {"me_turn_off_the_light", (uint16_t*)me_turn_off_the_light, sizeof(me_turn_off_the_light)},
+    {"me_red_color", (uint16_t*)me_red_color, sizeof(me_red_color)},
+    {"me_green_color", (uint16_t*)me_green_color, sizeof(me_green_color)},
+    {"me_turn_on_all_the_light", (uint16_t*)me_turn_on_all_the_light, sizeof(me_turn_on_all_the_light)},
+    {"me_turn_off_all_the_light", (uint16_t*)me_turn_off_all_the_light, sizeof(me_turn_off_all_the_light)},
+    {"me_turn_on_the_air_conditioner", (uint16_t*)me_turn_on_the_air_conditioner, sizeof(me_turn_on_the_air_conditioner)},
+    {"me_turn_off_the_air_conditioner", (uint16_t*)me_turn_off_the_air_conditioner, sizeof(me_turn_off_the_air_conditioner)},
+    {"me_16_degress", (uint16_t*)me_16_degress, sizeof(me_16_degress)},
+    {"me_17_degrees", (uint16_t*)me_17_degrees, sizeof(me_17_degrees)},
+    {"me_18_degrees", (uint16_t*)me_18_degrees, sizeof(me_18_degrees)},
+    {"me_19_degrees", (uint16_t*)me_19_degrees, sizeof(me_19_degrees)},
+    {"me_20_degrees", (uint16_t*)me_20_degrees, sizeof(me_20_degrees)},
+    {"me_21_degrees", (uint16_t*)me_21_degrees, sizeof(me_21_degrees)},
+    {"me_22_degrees", (uint16_t*)me_22_degrees, sizeof(me_22_degrees)},
+    {"me_23_degrees", (uint16_t*)me_23_degrees, sizeof(me_23_degrees)},
+    {"me_24_degrees", (uint16_t*)me_24_degrees, sizeof(me_24_degrees)},
+    {"me_25_degrees", (uint16_t*)me_25_degrees, sizeof(me_25_degrees)},
+    {"me_26_degrees", (uint16_t*)me_26_degrees, sizeof(me_26_degrees)},
 };
 
 void wake_up_action(void)

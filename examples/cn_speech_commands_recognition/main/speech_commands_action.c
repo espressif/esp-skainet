@@ -52,12 +52,6 @@ typedef struct {
 led_strip_t *strip = NULL;
 void led_Task(void *arg)
 {
-    int start_led = 1;
-    uint32_t red = 0;
-    uint32_t green = 0;
-    uint32_t blue = 0;
-    uint16_t hue = 0;
-    uint16_t start_rgb = 0;
     rmt_config_t config = RMT_DEFAULT_CONFIG_TX(19, RMT_TX_CHANNEL);
     // set counter clock to 40MHz
     config.clk_div = 2;
@@ -136,24 +130,24 @@ void led_Task(void * arg)
 
 dac_audio_item_t playlist[] = {
     // {"ie_kaiji.h", ie_kaiji, sizeof(ie_kaiji)},
-    {"wake_up_prompt_tone.h", wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
-    {"m_1.h", m_1, sizeof(m_1)},
-    {"m_2.h", m_2, sizeof(m_2)},
-    {"m_3.h", m_3, sizeof(m_3)},
-    {"m_4.h", m_4, sizeof(m_4)},
-    {"m_5.h", m_5, sizeof(m_5)},
-    {"m_6.h", m_6, sizeof(m_6)},
-    {"m_7.h", m_7, sizeof(m_7)},
-    {"m_8.h", m_8, sizeof(m_8)},
-    {"m_9.h", m_9, sizeof(m_9)},
-    {"m_10.h", m_10, sizeof(m_10)},
-    {"m_11.h", m_11, sizeof(m_11)},
-    {"m_12.h", m_12, sizeof(m_12)},
-    {"m_13.h", m_13, sizeof(m_13)},
-    {"m_14.h", m_14, sizeof(m_14)},
-    {"m_15.h", m_15, sizeof(m_15)},
-    {"m_16.h", m_16, sizeof(m_16)},
-    {"m_17.h", m_17, sizeof(m_17)},
+    {"wake_up_prompt_tone.h", (uint16_t*)wake_up_prompt_tone, sizeof(wake_up_prompt_tone)},
+    {"m_1.h", (uint16_t*)m_1, sizeof(m_1)},
+    {"m_2.h", (uint16_t*)m_2, sizeof(m_2)},
+    {"m_3.h", (uint16_t*)m_3, sizeof(m_3)},
+    {"m_4.h", (uint16_t*)m_4, sizeof(m_4)},
+    {"m_5.h", (uint16_t*)m_5, sizeof(m_5)},
+    {"m_6.h", (uint16_t*)m_6, sizeof(m_6)},
+    {"m_7.h", (uint16_t*)m_7, sizeof(m_7)},
+    {"m_8.h", (uint16_t*)m_8, sizeof(m_8)},
+    {"m_9.h", (uint16_t*)m_9, sizeof(m_9)},
+    {"m_10.h", (uint16_t*)m_10, sizeof(m_10)},
+    {"m_11.h", (uint16_t*)m_11, sizeof(m_11)},
+    {"m_12.h", (uint16_t*)m_12, sizeof(m_12)},
+    {"m_13.h", (uint16_t*)m_13, sizeof(m_13)},
+    {"m_14.h", (uint16_t*)m_14, sizeof(m_14)},
+    {"m_15.h", (uint16_t*)m_15, sizeof(m_15)},
+    {"m_16.h", (uint16_t*)m_16, sizeof(m_16)},
+    {"m_17.h", (uint16_t*)m_17, sizeof(m_17)},
 };
 
 void wake_up_action(void)
