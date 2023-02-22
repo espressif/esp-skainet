@@ -20,22 +20,16 @@ before_script:
   - git submodule update --init --recursive --force
 
 .build_all_examples_script: &build_all_examples_script
-  - for EXAMPLE in $EXAMPLES; do
-  - cd $CI_PROJECT_DIR/examples/$EXAMPLE
-  - echo Building $EXAMPLE
-  - idf.py fullclean
-  - idf.py set-target $IDF_TARGET
-  - idf.py build
-  - echo Build Complete for $EXAMPLE
-  - done
+  - cd $SKAINET_PATH
+  - python -m idf_build_apps build -p $EXAMPLES_PATH --recursive --manifest-file $EXAMPLES_PATH/$MANIFEST_FILE -t all
 
 .build_template:
   stage: build
   tags:
     - build
   variables:
-    EXAMPLES: "chinese_tts cn_speech_commands_recognition en_speech_commands_recognition wake_word_detection voice_communication usb_mic_recorder"
-    IDF_TARGET: "esp32s3"
+    EXAMPLES_PATH: "examples"
+    MANIFEST_FILE: ".build-test-rules.yml"
   script:
     - *build_all_examples_script
 
