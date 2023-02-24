@@ -167,7 +167,7 @@ void app_main()
     vTaskDelay(3000 / portTICK_PERIOD_MS);  // delay to load multinet model
 
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
-#if defined  CONFIG_ESP32_S3_KORVO_V4_0_BOARD
+#if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD
     xTaskCreatePinnedToCore(&led_Task, "led", 2 * 1024, NULL, 5, NULL, 0);
 #endif
 #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD  || CONFIG_ESP32_S3_BOX_BOARD

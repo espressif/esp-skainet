@@ -16,19 +16,19 @@ ESP-Skainet 的功能支持如下所示：
 
 ## 唤醒词识别 
 
-唤醒词模型 [WakeNet](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/README_cn.md)，致力于提供一个低资源消耗的的高性能模型，支持类似“Alexa”，“天猫精灵”，“小爱同学”等唤醒词的识别。  
+唤醒词模型 [WakeNet](https://docs.espressif.com/projects/esp-sr/zh_CN/latest/esp32s3/wake_word_engine/README.html)，致力于提供一个低资源消耗的的高性能模型，支持类似“Alexa”，“天猫精灵”，“小爱同学”等唤醒词的识别。  
 
-目前乐鑫免费开放“Hi，乐鑫”， “你好小智”， “你好小鑫”， “Hi，ESP”唤醒词。如果用户需要其它唤醒词，乐鑫提供有唤醒词定制服务，具体可参考 [乐鑫语音唤醒词定制流程](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/乐鑫语音唤醒词定制流程.md)。
+目前乐鑫免费开放“Hi，乐鑫”， “你好小智”， “你好小鑫”， “Hi，ESP”唤醒词。如果用户需要其它唤醒词，乐鑫提供有唤醒词定制服务，具体可参考 [乐鑫语音唤醒词定制流程](https://docs.espressif.com/projects/esp-sr/zh_CN/latest/esp32s3/wake_word_engine/ESP_Wake_Words_Customization.html)。
 
 ## 语音命令词识别
 
-命令词识别模型 [MultiNet](https://github.com/espressif/esp-sr/blob/master/docs/speech_command_recognition/README_cn.md) ，致力于提供一个灵活的离线语音命词识别框架。用户可方便根据需求自定义语音命令，无需重新训练模型。  
+命令词识别模型 [MultiNet](https://docs.espressif.com/projects/esp-sr/zh_CN/latest/esp32s3/speech_command_recognition/README.html) ，致力于提供一个灵活的离线语音命词识别框架。用户可方便根据需求自定义语音命令，无需重新训练模型。  
 
 目前模型支持类似“打开空调”，“打开卧室灯”等中文命令词识别和"Turn on/off the light" 等英文命令词识别，自定义语音命令词最大个数为 200。   
 
 ## 声学前端算法
 
-声学前端算法[Audio Front-End(AFE)]() 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Speech Enhancement)。
+声学前端算法[Audio Front-End(AFE)](https://docs.espressif.com/projects/esp-sr/zh_CN/latest/esp32s3/audio_front_end/index.html) 集成了回声消除 AEC(Acoustic Echo Cancellation)，自动增益调节 AGC(automatic_gain_control)，噪声抑制 NS(Noise Suppression)，语音活动检测 VAD(Voice Activity Detection) 和麦克风阵列算法(Mic Array Speech Enhancement)。
 
 # 快速开始
 

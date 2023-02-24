@@ -1,16 +1,10 @@
-/*
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-#include <stdio.h>
-#include <stdlib.h>
+/* SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
 #include "dl_lib_coefgetter_if.h"
@@ -18,10 +12,7 @@
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
 #include "esp_board_init.h"
-#include "driver/i2s.h"
 #include "model_path.h"
-#include "ringbuf.h"
-
 #include "usb_mic_recorder.h"
 
 static ringbuf_handle_t rb_debug = NULL;
@@ -39,7 +30,7 @@ void feed_Task(void *arg)
     int feed_channel = esp_get_feed_channel();
     assert(nch <= feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
-    int16_t *destry_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
+    char *destry_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
     assert(destry_buff);
 

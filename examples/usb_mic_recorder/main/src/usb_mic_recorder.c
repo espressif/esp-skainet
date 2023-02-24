@@ -1,54 +1,16 @@
-/*
- * The MIT License (MIT)
+/* SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
  *
- * Copyright (c) 2020 Reinhard Panhuber
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * SPDX-License-Identifier: Apache-2.0
  */
-
-/* plot_audio_samples.py requires following modules:
- * $ sudo apt install libportaudio
- * $ pip3 install sounddevice matplotlib
- *
- * Then run
- * $ python3 plot_audio_samples.py
- */
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-
-#include "tusb.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "freertos/queue.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
-
 #include "esp_private/usb_phy.h"
 #include "esp_board_init.h"
-#include "driver/i2s.h"
-#include "esp_log.h"
+#include "tusb.h"
 #include "tusb_config.h"
 #include "usb_descriptors.h"
-#include "sdkconfig.h"
 #include "usb_mic_recorder.h"
 
 #define USBD_STACK_SIZE     4096
@@ -63,17 +25,6 @@
 #elif CONFIG_SAMPLING_RATE_48K
 #define AUDIO_SAMPLE_RATE   48000
 #endif
-
-/* Blink pattern
- * - 250 ms  : device not mounted
- * - 1000 ms : device mounted
- * - 2500 ms : device is suspended
- */
-enum  {
-    BLINK_NOT_MOUNTED = 250,
-    BLINK_MOUNTED = 1000,
-    BLINK_SUSPENDED = 2500,
-};
 
 // static timer
 StaticTimer_t blinky_tmdef;
@@ -156,38 +107,6 @@ void usb_device_task(void *param)
         // tinyusb device task
         tud_task();
     }
-}
-
-
-//--------------------------------------------------------------------+
-// Device callbacks
-//--------------------------------------------------------------------+
-
-// Invoked when device is mounted
-void tud_mount_cb(void)
-{
-    // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_MOUNTED), 0);
-}
-
-// Invoked when device is unmounted
-void tud_umount_cb(void)
-{
-    // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_NOT_MOUNTED), 0);
-}
-
-// Invoked when usb bus is suspended
-// remote_wakeup_en : if host allow us  to perform remote wakeup
-// Within 7ms, device must draw an average of current less than 2.5 mA from bus
-void tud_suspend_cb(bool remote_wakeup_en)
-{
-    (void) remote_wakeup_en;
-    // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_SUSPENDED), 0);
-}
-
-// Invoked when usb bus is resumed
-void tud_resume_cb(void)
-{
-    // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_MOUNTED), 0);
 }
 
 //--------------------------------------------------------------------+
