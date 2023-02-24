@@ -24,7 +24,6 @@
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
-static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 srmodel_list_t *models = NULL;
 static int play_voice = -2;
@@ -55,9 +54,9 @@ void feed_Task(void *arg)
     int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
     int nch = afe_handle->get_channel_num(afe_data);
     int feed_channel = esp_get_feed_channel();
+    assert(nch <= feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
-    size_t bytes_read;
 
     while (task_flag) {
         esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
@@ -75,13 +74,11 @@ void detect_Task(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
     int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
-    int nch = afe_handle->get_channel_num(afe_data);
     char *mn_name = esp_srmodel_filter(models, ESP_MN_PREFIX, ESP_MN_ENGLISH);
     printf("multinet:%s\n", mn_name);
     esp_mn_iface_t *multinet = esp_mn_handle_from_name(mn_name);
     model_iface_data_t *model_data = multinet->create(mn_name, 5760);
     int mu_chunksize = multinet->get_samp_chunksize(model_data);
-    int chunk_num = multinet->get_samp_chunknum(model_data);
     esp_mn_commands_update_from_sdkconfig(multinet, model_data); // Add speech commands from sdkconfig
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
@@ -150,7 +147,7 @@ void app_main()
     printf("This demo only support ESP32S3\n");
     return;
 #else 
-    afe_handle = &ESP_AFE_SR_HANDLE;
+    afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_SR_HANDLE;
 #endif
 
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();

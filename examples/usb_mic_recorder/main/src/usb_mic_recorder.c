@@ -458,7 +458,7 @@ bool tud_audio_tx_done_post_load_cb(uint8_t rhport, uint16_t n_bytes_copied, uin
     (void) cur_alt_setting;
 
     /*** Here to fill audio buffer, only use in audio transmission begin ***/
-    rb_read(rb_debug, &s_buffer_audio, BUFFER_LEN, 0);
+    rb_read(rb_debug, (char *)&s_buffer_audio, BUFFER_LEN, 0);
 
     return true;
 }

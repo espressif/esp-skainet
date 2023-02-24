@@ -52,13 +52,13 @@ int app_main()
         printf("voice_data paration size:%d\n", part->size);
     }
     spi_flash_mmap_handle_t mmap;
-    uint16_t* voicedata;
+    void* voicedata;
     esp_err_t err=esp_partition_mmap(part, 0, part->size, SPI_FLASH_MMAP_DATA, &voicedata, &mmap);
     if (err != ESP_OK) {
         printf("Couldn't map voice data partition!\n"); 
         return 0;
     }
-    esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
+    esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, (int16_t*)voicedata); 
     
 
     esp_tts_handle_t *tts_handle=esp_tts_create(voice);

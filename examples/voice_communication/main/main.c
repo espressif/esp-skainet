@@ -42,9 +42,9 @@ void feed_Task(void *arg)
     int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
     int nch = afe_handle->get_total_channel_num(afe_data);
     int feed_channel = esp_get_feed_channel();
+    assert(nch <= feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
-    size_t bytes_read;
 
     while (task_flag) {
         esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
@@ -70,7 +70,6 @@ void detect_Task(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
     int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
-    int nch = afe_handle->get_channel_num(afe_data);
     int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
     assert(buff);
     printf("------------detect start------------\n");
@@ -131,7 +130,7 @@ void app_main()
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #endif
 
-    afe_handle = &ESP_AFE_VC_HANDLE;
+    afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_VC_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     afe_config.vad_init = false;
     afe_config.wakenet_init = false;
