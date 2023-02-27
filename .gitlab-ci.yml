@@ -21,7 +21,6 @@ before_script:
   - pip install idf_build_apps
 
 .build_all_examples_script: &build_all_examples_script
-  - cd $SKAINET_PATH
   - python -m idf_build_apps build -p $EXAMPLES_PATH --recursive --manifest-file $EXAMPLES_PATH/$MANIFEST_FILE -t all
 
 .build_template:
@@ -40,11 +39,13 @@ build_idf_v4.4:
 
 push_to_github:
   stage: deploy
+  image: $CI_DOCKER_REGISTRY/esp-env-v4.4:1
+  tags:
+    - deploy
+  when: on_success
   only:
     - master
     - /^release\/v/
-#  when: on_success
-  image: $CI_DOCKER_REGISTRY/esp-env
   variables:
     GIT_STRATEGY: clone
   before_script:
@@ -57,5 +58,5 @@ push_to_github:
     - chmod 600 ~/.ssh/id_rsa
     - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
     - git remote remove github &>/dev/null || true
-    - git remote add github git@github.com:espressif/esp-box.git
+    - git remote add github git@github.com:espressif/esp-skainet.git
     - ${SKAINET_PATH}/tools/ci/push_to_github.sh
