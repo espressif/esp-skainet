@@ -39,14 +39,13 @@ build_idf_v4.4:
 
 push_to_github:
   stage: deploy
-  image: $CI_DOCKER_REGISTRY/esp-env
+  image: $CI_DOCKER_REGISTRY/esp-env-v4.4:1
   tags:
     - deploy
   when: on_success
   only:
     - master
     - /^release\/v/
-    - test\/push_to_github
   variables:
     GIT_STRATEGY: clone
   before_script:
