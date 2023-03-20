@@ -138,8 +138,7 @@ void app_main()
     models = esp_srmodel_init("model"); // partition label defined in partitions.csv
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
-
-#if defined CONFIG_ESP_LYRAT_MINI_V1_1_BOARD || defined CONFIG_ESP32_KORVO_V1_1_BOARD
+#if defined CONFIG_ESP32_KORVO_V1_1_BOARD
     led_init();
 #endif
 
@@ -164,8 +163,6 @@ void app_main()
 
     task_flag = 1;
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
-    vTaskDelay(3000 / portTICK_PERIOD_MS);  // delay to load multinet model
-
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD
     xTaskCreatePinnedToCore(&led_Task, "led", 2 * 1024, NULL, 5, NULL, 0);
