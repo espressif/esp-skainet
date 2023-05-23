@@ -70,11 +70,11 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 
 [examples](examples) 文件夹包含了使用 ESP-Skainet API 搭建的一些应用示例。
 
-请从get_started示例开始：
+请从wake_word_detection示例开始：
 
-1. 进入示例文件夹 `esp-skainet/examples/get_started
+1. 进入示例文件夹 `esp-skainet/examples/wake_word_detection:
 ```
-cd esp-skainet/examples/get_started
+cd esp-skainet/examples/wake_word_detection
 ```
 
 2. 编译和烧写

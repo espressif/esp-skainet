@@ -19,7 +19,7 @@ idf.py flash
 
 ### 2. select sound card device
 
-When you plug the usb port into your computer(**Linux only**), it will display the MicNode sound card device. Please select MicNode sound card device.
+When you plug the usb port into your computer(**Linux only**), it will display the MicNode sound card device. Please select MicNode sound card device.   
 ![MicNode](../../img/MicNode.png)
 
 ### 3. Recording by arecord
@@ -40,6 +40,6 @@ When you plug the usb port into your computer(**Linux only**), it will display t
     #-c, --channels=#        channels
     #-t, --file-type TYPE    file type (voc, wav, raw or au)
 
-    #for more help
+    # Print help info
     arecord -h
     ```
