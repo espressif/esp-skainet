@@ -59,7 +59,7 @@ void feed_Task(void *arg)
     assert(i2s_buff);
 
     while (task_flag) {
-        esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
+        esp_get_feed_data(false, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
     }
@@ -144,7 +144,7 @@ void detect_Task(void *arg)
 void app_main()
 {
     models = esp_srmodel_init("model");
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD
     led_init();

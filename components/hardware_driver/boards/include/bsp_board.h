@@ -20,7 +20,8 @@
 #include <stdbool.h>
 #include "esp_err.h"
 #include "audio_hal.h"
-#include "i2c_bus.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 
 /**
  * @brief Add dev board pin defination and check target.
@@ -39,6 +40,10 @@
     #include "esp32_s3_eye_board.h"
 #elif CONFIG_ESP_CUSTOM_BOARD
     #include "esp_custom_board.h"
+#elif CONFIG_ESP32_S3_BOX_LITE_BOARD
+    #include "esp32_s3_box_lite_board.h"
+#elif CONFIG_ESP32_S3_AFE_RASPBERRY_BOARD
+    #include "esp32_s3_afe_raspberry_board.h"
 #else 
     #error "Please select type of dev board"
 #endif
@@ -56,17 +61,6 @@ typedef enum {
     POWER_MODULE_AUDIO,         /*!< Audio PA power control */
     POWER_MODULE_ALL = 0xff,    /*!< All module power control */
 } power_module_t;
-
-/**
- * @brief Add device to I2C bus
- * 
- * @param i2c_device_handle Handle of I2C device
- * @param dev_addr 7 bit address of device
- * @return
- *    - ESP_OK Success
- *    - Others: Refer to error code `esp_err.h`.
- */
-esp_err_t bsp_i2c_add_device(i2c_bus_device_handle_t *i2c_device_handle, uint8_t dev_addr);
 
 /**
  * @brief Deinit SD card
@@ -104,10 +98,38 @@ esp_err_t bsp_board_init(audio_hal_iface_samples_t sample_rate, int channel_form
 
 esp_err_t bsp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wait);
 
-esp_err_t bsp_get_feed_data(int16_t *buffer, int buffer_len);
+/**
+ * @brief Get the record pcm data.
+ * 
+ * @param is_get_raw_channel Whether to get the recording data of the original number of channels. 
+ *                           Otherwise, the corresponding number of channels will be filtered based on the board.
+ * @param buffer The buffer where the data is stored.
+ * @param buffer_len The buffer length.
+ * @return
+ *    - ESP_OK                  Success
+ *    - Others                  Fail
+ */
+esp_err_t bsp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer_len);
 
 int bsp_get_feed_channel(void);
 
+/**
+ * @brief Set play volume
+ * 
+ * @return
+ *    - ESP_OK: Success
+ *    - Others: Fail
+ */
+esp_err_t bsp_audio_set_play_vol(int volume);
+
+/**
+ * @brief Get play volume
+ * 
+ * @return
+ *    - ESP_OK: Success
+ *    - Others: Fail
+ */
+esp_err_t bsp_audio_get_play_vol(int *volume);
 
 
 #ifdef __cplusplus

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "driver/gpio.h"
+#include "esp_idf_version.h"
 
 /**
  * @brief ESP32-S3-EYE I2C GPIO defineation
@@ -84,7 +85,28 @@
 #define GPIO_PWR_CTRL       (GPIO_NUM_NC)
 #define GPIO_PWR_ON_LEVEL   (1)
 
-#define I2S_CONFIG_DEFAULT() { \
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+
+#define I2S_CONFIG_DEFAULT(sample_rate, channel_fmt, bits_per_chan) { \
+        .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(sample_rate), \
+        .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(bits_per_chan, channel_fmt), \
+        .gpio_cfg = { \
+            .mclk = GPIO_I2S_MCLK, \
+            .bclk = GPIO_I2S_SCLK, \
+            .ws   = GPIO_I2S_LRCK, \
+            .dout = GPIO_I2S_DOUT, \
+            .din  = GPIO_I2S_SDIN, \
+            .invert_flags = { \
+                .mclk_inv = false, \
+                .bclk_inv = false, \
+                .ws_inv   = false, \
+            }, \
+        }, \
+    }
+
+#else
+
+#define I2S_CONFIG_DEFAULT(sample_rate, channel_fmt, bits_per_chan) { \
     .mode                   = I2S_MODE_MASTER | I2S_MODE_RX, \
     .sample_rate            = 16000, \
     .bits_per_sample        = I2S_BITS_PER_SAMPLE_32BIT, \
@@ -99,3 +121,5 @@
     .mclk_multiple          = I2S_MCLK_MULTIPLE_DEFAULT, \
     .bits_per_chan          = I2S_BITS_PER_CHAN_32BIT, \
 }
+
+#endif
