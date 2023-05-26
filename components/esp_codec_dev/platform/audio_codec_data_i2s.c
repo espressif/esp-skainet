@@ -493,6 +493,9 @@ int _i2s_data_write(const audio_codec_data_if_t *h, uint8_t *data, int size)
         return ESP_CODEC_DEV_OK;
     }
     int ret = i2s_channel_write(tx_chan, data, size, &bytes_written, 1000);
+    if (ret != 0) {
+        printf("fail to write return %d\n", ret);
+    }
 #else
     int ret = i2s_write(i2s_data->port, data, size, &bytes_written, portMAX_DELAY);
 #endif

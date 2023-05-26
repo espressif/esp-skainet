@@ -160,8 +160,8 @@ esp_err_t bsp_codec_dac_init(int sample_rate, int channel_format, int bits_per_c
         .sample_rate = sample_rate,
         .channel = channel_format,
     };
-    esp_codec_dev_open(play_dev, &fs);
     esp_codec_dev_set_out_vol(play_dev, PLAYER_VOLUME);
+    esp_codec_dev_open(play_dev, &fs);
 
     return ret_val;
 }
@@ -449,8 +449,8 @@ esp_err_t bsp_board_init(audio_hal_iface_samples_t sample_rate, int channel_form
         break;
     }
 
-    bsp_i2s_init(I2S_NUM_1, 16000, 2, 32);
     bsp_i2s_init(I2S_NUM_0, sample_fre, channel_format, bits_per_chan);
+    bsp_i2s_init(I2S_NUM_1, 16000, 2, 32);
 
     bsp_codec_init(16000, sample_fre, channel_format, bits_per_chan);
     /* Initialize PA */

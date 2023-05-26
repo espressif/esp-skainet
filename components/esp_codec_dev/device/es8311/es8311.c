@@ -360,7 +360,7 @@ static int es8311_set_vol(const audio_codec_if_t *h, float db_value)
     }
     db_value -= codec->hw_gain;
     int reg = esp_codec_dev_vol_calc_reg(&vol_range, db_value);
-    ESP_LOGD(TAG, "Set volume reg:%x db:%d", reg, (int) db_value);
+    ESP_LOGI(TAG, "Set volume reg:%x db:%d", reg, (int) db_value);
     return es8311_write_reg(codec, ES8311_DAC_REG32, (uint8_t) reg);
 }
 
@@ -546,7 +546,8 @@ static int es8311_open(const audio_codec_if_t *h, void *cfg, int cfg_size)
     ret |= es8311_write_reg(codec, ES8311_ADC_REG1C, 0x6A);
     if (codec_cfg->no_dac_ref == false) {
         /* set internal reference signal (ADCL + DACR) */
-        ret |= es8311_write_reg(codec, ES8311_GPIO_REG44, 0x50);
+        ret |= es8311_write_reg(codec, ES8311_GPIO_REG44, 0x60);
+        ESP_LOGI(TAG, "Set dac ref");
     } else {
         ret |= es8311_write_reg(codec, ES8311_GPIO_REG44, 0);
     }

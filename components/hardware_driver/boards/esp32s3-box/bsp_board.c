@@ -163,8 +163,8 @@ esp_err_t bsp_codec_dac_init(int sample_rate, int channel_format, int bits_per_c
         .sample_rate = sample_rate,
         .channel = channel_format,
     };
-    esp_codec_dev_open(play_dev, &fs);
     esp_codec_dev_set_out_vol(play_dev, PLAYER_VOLUME);
+    esp_codec_dev_open(play_dev, &fs);
 
     return ret_val;
 }
