@@ -108,14 +108,14 @@ void debug_pcm_save_Task(void *arg)
                     int ret = rb_read(rb_debug[i], buf_temp, size, 3000 / portTICK_PERIOD_MS);
                     if ((ret < 0) || (ret < size)) {
                         // ESP_LOGE(TAG, "rb_debug read error, ret: %d\n", ret);
-                        vTaskDelay(10 / portTICK_RATE_MS);
+                        vTaskDelay(10 / portTICK_PERIOD_MS);
                         continue;
                     }
                     FatfsComboWrite(buf_temp, size, 1, file_save[i]);
                 }
             }
         }
-        vTaskDelay(1 / portTICK_RATE_MS);
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 
     free(buf_temp);

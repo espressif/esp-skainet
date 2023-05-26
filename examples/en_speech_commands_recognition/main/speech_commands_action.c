@@ -134,7 +134,7 @@ void led_Task(void * arg)
             light_off();
             on = 0;
         } else {
-            vTaskDelay(10 / portTICK_RATE_MS);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
     }
 }
