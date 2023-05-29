@@ -117,7 +117,7 @@ int app_main()
                     esp_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
 #endif
                 } while(len[0]>0);
-                i2s_zero_dma_buffer(0);
+                // i2s_zero_dma_buffer(0);
             }
             esp_tts_stream_reset(tts_handle);
             printf("%s\n", prompt2);
