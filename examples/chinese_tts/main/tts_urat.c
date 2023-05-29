@@ -9,8 +9,8 @@
 #include <sys/select.h>
 
 #include "ringbuf.h"
-#include "esp_vfs.h"
-#include "esp_vfs_dev.h"
+// #include "esp_vfs.h"
+// #include "esp_vfs_dev.h"
 #include "esp_log.h"
 #include "driver/uart.h"
 
