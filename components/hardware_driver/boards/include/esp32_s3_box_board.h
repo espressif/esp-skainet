@@ -80,7 +80,7 @@
 #define GPIO_I2S0_SDIN       (GPIO_NUM_NC)
 #define GPIO_I2S0_DOUT       (GPIO_NUM_NC)
 
-#define RECORD_VOLUME   (30.0)
+#define RECORD_VOLUME   (27.0)
 /**
  * @brief player configurations
  *
