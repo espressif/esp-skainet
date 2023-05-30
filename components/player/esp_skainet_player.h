@@ -11,8 +11,7 @@ void esp_skainet_player_pause(void *handle);
 void esp_skainet_player_continue(void *handle);
 void esp_skainet_player_exit(void *handle);
 int esp_skainet_player_get_state(void *handle);
-
-// void esp_skainet_player_increase_vol(void *handle);
-// void esp_skainet_player_decrease_vol(void *handle);
+void esp_skainet_player_increase_vol(void *handle);
+void esp_skainet_player_decrease_vol(void *handle);
 
 #endif

@@ -22,10 +22,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "dirent.h"
-#include <sys/unistd.h>
-#include <sys/stat.h>
-
 struct wav_encoder {
 	FILE *wav;
 	int data_length;
@@ -110,9 +106,6 @@ void wav_encoder_run(void* obj, const unsigned char* data, int length) {
 	if (ww->wav == NULL)
 		return;
 	fwrite(data, length, 1, ww->wav);
-    // fflush(ww->wav);            // required by stdio, this will empty any buffers which newlib holds
-    // fsync(fileno(ww->wav));     // this will tell the filesystem driver to write data to disk
-
 	ww->data_length += length;
 }
 
