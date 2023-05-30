@@ -10,7 +10,6 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/i2s.h"
 #include <driver/gpio.h>
 
 // #include "ie_kaiji.h"
@@ -63,7 +62,7 @@ void led_Task(void *arg)
     led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(12, (led_strip_dev_t)config.channel);
     strip = led_strip_new_rmt_ws2812(&strip_config);
     if (!strip) {
-        ets_printf("install WS2812 driver failed");
+        printf("install WS2812 driver failed\n");
     }
     // Clear LED strip (turn off all LEDs)
     ESP_ERROR_CHECK(strip->clear(strip, 100));

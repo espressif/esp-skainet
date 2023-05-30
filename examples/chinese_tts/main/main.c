@@ -5,7 +5,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
-#include "driver/i2s.h"
 #include "esp_tts.h"
 #include "esp_tts_voice_xiaole.h"
 #include "esp_tts_voice_template.h"

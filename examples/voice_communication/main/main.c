@@ -19,7 +19,6 @@
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
 #include "esp_board_init.h"
-#include "driver/i2s.h"
 #include "model_path.h"
 #include "ringbuf.h"
 
