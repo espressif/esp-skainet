@@ -27,13 +27,12 @@ typedef struct
     TaskHandle_t stream_out;
 } esp_skainet_player_handle_t;
 
-int esp_skainet_stream_in_task(void *arg)
+void esp_skainet_stream_in_task(void *arg)
 {
     esp_skainet_player_handle_t *player = arg;
     unsigned char* buffer = malloc(player->frame_size * sizeof(unsigned char));
     void * wav_decoder = NULL;
     int cur_file_num = 0;
-    char *file_name = "/sdcard/1.wav";
     printf("create stream in\n");
     int count = 0;
     int channels = CODEC_CHANNEL;
@@ -85,7 +84,7 @@ int esp_skainet_stream_in_task(void *arg)
             free(buffer);
             if (wav_decoder != NULL)
                 wav_decoder_close(wav_decoder);
-            return 0;
+            return;
 
         default: // exit
             vTaskDelay(16 / portTICK_PERIOD_MS);
@@ -93,12 +92,11 @@ int esp_skainet_stream_in_task(void *arg)
     }
 }
 
-int esp_skainet_stream_out_task(void *arg)
+void esp_skainet_stream_out_task(void *arg)
 {
     esp_skainet_player_handle_t *player = arg;
     int16_t* buffer = malloc(player->frame_size * sizeof(unsigned char));
     int16_t* zero_buffer = calloc(player->frame_size, sizeof(unsigned char));
-    size_t bytes_write = 0;
     printf("create stream_out\n");
     int count = 0;
     while (1) {
@@ -106,12 +104,10 @@ int esp_skainet_stream_out_task(void *arg)
         switch (player->player_state) {
         case 1: // play
             xQueueReceive(player->player_queue, buffer, portMAX_DELAY);
-            // i2s_write(0, buffer, player->frame_size, &bytes_write, portMAX_DELAY);
             esp_audio_play(buffer, player->frame_size, portMAX_DELAY);
             break;
 
         case 2: // pause or stop
-            // i2s_write(0, zero_buffer, player->frame_size, &bytes_write, portMAX_DELAY);
             esp_audio_play(zero_buffer, player->frame_size, portMAX_DELAY);
             break;
 
@@ -122,7 +118,7 @@ int esp_skainet_stream_out_task(void *arg)
 
         case 4: // exit
             free(buffer);
-            return 0;
+            return;
 
         default: // exit
             // i2s_zero_dma_buffer(0);
@@ -132,7 +128,7 @@ int esp_skainet_stream_out_task(void *arg)
     }
 }
 
-int file_list_scan(void *handle, char *path)
+int file_list_scan(void *handle, const char *path)
 {
     esp_skainet_player_handle_t *player = handle;
     struct dirent *ret;
