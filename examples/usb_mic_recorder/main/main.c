@@ -35,7 +35,7 @@ void feed_Task(void *arg)
     assert(destry_buff);
 
     while (task_flag) {
-        esp_get_feed_data(i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
+        esp_get_feed_data(false, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
 
@@ -76,7 +76,7 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
 
     afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_VC_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();

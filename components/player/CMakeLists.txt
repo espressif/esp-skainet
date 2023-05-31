@@ -4,11 +4,11 @@ set(srcs
     ./esp_tts_wav/wav_decoder.c
     )
 
-set(include_dirs 
-    ./
-    ./esp_tts_wav
-    )
+idf_component_register(
+    SRCS ${srcs}
+    INCLUDE_DIRS
+        "."
+        "./esp_tts_wav"
+    REQUIRES
+        hardware_driver)
 
-idf_component_register(SRCS ${srcs}
-                       INCLUDE_DIRS ${include_dirs}
-                       REQUIRES hardware_driver)

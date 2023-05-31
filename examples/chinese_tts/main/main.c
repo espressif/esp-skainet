@@ -5,7 +5,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
-#include "driver/i2s.h"
 #include "esp_tts.h"
 #include "esp_tts_voice_xiaole.h"
 #include "esp_tts_voice_template.h"
@@ -17,6 +16,7 @@
 
 #include "wav_encoder.h"
 #include "esp_partition.h"
+#include "esp_idf_version.h"
 
 //#define SDCARD_OUTPUT_ENABLE
 
@@ -44,6 +44,7 @@ int app_main()
 
     /*** 1. create esp tts handle ***/
     // initial voice set from separate voice data partition
+
     const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, "voice_data");
     if (part==NULL) { 
         printf("Couldn't find voice data partition!\n"); 
@@ -51,9 +52,14 @@ int app_main()
     } else {
         printf("voice_data paration size:%d\n", part->size);
     }
-    spi_flash_mmap_handle_t mmap;
     void* voicedata;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    esp_partition_mmap_handle_t mmap;
+    esp_err_t err=esp_partition_mmap(part, 0, part->size, ESP_PARTITION_MMAP_DATA, &voicedata, &mmap);
+#else
+    spi_flash_mmap_handle_t mmap;
     esp_err_t err=esp_partition_mmap(part, 0, part->size, SPI_FLASH_MMAP_DATA, &voicedata, &mmap);
+#endif
     if (err != ESP_OK) {
         printf("Couldn't map voice data partition!\n"); 
         return 0;
@@ -110,7 +116,7 @@ int app_main()
                     esp_audio_play(pcm_data, len[0]*2, portMAX_DELAY);
 #endif
                 } while(len[0]>0);
-                i2s_zero_dma_buffer(0);
+                // i2s_zero_dma_buffer(0);
             }
             esp_tts_stream_reset(tts_handle);
             printf("%s\n", prompt2);

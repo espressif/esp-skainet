@@ -150,7 +150,7 @@ void breathing_light() {
 
         }
         ws2812_write_leds(pixels);
-        vTaskDelay(300 / portTICK_RATE_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
 
         for (int i = 0; i < LED_NUM; i++) {
 
@@ -158,7 +158,7 @@ void breathing_light() {
 
         }
         ws2812_write_leds(pixels);
-        vTaskDelay(300 / portTICK_RATE_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
 
 
         //red blinks.
@@ -169,7 +169,7 @@ void breathing_light() {
 
         }
         ws2812_write_leds(pixels);
-        vTaskDelay(300 / portTICK_RATE_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
 
         for (int i = 0; i < LED_NUM; i++) {
 
@@ -177,7 +177,7 @@ void breathing_light() {
 
         }
         ws2812_write_leds(pixels);
-        vTaskDelay(300 / portTICK_RATE_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
 
 
         //green blinks.
@@ -188,7 +188,7 @@ void breathing_light() {
 
         }
         ws2812_write_leds(pixels);
-        vTaskDelay(300 / portTICK_RATE_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
 
         for (int i = 0; i < LED_NUM; i++) {
 
@@ -197,7 +197,7 @@ void breathing_light() {
         }
 
         ws2812_write_leds(pixels);
-        vTaskDelay(300 / portTICK_RATE_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
 
     }
 }
@@ -214,7 +214,7 @@ void breathing_done() {
 
     }
     ws2812_write_leds(pixels);
-    vTaskDelay(300 / portTICK_RATE_MS);
+    vTaskDelay(300 / portTICK_PERIOD_MS);
 
 }
 
@@ -249,7 +249,7 @@ void RGB_1s()
 
     }
     ws2812_write_leds(pixels);
-    vTaskDelay(1000 / portTICK_RATE_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     for (int i = 0; i < LED_NUM; i++) {
 
@@ -257,7 +257,7 @@ void RGB_1s()
 
     }
     ws2812_write_leds(pixels);
-    vTaskDelay(1000 / portTICK_RATE_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     // GREEN
 
@@ -267,7 +267,7 @@ void RGB_1s()
 
     }
     ws2812_write_leds(pixels);
-    vTaskDelay(1000 / portTICK_RATE_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     for (int i = 0; i < LED_NUM; i++) {
 
@@ -275,7 +275,7 @@ void RGB_1s()
 
     }
     ws2812_write_leds(pixels);
-    vTaskDelay(1000 / portTICK_RATE_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     // BLUE
 
@@ -285,7 +285,7 @@ void RGB_1s()
 
     }
     ws2812_write_leds(pixels);
-    vTaskDelay(1000 / portTICK_RATE_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     for (int i = 0; i < LED_NUM; i++) {
 
@@ -320,7 +320,7 @@ void wake_up_light_task(void *arg)
             }
         }
         ws2812_write_leds(pixels);
-        vTaskDelay(200 / portTICK_RATE_MS);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 
     free(pixels);

@@ -40,9 +40,9 @@ esp_err_t esp_sdcard_deinit(char *mount_point)
     return bsp_sdcard_deinit(mount_point);
 }
 
-esp_err_t esp_get_feed_data(int16_t *buffer, int buffer_len)
+esp_err_t esp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer_len)
 {
-    return bsp_get_feed_data(buffer, buffer_len);
+    return bsp_get_feed_data(is_get_raw_channel, buffer, buffer_len);
 }
 
 int esp_get_feed_channel(void)
@@ -53,6 +53,16 @@ int esp_get_feed_channel(void)
 esp_err_t esp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wait)
 {
     return bsp_audio_play(data, length, ticks_to_wait);
+}
+
+esp_err_t esp_audio_set_play_vol(int volume)
+{
+    return bsp_audio_set_play_vol(volume);
+}
+
+esp_err_t esp_audio_get_play_vol(int *volume)
+{
+    return bsp_audio_get_play_vol(volume);
 }
 
 esp_err_t FatfsComboWrite(const void* buffer, int size, int count, FILE* stream)

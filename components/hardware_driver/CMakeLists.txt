@@ -20,24 +20,19 @@ endif()
 
 idf_component_register(
     SRC_DIRS
-        "./"
+        ./
         "./led"
         ${BSP_BOARD_SRC}
-        "codec/es7210"
-        "codec/es8311"
-        "codec/es8388"
-        "i2c_bus"
     INCLUDE_DIRS
         "include"
         "codec/include"
-        "codec/es7210"
-        "codec/es8311"
-        "codec/es8388"
-        "i2c_bus/include"
         "boards/include"
         "./led/include"
     REQUIRES
+        driver
         fatfs
-        spiffs)
+        spiffs
+        esp_codec_dev)
 
 component_compile_options(-w)
+target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-format")

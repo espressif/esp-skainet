@@ -8,60 +8,38 @@
 
 - 一只外接喇叭(4~6 欧姆)
 
-### 配置工程
 
-* 进入 `idf.py menuconfig`
-
-* 通过 `Serial Flasher Options`设置串口信息
-
-
-### 编译和烧写, 将voice data烧写到独立分区，可以有效降低app bin大小，方便用户OTA： 
-
-##### 1)参考partition.csv中第二行添加voice data部分的分区列表, 分区大小为voice data的尺寸:  
-
+### 编译和烧写
+- 参考partition.csv中的第二行添加voice data
 ```
 # Name,  Type, SubType, Offset,  Size
 factory, app,  factory, 0x010000, 4M
 voice_data, data,  fat,         , 3M
 ```
 
-##### 2)使用该目录下的flash_voicedata.sh脚本，烧写voice data到指定分区:   
-目前支持两种声音，　任选一个进行烧写:
- - esp_tts_voice_data_xiaole.dat: 2900K
- - esp_tts_voice_data_xiaoxin.dat: 2800K, 该voice data专为数字播报优化
-
+- 编译和烧写程序
 ```
-source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaole.dat  /dev/ttyUSB0
-
-source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaoxin.dat  /dev/ttyUSB0
-```
-##### 3)[代码](./main/main.c)中voice data的初始化方法如下：
-```
-
-    // method2: initial voice set from separate voice data partition
-    const esp_partition_t* part=esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, "voice_data");
-    if (part==0) { 
-        printf("Couldn't find voice data partition!\n"); 
-        return 0;
-    }
-    spi_flash_mmap_handle_t mmap;
-    uint16_t* voicedata;
-    esp_err_t err=esp_partition_mmap(part, 0, 3*1024*1024, SPI_FLASH_MMAP_DATA, (const void**)&voicedata, &mmap);
-    if (err != ESP_OK) {
-        printf("Couldn't map voice data partition!\n"); 
-        return 0;
-    }
-    esp_tts_voice_t *voice=esp_tts_voice_set_init(&esp_tts_voice_template, voicedata); 
-
-```
-
-##### 4)烧写app bin.
-```
+# flash app bin and voice_data 
 idf.py flash monitor
+
+# only flash app bin
+idf.py app-flash monitor
+
 ```
 
+### 修改voice data
+所有可用voice data放置在 `esp-skainet/components/esp-sr/esp-tts/esp_tts_chinese/`
+- 方法1. 修改CmakeLists.txt   
+修改CmakeLists.txt中 `voice_data_image` 的路径
+```
+set(voice_data_image ${PROJECT_DIR}/../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaoxin_small.dat)
+```
 
-
+- 方法2. 单独烧写 voice data    
+使用该例子提供的 `flash_voicedata.sh` 脚本烧写相应的音频数据
+```
+source flash_voicedata.sh ../../components/esp-sr/esp-tts/esp_tts_chinese/esp_tts_voice_data_xiaoxin_small.dat  /dev/ttyUSB0
+```
 
 ### 例程输出
 
