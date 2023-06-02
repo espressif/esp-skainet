@@ -83,13 +83,6 @@ void detect_Task(void *arg)
 
     //print active speech commands
     multinet->print_active_speech_commands(model_data);
-
-    // add/modify a speech commands in the code.
-    esp_mn_commands_add(100, "tian jia ming ling ci");
-    esp_mn_commands_modify("tian jia ming ling ci", "xiu gai ming ling ci");
-    esp_mn_commands_update();
-    multinet->print_active_speech_commands(model_data);
-
     printf("------------detect start------------\n");
     // FILE *fp = fopen("/sdcard/out1", "w");
     // if (fp == NULL) printf("can not open file\n");

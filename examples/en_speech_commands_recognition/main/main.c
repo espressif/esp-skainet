@@ -76,21 +76,14 @@ void detect_Task(void *arg)
     char *mn_name = esp_srmodel_filter(models, ESP_MN_PREFIX, ESP_MN_ENGLISH);
     printf("multinet:%s\n", mn_name);
     esp_mn_iface_t *multinet = esp_mn_handle_from_name(mn_name);
-    model_iface_data_t *model_data = multinet->create(mn_name, 5760);
+    model_iface_data_t *model_data = multinet->create(mn_name, 6000);
     int mu_chunksize = multinet->get_samp_chunksize(model_data);
     esp_mn_commands_update_from_sdkconfig(multinet, model_data); // Add speech commands from sdkconfig
     assert(mu_chunksize == afe_chunksize);
-    printf("------------detect start------------\n");
     //print active speech commands
     multinet->print_active_speech_commands(model_data);
 
-    // add/modify a speech commands in the code.
-    esp_mn_commands_add(100, "add a speech command");
-    esp_mn_commands_modify("add a speech command", "modify a speech command");
-    esp_mn_commands_update();
-    multinet->print_active_speech_commands(model_data);
-
-
+    printf("------------detect start------------\n");
     while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (!res || res->ret_value == ESP_FAIL) {
