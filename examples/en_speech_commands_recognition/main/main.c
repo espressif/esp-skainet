@@ -81,6 +81,15 @@ void detect_Task(void *arg)
     esp_mn_commands_update_from_sdkconfig(multinet, model_data); // Add speech commands from sdkconfig
     assert(mu_chunksize == afe_chunksize);
     printf("------------detect start------------\n");
+    //print active speech commands
+    multinet->print_active_speech_commands(model_data);
+
+    // add/modify a speech commands in the code.
+    esp_mn_commands_add(100, "add a speech command");
+    esp_mn_commands_modify("add a speech command", "modify a speech command");
+    esp_mn_commands_update();
+    multinet->print_active_speech_commands(model_data);
+
 
     while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
@@ -110,13 +119,15 @@ void detect_Task(void *arg)
             if (mn_state == ESP_MN_STATE_DETECTED) {
                 esp_mn_results_t *mn_result = multinet->get_results(model_data);
                 for (int i = 0; i < mn_result->num; i++) {
-                    printf("TOP %d, command_id: %d, phrase_id: %d, prob: %f\n", 
-                    i+1, mn_result->command_id[i], mn_result->phrase_id[i], mn_result->prob[i]);
+                    printf("TOP %d, command_id: %d, phrase_id: %d, string: %s, prob: %f\n", 
+                    i+1, mn_result->command_id[i], mn_result->phrase_id[i], mn_result->string, mn_result->prob[i]);
                 }
                 printf("-----------listening-----------\n");
             }
 
             if (mn_state == ESP_MN_STATE_TIMEOUT) {
+                esp_mn_results_t *mn_result = multinet->get_results(model_data);
+                printf("timeout, string:%s\n", mn_result->string);
                 afe_handle->enable_wakenet(afe_data);
                 detect_flag = 0;
                 printf("\n-----------awaits to be waken up-----------\n");
