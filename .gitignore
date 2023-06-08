@@ -5,3 +5,6 @@ target
 .vscode
 managed_components/
 dependencies.lock
+test/*/5.0
+test/*/4.4
+__pycache__
