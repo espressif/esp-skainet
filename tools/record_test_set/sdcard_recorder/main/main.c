@@ -86,7 +86,7 @@ void save_Task(void *arg)
                 filename[0] = '\0';
             }
             wav_encoder_run(wav_encoder, (unsigned char *)buff, buff_size);
-            printf("wav_encoder_run");
+            // printf("wav_encoder_run");
         } else if (ctrl_flag == RECORDER_END) {
             if (wav_encoder != NULL) {
                 wav_encoder_close(wav_encoder);

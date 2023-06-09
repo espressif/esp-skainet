@@ -12,11 +12,11 @@ noise_set:
   target_dB: -36
 output_set:
   path: "/home/sunxiangyu/Code/output"
+  remove_old_files: true
   snr:
     - snr_dB: 10
       clean_gain_dB: 10
     - snr_dB: 5
       clean_gain_dB: 10
 player:
-  enable: false
-    
+  play_output: True    

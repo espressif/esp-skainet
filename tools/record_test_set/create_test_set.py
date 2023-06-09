@@ -12,6 +12,22 @@ import argparse
 import yaml
 import pandas
 import shutil
+import serial
+from serial.tools import list_ports
+
+def get_serial_port_name(): 	# Get the name of the serial port the computer is using.
+    plist = list(list_ports.comports())
+    out = []
+
+    if len(plist) <= 0:
+        print("Can not find any port!")
+        return out
+    else:
+        for plist_item in plist: 	# Print the port name and description.
+            for port in list(plist_item): 	# Get the port name.
+                if "/dev/ttyUSB" in port: 	# Filter the port name.
+                    out.append(port)
+    return out
 
 class AudioTools(object):
     audio_play_count = 0
@@ -110,6 +126,14 @@ class AudioTools(object):
     def audio_play(cls, path):
         file_list = os.listdir(path)
         play_list = []   # list for playing files one by one
+        ports = get_serial_port_name()
+        print(ports)
+        port_handles = []  # list for port handles
+        for port in ports:
+            handle = serial.Serial(port, 115200, timeout=50)
+            if (handle.isOpen()==True):
+                port_handles.append(handle) # add port handles to port_handles list for serial port comms.
+
         for filename in file_list:
             filepath = os.path.join(path, filename)
             if os.path.isdir(filepath):
@@ -121,20 +145,28 @@ class AudioTools(object):
                     audio_format = "mp3"
                 else:
                     continue
-                
-                print("==> Start to play: %s,  %s" % (filepath, time.ctime()))
+                string = f'start,{filename}\n'
+                print("==> Start to play: %s,  %s" % (string, time.ctime()))
+                for handle in port_handles:  # write port_handle to port_handles list for serial port comms.
+                    handle.write(bytes(string, 'utf-8')) 
+
                 start_time = time.time()            # start time of playing
-                time.sleep(10)
-                playsound(filepath)
-                time.sleep(10)
+                time.sleep(5)
+                # playsound(filepath)
+                time.sleep(5)
                 end_time = time.time()            # end time of playing
                 play_list.append((filepath, start_time, end_time))
                 print("==> End play : %s" % time.ctime())
+                for handle in port_handles:  # write port_handle to port_handles list for serial port comms.
+                    handle.write(b'end\n')
+                time.sleep(5)
+                
+
         basedir = os.path.dirname(path) # get base directory of the path
         csv_file = os.path.join(basedir, "play_list.csv")
 
         play_set = pandas.DataFrame(data=play_list,
-                                    columns=["wav_filename, start, end"])
+                                    columns=["wav_filename", "start", "end"])
         play_set.to_csv(csv_file, index=False)
         return
         
@@ -171,7 +203,7 @@ if __name__ == '__main__':
 
     #step2: merge clean audio and noise audio to generate stereo audio
     output_set = config["output_set"]
-    if output_set["clean"]:
+    if output_set["remove_old_files"]:
         shutil.rmtree(output_set["path"], ignore_errors=True)
 
     for clean_path in clean_set["paths"]:
