@@ -1,0 +1,22 @@
+clean_set:
+  paths:
+    - "/home/sunxiangyu/Data/Data/alexa/TRAIN_SET/just_test"
+    - "/home/sunxiangyu/Data/Data/alexa/TRAIN_SET/just_test"
+  normalization: True
+  target_dB: -36
+noise_set:
+  paths:
+    - "/home/sunxiangyu/Data/Data/alexa/TRAIN_SET/just_test"
+    - "/home/sunxiangyu/Data/Data/alexa/TRAIN_SET/just_test"
+  normalization: True
+  target_dB: -36
+output_set:
+  path: "/home/sunxiangyu/Code/output"
+  snr:
+    - snr_dB: 10
+      clean_gain_dB: 10
+    - snr_dB: 5
+      clean_gain_dB: 10
+player:
+  enable: false
+    
