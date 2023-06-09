@@ -11,6 +11,7 @@ import csv
 import argparse
 import yaml
 import pandas
+import shutil
 
 class AudioTools(object):
     audio_play_count = 0
@@ -25,7 +26,8 @@ class AudioTools(object):
             print(f"Warning: skip {audio_file}, only support mp3 and wav format")
             return None
         audio_data = AudioSegment.from_file(audio_file, audio_format)
-        audio_data.set_frame_rate(16000)
+        audio_data = audio_data.set_frame_rate(16000)
+        audio_data = audio_data.set_sample_width(2)
         if audio_data.channels > 1:
             audio_data = audio_data.split_to_mono()[0]
 
@@ -44,12 +46,11 @@ class AudioTools(object):
                 sound = cls.read_audio_file(src_file)
 
                 loudness = sound.dBFS
-                print(f'Before amplitude adjustment, {src_file}: {loudness}dBA')
                 adjust_db = target_db - loudness
-                sound_amp = sound.apply_gain(adjust_db)
-                loudness = sound_amp.dBFS
-                print(f'After amplitude adjustment, {src_file}: {loudness}dBA')
-                sound_amp.export(src_file, format='wav')
+                if adjust_db > 0.2:
+                    sound_amp = sound.apply_gain(adjust_db)
+                    print(f'Amplitude adjustment, {src_file}: from {loudness} to {sound_amp.dBFS} dBA')
+                    sound_amp.export(src_file, format='wav')
 
                 allfile.append(src_file)
         return allfile
@@ -79,23 +80,19 @@ class AudioTools(object):
                 if src_audio != None:
                     noise_audio += src_audio
         
-        clean_len = int(len(clean_audio))
-        noise_len = int(len(noise_audio))
-        print(f'clean: {clean_len}, noise: {noise_len}')
-
-        if noise_len >= clean_len: 
-            noise_audio = noise_audio[:clean_len]
-            noise_len = len(noise_audio)
-        else:
-            # repeat noise audio to match the length of clean audio
-            repeat_num = int(clean_len/noise_len) + 1
-            noise_audio = noise_audio * repeat_num
-            noise_audio = noise_audio[:clean_len]
-        
         clean_audio.apply_gain(clean_gain)
         noise_audio.apply_gain(noise_gain)
         
-        print(f'clean: {clean_len}, noise: {noise_len}')
+        # the len() is not exactly, so replace len() with frame_count()
+        while(noise_audio.frame_count() < clean_audio.frame_count()):
+            noise_audio = noise_audio + noise_audio
+        
+        # Returns the raw audio data as an array of (numeric) samples.
+        clean_audio_array = clean_audio.get_array_of_samples()
+        noise_audio_array = noise_audio.get_array_of_samples()
+        # slice in array, not in AudioSegment
+        noise_audio_array = noise_audio_array[:len(clean_audio_array)]
+        noise_audio = noise_audio._spawn(noise_audio_array)
 
         # Combine two mono channels into multichannel
         stereo_sound = AudioSegment.from_mono_audiosegments(clean_audio, noise_audio)
@@ -167,20 +164,31 @@ if __name__ == '__main__':
     if clean_set["normalization"]:
         for src_path in clean_set["paths"]:
             AudioTools.audio_normalization(src_path, clean_set["target_dB"])
-    
+
     if noise_set["normalization"]:
         for src_path in noise_set["paths"]:
             AudioTools.audio_normalization(src_path, clean_set["target_dB"])
 
     #step2: merge clean audio and noise audio to generate stereo audio
     output_set = config["output_set"]
+    if output_set["clean"]:
+        shutil.rmtree(output_set["path"], ignore_errors=True)
 
     for clean_path in clean_set["paths"]:
         for noise_path in noise_set["paths"]:
             for snr in output_set["snr"]:
                 print(clean_path, noise_path, snr)
-    
+                clean_gain = snr["clean_gain_dB"]
+                noise_gain = snr["clean_gain_dB"] - snr["snr_dB"]
+                AudioTools.merge_clean_and_noise(clean_path, noise_path, output_set["path"], clean_gain, noise_gain)
 
     #step3: play merged audio one by one
+    player = config["player"]
+
+    if player["play_output"]:
+        AudioTools.audio_play(output_set["path"])
+    elif "path" in player:
+        AudioTools.audio_play(player["path"])
+
 
 

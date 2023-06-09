@@ -5,6 +5,8 @@ set(requires
     player
     )
 
-idf_component_register(SRCS main.c
+idf_component_register(SRCS main.c uart.c
+                       INCLUDE_DIRS .
                        REQUIRES ${requires})
 
+add_definitions(-w)

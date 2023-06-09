@@ -19,8 +19,19 @@
 
 #include "ringbuf.h"
 #include "wav_encoder.h"
+#include "string.h"
+#include "uart.h"
+
+typedef enum {
+    RECORDER_START = 0,        // start 
+    RECORDER_PAUSE = 1,        // pause 
+    RECORDER_END = 2,          // stop
+} recorder_ctrl_t;
 
 static int out_channel = 2;
+static recorder_ctrl_t ctrl_flag = RECORDER_END;
+char filename[UART_BUF_LEN];
+
 void feed_Task(void *arg)
 {
     ringbuf_handle_t audio_rb = arg;
@@ -30,12 +41,11 @@ void feed_Task(void *arg)
         out_channel = 3;
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
+    printf("feed_Task ...\n");
 
     while (1) {
         esp_get_feed_data(false, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
         rb_write(audio_rb, i2s_buff, audio_chunksize * sizeof(int16_t) * out_channel, portMAX_DELAY);
-        printf("write %d \n", rb_bytes_available(audio_rb));
-
     }
     free(i2s_buff);
     vTaskDelete(NULL);
@@ -64,32 +74,79 @@ void save_Task(void *arg)
     int buff_size = out_channel * audio_chunksize * sizeof(int16_t);
     int16_t *buff = malloc(buff_size);
     assert(buff);
-    int count = 0;
-    int split_num = 3600 * 16000 / 512;  // one hour per file 
-    char filename[128];
-    int file_idx = get_start_index();
-    sprintf(filename, "/sdcard/audio_%d.wav", file_idx);
-    void *wav_encoder=wav_encoder_open(filename, 16000, 16, out_channel);
-    printf("Save audio data as %s, %d\n", filename, split_num);
+    void *wav_encoder = NULL;
+    printf("save_Task ...\n");
     
     while (1) {
         rb_read(audio_rb, buff, buff_size, portMAX_DELAY);
-        count ++;
-        if (count ==  split_num) {
-            count = 0;
-            wav_encoder_close(wav_encoder);
-            file_idx ++;
-            sprintf(filename, "/sdcard/audio_%d.wav", file_idx);
-            wav_encoder=wav_encoder_open(filename, 16000, 16, out_channel); 
-            printf("Save audio data as %s\n", filename);
-        } else {
-            wav_encoder_run(wav_encoder, buff, buff_size);
-        }
-        printf("read %d \n", rb_bytes_available(audio_rb));
 
+        if (ctrl_flag == RECORDER_START) {
+            if (wav_encoder == NULL && strlen(filename) > 7) {
+                wav_encoder = wav_encoder_open(filename, 16000, 16, out_channel);
+                filename[0] = '\0';
+            }
+            wav_encoder_run(wav_encoder, (unsigned char *)buff, buff_size);
+            printf("wav_encoder_run");
+        } else if (ctrl_flag == RECORDER_END) {
+            if (wav_encoder != NULL) {
+                wav_encoder_close(wav_encoder);
+                wav_encoder = NULL;
+            }
+        } else if (ctrl_flag == RECORDER_PAUSE) {
+            continue;
+        }
     }
     free(buff);
     buff = NULL;
+    vTaskDelete(NULL);
+}
+
+recorder_ctrl_t parse_uart_text(char *text, char *filename)
+{
+    recorder_ctrl_t ctrl = RECORDER_END;
+    char *token = strtok(text, ",");
+    if (strcmp(token, "start") == 0) {
+        token = strtok(NULL, ",");
+        if (token != NULL) {
+            ctrl = RECORDER_START;
+            sprintf(filename, "/sdcard/%s", token);
+        }
+    } else if (strcmp(token, "end") == 0) {
+        ctrl = RECORDER_END;
+    } else if (strcmp(token, "pause") == 0) {
+        ctrl = RECORDER_PAUSE;
+    } 
+
+    return ctrl;
+}
+
+
+void uart_ctrl_Task(void *arg)
+{
+    ringbuf_handle_t uart_rb = (ringbuf_handle_t) arg;
+    char uart_buff[UART_BUF_LEN];
+    char in;
+    int buff_size = 0;
+    printf("uart_ctrl_Task ...\n");
+
+    while (1) {
+        rb_read(uart_rb, &in, 1, portMAX_DELAY);
+
+        if(in=='\n') {
+            // start to run tts
+            uart_buff[buff_size] = '\0';
+            ctrl_flag = parse_uart_text(uart_buff, filename);
+            buff_size = 0;
+        } else if(buff_size<UART_BUF_LEN) {
+            // append urat buffer into data
+            uart_buff[buff_size] = in;
+            buff_size++;
+        } else {
+            printf("ERROR: out of range\n");
+            buff_size = 0;
+        }
+    }
+
     vTaskDelete(NULL);
 }
 
@@ -97,8 +154,15 @@ void app_main()
 {
     ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
-    ringbuf_handle_t audio_rb = rb_create(1024*512, 1);;
+    ringbuf_handle_t audio_rb = rb_create(1024*512, 1);
+    ringbuf_handle_t uart_rb = rb_create(UART_BUF_LEN, 1);
+    filename[0] = '\0';
 
+    // recorder task
     xTaskCreatePinnedToCore(&feed_Task, "feed", 4 * 1024, (void*)audio_rb, 5, NULL, 0);
-    xTaskCreatePinnedToCore(&save_Task, "save", 4 * 1024, (void*)audio_rb, 6, NULL, 1);
+    xTaskCreatePinnedToCore(&save_Task, "save", 4 * 1024, (void*)audio_rb, 5, NULL, 0);
+
+    // uart task
+    xTaskCreatePinnedToCore(&uart_read_Task, "uart_read", 6 * 1024, (void*)uart_rb, 5, NULL, 1);
+    xTaskCreatePinnedToCore(&uart_ctrl_Task, "uart_ctrl", 6 * 1024, (void*)uart_rb, 5, NULL, 1);
 }
