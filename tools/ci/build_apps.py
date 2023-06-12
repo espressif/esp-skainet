@@ -15,7 +15,7 @@ from typing import List
 
 from idf_build_apps import LOGGER, App, build_apps, find_apps, setup_logging
 
-PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 APPS_BUILD_PER_JOB = 30
 IGNORE_WARNINGS = [
     r'1/2 app partitions are too small',

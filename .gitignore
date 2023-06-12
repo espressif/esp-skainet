@@ -8,3 +8,4 @@ dependencies.lock
 test/*/5.0
 test/*/4.4
 __pycache__
+pytest_log

@@ -10,15 +10,37 @@ Steps to run these cases:
 '''
 
 import pytest
+import re
+import os
+import json
 from pytest_embedded import Dut
+
+def save_report(results):
+    with open(results["report_file"], "w") as f:
+        json.dump(results, f)
 
 @pytest.mark.target('esp32s3')
 @pytest.mark.parametrize(
     'config',
     [
-        # 'hilexin',
+        'hilexin',
         'hiesp',
     ],
 )
 def test_wakenet(dut: Dut)-> None:
-    dut.expect('MC Quantized wakenet9', timeout=20)
+    results = {}
+    basedir = os.path.dirname(dut.logfile)
+    report_file = os.path.join(basedir, "report.json")
+    results["report_file"] = report_file
+
+    #Get the number of test file
+    file_num = dut.expect(re.compile(rb'Number of files: (\d+)'), timeout=20).group(1).decode()
+    dut.expect('MC Quantized wakenet9: ', timeout=20)
+    results["file_num"] = int(file_num)
+
+    # Get the trigger times
+    trigger_times = dut.expect(re.compile(rb'Total trigger times: (\d+)'), timeout=18000).group(1).decode()
+    results["times"] = trigger_times
+
+    save_report(results)
+    dut.expect('TEST DONE', timeout=18000)

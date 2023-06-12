@@ -99,10 +99,11 @@ int sdcard_scan(void *handle, const char *path, int audio_type)
             
         }
         closedir(dir);
+        printf("Number of files: %d\n", tester->file_num);
     }
     else
     {
-        printf("opendir NULL \r\n");
+        printf("Fail to open %s\r\n", path);
     }
     return tester->file_num;
 }
@@ -148,15 +149,16 @@ void save_test_report(skainet_perf_tester *tester) {
     if (tester->file_num>0) {
         int count=0;
         for (int i=0; i<tester->file_num; i++) {
-            fprintf(fp, "%s -> trigger times: %d\n", tester->file_list[i], tester->file_det_times[i]);
+            fprintf(fp, "Filename: %s, Trigger times: %d\n", tester->file_list[i], tester->file_det_times[i]);
             printf("%s -> trigger times: %d\n", tester->file_list[i], tester->file_det_times[i]);
             count+=tester->file_det_times[i];
         }
-        fprintf(fp, "the total trigger times: %d\n", count);
+        fprintf(fp, "total trigger times: %d\n", count);
+        printf("Total trigger times: %d\n", count);
     }
     fclose(fp);
 
-    printf("test done\n");
+    printf("TEST DONE\n");
 }
 
 void wav_feed_task(void *arg)
@@ -202,9 +204,7 @@ void wav_feed_task(void *arg)
         
         tester->file_id=i;
         tester->file_det_times[i]=0;
-        float step_length=wav_decoder_get_data_length(wav_decoder)*1.0/(nch+1)/2/100;
         int out_samples=0;
-        int percent=-5;
         int size = i2s_buffer_size;
         
         while (1)
@@ -212,12 +212,6 @@ void wav_feed_task(void *arg)
             size = wav_decoder_run(wav_decoder, (unsigned char*)i2s_buffer, i2s_buffer_size);
             out_samples += frame_size;
             
-            // print progress bar
-            if (out_samples/step_length-percent >= 5) {
-                percent=out_samples/step_length;
-                printf(" %d%%,", percent);
-            }
-
             // size=i2s_buffer_size;
             if (size == i2s_buffer_size) {
                 afe_handle->feed(afe_data, i2s_buffer);
@@ -227,6 +221,7 @@ void wav_feed_task(void *arg)
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
                 wav_decoder_close(wav_decoder);
                 wav_decoder = NULL;
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
                 break;
             }
         }
@@ -255,7 +250,6 @@ void fetch_task(void *arg)
         RSR(CCOUNT, c0);
         afe_fetch_result_t* res = afe_handle->fetch(afe_data);
         if (!res || res->ret_value == ESP_FAIL) {
-            printf("fetch error!\n");
             break;
         }
         // int res = 0;
@@ -266,11 +260,9 @@ void fetch_task(void *arg)
             tester->file_det_times[file_id]++;
         }
         if (file_id != tester->file_id) {
-            printf("\n%s:\n  trigger times: %d\n\n", tester->file_list[file_id], tester->file_det_times[file_id]);
             file_id = tester->file_id;
             chunk_num = 0;
         } else if (tester->test_done) {
-            printf("\n%s:\n  trigger times: %d\n\n", tester->file_list[file_id], tester->file_det_times[file_id]);
             break;
         }
     }
