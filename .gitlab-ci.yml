@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+  - target_test
   - deploy
 
 variables:
@@ -63,7 +63,41 @@ before_script:
   variables:
     EXAMPLES_PATH: "test"
   script:
-    - *build_test_script  
+    - *build_test_script 
+
+variables:
+  # There is no target-test-env-v4.4 
+  DOCKER_TARGET_TEST_v5_0_ENV_IMAGE: "$CI_DOCKER_REGISTRY/target-test-env-v5.0:3"
+
+.test_template: &test_template
+  image: DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
+  stage: target_test
+  timeout: 10 hour
+  variables:
+    GIT_DEPTH: 1
+    SUBMODULES_TO_FETCH: "none"
+  cache:
+    # Usually do not need submodule-cache in target_test
+    - key: pip-cache
+      paths:
+        - .cache/pip
+      policy: pull
+
+.pytest_template:
+  <<: *test_template
+  artifacts:
+    when: always
+    paths:
+      - XUNIT_RESULT.xml
+    reports:
+      junit: XUNIT_RESULT.xml
+    expire_in: 4 days
+  variables:
+    TEST_TARGET: 'esp32s3'
+    TEST_FOLDER: './test'
+    TEST_ENV: 'korvo-2'
+  script:
+    - pytest ${TEST_FOLDER} --target ${TEST_TARGET} --env ${TEST_ENV} --junitxml=XUNIT_RESULT.xml
 
 build_idf_v4.4:
   extends: .build_examples_template
@@ -73,9 +107,25 @@ build_idf_v5.0:
   extends: .build_examples_template
   image: espressif/idf:release-v5.0
 
-build_test_v5.0:
+build_all_tests:
   extends: .build_test_template
   image: espressif/idf:release-v5.0
+
+test_wakenet:
+  extends:
+    - .pytest_template
+  needs:
+    - job: "build_all_tests"
+      artifacts: true
+      optional: true
+  tags: 
+    - 'korvo-2'
+  image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
+  variables:
+    TEST_TARGET: 'esp32s3'
+    TEST_FOLDER: './test/wakenet'
+    TEST_ENV: 'korvo-2'
+    IDF_VERSION: "5.0"
 
 push_to_github:
   stage: deploy
