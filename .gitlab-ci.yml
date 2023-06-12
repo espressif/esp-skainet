@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - deploy
 
 variables:
@@ -19,11 +20,15 @@ before_script:
   - git --version
   - git submodule update --init --recursive --force
   - pip install idf_build_apps
+  - pip install -r tools/ci/requirements.txt
 
 .build_all_examples_script: &build_all_examples_script
   - python -m idf_build_apps build -p $EXAMPLES_PATH --recursive --manifest-file $EXAMPLES_PATH/$MANIFEST_FILE -t all
 
-.build_template:
+.build_test_script: &build_test_script
+  - python ./tools/ci/build_apps.py $EXAMPLES_PATH -t all
+
+.build_examples_template:
   stage: build
   tags:
     - build
@@ -33,12 +38,43 @@ before_script:
   script:
     - *build_all_examples_script
 
+.build_test_template:
+  stage: build
+  tags:
+    - build
+  artifacts:
+    when: always
+    paths:
+      - "**/build*/size.json"
+      - "**/build*/build_log.txt"
+      - "**/build*/*.bin"
+      # upload to s3 server to save the artifacts size
+      - "**/build*/*.map"
+      - "**/build*/*.elf"
+      - "**/build*/flasher_args.json"
+      - "**/build*/flash_project_args"
+      - "**/build*/config/sdkconfig.json"
+      - "**/build*/bootloader/*.bin"
+      - "**/build*/bootloader/*.elf"
+      - "**/build*/partition_table/*.bin"
+      - "**/build*/srmodels/*.bin"
+      - size_info.txt
+    expire_in: 1 week
+  variables:
+    EXAMPLES_PATH: "test"
+  script:
+    - *build_test_script  
+
 build_idf_v4.4:
-  extends: .build_template
+  extends: .build_examples_template
   image: espressif/idf:release-v4.4
 
 build_idf_v5.0:
-  extends: .build_template
+  extends: .build_examples_template
+  image: espressif/idf:release-v5.0
+
+build_test_v5.0:
+  extends: .build_test_template
   image: espressif/idf:release-v5.0
 
 push_to_github:

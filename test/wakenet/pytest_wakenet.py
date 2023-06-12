@@ -20,6 +20,7 @@ def save_report(results):
         json.dump(results, f)
 
 @pytest.mark.target('esp32s3')
+@pytest.mark.env('korvo-2')
 @pytest.mark.parametrize(
     'config',
     [
