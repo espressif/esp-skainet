@@ -26,6 +26,7 @@ typedef enum {
     RECORDER_START = 0,        // start 
     RECORDER_PAUSE = 1,        // pause 
     RECORDER_END = 2,          // stop
+    RECORDER_RECORDING = 3,    // recording 
 } recorder_ctrl_t;
 
 static int out_channel = 2;
@@ -80,13 +81,24 @@ void save_Task(void *arg)
     while (1) {
         rb_read(audio_rb, buff, buff_size, portMAX_DELAY);
 
-        if (ctrl_flag == RECORDER_START) {
-            if (wav_encoder == NULL && strlen(filename) > 7) {
-                wav_encoder = wav_encoder_open(filename, 16000, 16, out_channel);
-                filename[0] = '\0';
-            }
+        if (ctrl_flag == RECORDER_RECORDING) {
             wav_encoder_run(wav_encoder, (unsigned char *)buff, buff_size);
-            // printf("wav_encoder_run");
+        } else if(ctrl_flag == RECORDER_START) {
+            if (strlen(filename) < 9) {
+                printf("Skip %s, the length of filename is too short", filename);
+                ctrl_flag = RECORDER_END;
+                continue;
+            }
+            if (wav_encoder == NULL) {
+                wav_encoder = wav_encoder_open(filename, 16000, 16, out_channel);
+                // filename[0] = '\0';
+            } else {
+                wav_encoder_close(wav_encoder);
+                wav_encoder = wav_encoder_open(filename, 16000, 16, out_channel);
+                // filename[0] = '\0';
+            } 
+            wav_encoder_run(wav_encoder, (unsigned char *)buff, buff_size);
+            ctrl_flag = RECORDER_RECORDING;
         } else if (ctrl_flag == RECORDER_END) {
             if (wav_encoder != NULL) {
                 wav_encoder_close(wav_encoder);
@@ -111,6 +123,7 @@ recorder_ctrl_t parse_uart_text(char *text, char *filename)
             ctrl = RECORDER_START;
             sprintf(filename, "/sdcard/%s", token);
         }
+        printf("\nfilename:%s\n", filename);
     } else if (strcmp(token, "end") == 0) {
         ctrl = RECORDER_END;
     } else if (strcmp(token, "pause") == 0) {

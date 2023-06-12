@@ -152,7 +152,7 @@ class AudioTools(object):
 
                 start_time = time.time()            # start time of playing
                 time.sleep(5)
-                # playsound(filepath)
+                playsound(filepath)
                 time.sleep(5)
                 end_time = time.time()            # end time of playing
                 play_list.append((filepath, start_time, end_time))
