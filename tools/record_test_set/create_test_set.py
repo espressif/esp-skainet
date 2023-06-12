@@ -96,8 +96,8 @@ class AudioTools(object):
                 if src_audio != None:
                     noise_audio += src_audio
         
-        clean_audio.apply_gain(clean_gain)
-        noise_audio.apply_gain(noise_gain)
+        clean_audio = clean_audio.apply_gain(clean_gain)
+        noise_audio = noise_audio.apply_gain(noise_gain)
         
         # the len() is not exactly, so replace len() with frame_count()
         while(noise_audio.frame_count() < clean_audio.frame_count()):
