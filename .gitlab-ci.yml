@@ -8,6 +8,7 @@ variables:
   BATCH_BUILD: "1"
   V: "0"
   IDF_CI_BUILD: "1"
+  DOCKER_TARGET_TEST_v5_0_ENV_IMAGE: "$CI_DOCKER_REGISTRY/target-test-env-v5.0:3"
 
 before_script:
   # add gitlab ssh key
@@ -65,10 +66,6 @@ before_script:
   script:
     - *build_test_script 
 
-variables:
-  # There is no target-test-env-v4.4 
-  DOCKER_TARGET_TEST_v5_0_ENV_IMAGE: "$CI_DOCKER_REGISTRY/target-test-env-v5.0:3"
-
 .test_template: &test_template
   image: DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
   stage: target_test
@@ -89,6 +86,7 @@ variables:
     when: always
     paths:
       - XUNIT_RESULT.xml
+      - pytest_log/
     reports:
       junit: XUNIT_RESULT.xml
     expire_in: 4 days
