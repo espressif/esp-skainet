@@ -1,0 +1,4 @@
+pydub
+pyyaml
+pyserial
+playsound
