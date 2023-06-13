@@ -1,7 +1,7 @@
 # How to record test set
-`create_test_set.py` is used to synthesize audio with different SNR, play the audio, and use the serial port to control the recording of the board
+`create_test_set.py` is used to synthesize audio with different SNR, play the audio, and use the serial port to recoard audio data by the board.
 
-sdcard_recorder records and save data into SD card by receiving the serial port signal from `create_test_set.py`. This project supports esp32-korvo, esp32-korvo-1, esp32-korvo-2.
+`sdcard_recorder` app records and saves data into SD card by receiving the serial port signal from `create_test_set.py`. This project supports [ESP32-Korvo](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md), [ESP32-S3-Korvo-1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32s3/user-guide-korvo-1.md),[ESP-S3-Korvo-2](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/user-guide-esp32-s3-korvo-2.html).
 
 ## 1. configuration
 The user can synthesize test set with different SNR by modifying the `config.yml` file. The template of `config.yml` is as follows:
@@ -44,7 +44,7 @@ idf.py menuconfig   // select board and change the target
 idf.py flash monitor   // build and flash
 ```
 
-## 2. synthesize, play and record
+## 3. synthesize, play and record
 
 ```
 pip install -r requirement.txt
