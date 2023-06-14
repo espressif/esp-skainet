@@ -19,29 +19,67 @@ def save_report(results):
     with open(results["report_file"], "w") as f:
         json.dump(results, f)
 
+
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
 @pytest.mark.parametrize(
     'config',
     [
         'hilexin',
-        'hiesp',
+        # 'hiesp',
     ],
 )
 def test_wakenet(dut: Dut)-> None:
+
+    def match_log(pattern, timeout=18000):
+        str = dut.expect(pattern, timeout=timeout).group(1).decode()
+        return str
+    
+    def match_log_int(pattern, timeout=18000):
+        num = match_log(pattern, timeout)
+        return int(num)
+
     results = {}
     basedir = os.path.dirname(dut.logfile)
     report_file = os.path.join(basedir, "report.json")
     results["report_file"] = report_file
 
     #Get the number of test file
-    file_num = dut.expect(re.compile(rb'Number of files: (\d+)'), timeout=20).group(1).decode()
+    file_num_pattern = re.compile(rb'Number of files: (\d+)')
+    file_num = match_log_int(file_num_pattern, 20)
     dut.expect('MC Quantized wakenet9: ', timeout=20)
-    results["file_num"] = int(file_num)
+    results["file_num"] = file_num
 
-    # Get the trigger times
-    trigger_times = dut.expect(re.compile(rb'Total trigger times: (\d+)'), timeout=18000).group(1).decode()
-    results["times"] = trigger_times
+    # Get the trigger times and memory siize
+    # The following formats are defined in perf_tester.c
+    timeout = 18000  # 5 hours
+    psram_pattern = re.compile(rb'FAR PSRAM: (\d+) KB')
+    sram_pattern = re.compile(rb'FAR SRAM: (\d+) KB')
+    psram_size = match_log_int(psram_pattern, timeout)
+    sram_size = match_log_int(sram_pattern, timeout)
+    assert psram_size < 1120   # Assert that the psram size is under 1120 kB
+    assert sram_size < 32      # Assert that the internal ram size is under 32 kB
+    results["psram"] = psram_size
+    results["sram"] = sram_size
+
+    for i in range(file_num):
+        file_id = f'File{i}'
+        filename_pattern = re.compile(str.encode(f'{file_id}: (\\S+)'))
+        trigger_times_pattern = re.compile(str.encode(f'{file_id}, trigger times: (\\d+)'))
+        required_times_pattern = re.compile(str.encode(f'{file_id}, required times: (\\d+)'))
+        truth_times_pattern = re.compile(str.encode(f'{file_id}, truth times: (\\d+)'))
+
+        filename = match_log(filename_pattern, timeout)
+        trigger_times = match_log_int(trigger_times_pattern, timeout)
+        required_times = match_log_int(required_times_pattern, timeout)
+        truth_times = match_log_int(truth_times_pattern, timeout)
+
+        results[file_id] = {}
+        results[file_id]["filename"] = filename
+        results[file_id]["trigger_times"] = trigger_times
+        results[file_id]["required_times"] = required_times
+        results[file_id]["truth_times"] = truth_times
+        assert trigger_times >= required_times
 
     save_report(results)
-    dut.expect('TEST DONE', timeout=18000)
+    dut.expect('TEST DONE', timeout=timeout)

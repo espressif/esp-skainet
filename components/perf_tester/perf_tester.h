@@ -21,13 +21,13 @@ typedef enum {
 /**
  * @brief Test wakenet and AFE pipeline performance,include CPU loading, memory size and trigger times
  *
- * @param test_path      Path to read test files
+ * @param csv_file       CSV file path
  * @param log_file       File name to save test report
  * @param afe_handle     Handle of speech front end
- * @param afe_config     Config of afe handle 
+ * @param afe_config     Config of afe handle
  * @param audio_type     Input audio type, 0: 3channel-PCM; 1: 3channel-WAV
  */
-void offline_wn_tester(const char *test_path,
+void offline_wn_tester(const char *csv_file,
                        const char *log_file,
                        const esp_afe_sr_iface_t *afe_handle,
                        afe_config_t *afe_config,

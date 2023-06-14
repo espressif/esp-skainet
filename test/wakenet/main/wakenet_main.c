@@ -12,17 +12,16 @@ void app_main()
 
     srmodel_list_t *models = esp_srmodel_init("model");
     char *wn_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);
-    char test_path[128];
+    char csv_file[128];
     char log_file[128];
-    sprintf(test_path, "/sdcard/%s/", wn_name);
+    sprintf(csv_file, "/sdcard/%s.csv", wn_name);
     sprintf(log_file, "/sdcard/%s.log", wn_name);
-    printf("test:%s, log:%s\n", test_path, log_file);
+    printf("test:%s, log:%s\n", csv_file, log_file);
 
     // Select speech enhancement pipeline
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     afe_config.wakenet_model_name = wn_name;
     afe_config.wakenet_mode = DET_MODE_3CH_90;
-    // esp_afe_sr_iface_t *afe_handle = 
 
-    offline_wn_tester(test_path, log_file, &ESP_AFE_SR_HANDLE, &afe_config, TESTER_WAV_3CH);
+    offline_wn_tester(csv_file, log_file, &ESP_AFE_SR_HANDLE, &afe_config, TESTER_WAV_3CH);
 }

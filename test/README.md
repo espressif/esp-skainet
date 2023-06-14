@@ -28,14 +28,14 @@ The test report will be generated in `./pytest_log/`.
 
 ### 1. record test set
 Please refer to esp-skainet/tools/record_test_set to record your test case.
-### 2. develop a test app
-Please refer to esp-skainet/test/wakenet to add a test app.
+### 2. add a test app
+Please refer to esp-skainet/test/wakenet to add your test app.
 
-### 3. develop a pytest scripts
-Please refer to esp-skainet/test/wakenet/pytest_wakenet.py for the script to run and ckeck your test case.
-
+### 3. add a pytest script
+Please refer to esp-skainet/test/wakenet/pytest_wakenet.py to add your pytest script.   
+The more details about pytest you can find [here](https://espressif-docs.readthedocs-hosted.com/projects/pytest-embedded/en/latest/index.html).
 ### 4. add a ci pipeline 
-Please refer to the following template to add a test case in .gitlab-ci.yml:
+Please refer to the following template to add your test case in .gitlab-ci.yml:
 ```
 test_wakenet:
   extends:
