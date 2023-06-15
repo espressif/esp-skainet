@@ -100,6 +100,9 @@ before_script:
 .if-protected: &if-protected
   if: '($CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_BRANCH =~ /^release\/v/ || $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?($|-)/)'
 
+.if-wakenet_test: &if-wakenet_test
+  if: '($CI_COMMIT_BRANCH =~ /^test\/wn/)'
+
 .patterns-test_wakenet: &patterns-test_wakenet
   - "components/esp-sr/**/*"
   - "test/tools/wakenet/**/*"
@@ -116,10 +119,12 @@ build_all_tests:
   extends: .build_test_template
   image: espressif/idf:release-v5.0
 
+# Rules to trigger wakenet test 
 .rules:test:test_wakenet:
   rules:
     - <<: *if-protected
       changes: *patterns-test_wakenet
+    - <<: *if-wakenet_test
 
 test_wakenet:
   extends:
