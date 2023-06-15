@@ -118,6 +118,8 @@ test_wakenet:
       optional: true
   tags: 
     - 'korvo-2'
+  only:
+    - /^test\/
   image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
   variables:
     TEST_TARGET: 'esp32s3'
