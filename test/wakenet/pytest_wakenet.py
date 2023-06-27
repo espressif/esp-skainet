@@ -22,11 +22,12 @@ def save_report(results):
 
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
+@pytest.mark.timeout(60000)
 @pytest.mark.parametrize(
     'config',
     [
         'hilexin',
-        # 'hiesp',
+        'hiesp',
     ],
 )
 def test_wakenet(dut: Dut)-> None:
@@ -38,7 +39,8 @@ def test_wakenet(dut: Dut)-> None:
     def match_log_int(pattern, timeout=18000):
         num = match_log(pattern, timeout)
         return int(num)
-
+    
+    timeout = 36000 
     results = {}
     basedir = os.path.dirname(dut.logfile)
     report_file = os.path.join(basedir, "report.json")
@@ -52,7 +54,6 @@ def test_wakenet(dut: Dut)-> None:
 
     # Get the trigger times and memory siize
     # The following formats are defined in perf_tester.c
-    timeout = 18000  # 5 hours
     psram_pattern = re.compile(rb'FAR PSRAM: (\d+) KB')
     sram_pattern = re.compile(rb'FAR SRAM: (\d+) KB')
     psram_size = match_log_int(psram_pattern, timeout)
