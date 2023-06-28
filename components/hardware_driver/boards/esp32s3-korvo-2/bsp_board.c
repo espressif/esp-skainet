@@ -442,41 +442,11 @@ int bsp_get_feed_channel(void)
     return ADC_I2S_CHANNEL;
 }
 
-esp_err_t bsp_board_init(audio_hal_iface_samples_t sample_rate, int channel_format, int bits_per_chan)
+esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
-    int sample_fre = 16000;
     /*!< Initialize I2C bus, used for audio codec*/
     bsp_i2c_init(I2C_NUM, I2C_CLK);
-    switch (sample_rate) {
-    case AUDIO_HAL_08K_SAMPLES:
-        sample_fre = 8000;
-        break;
-    case AUDIO_HAL_11K_SAMPLES:
-        sample_fre = 11025;
-        break;
-    case AUDIO_HAL_16K_SAMPLES:
-        sample_fre = 16000;
-        break;
-    case AUDIO_HAL_22K_SAMPLES:
-        sample_fre = 22050;
-        break;
-    case AUDIO_HAL_24K_SAMPLES:
-        sample_fre = 24000;
-        break;
-    case AUDIO_HAL_32K_SAMPLES:
-        sample_fre = 32000;
-        break;
-    case AUDIO_HAL_44K_SAMPLES:
-        sample_fre = 44100;
-        break;
-    case AUDIO_HAL_48K_SAMPLES:
-        sample_fre = 48000;
-        break;
-    default:
-        ESP_LOGE(TAG, "Unable to configure sample rate %dHz", sample_fre);
-        break;
-    }
-    s_play_sample_rate = sample_fre;
+    s_play_sample_rate = sample_rate;
 
     if (channel_format != 2 && channel_format != 1) {
         ESP_LOGE(TAG, "Unable to configure channel_format");

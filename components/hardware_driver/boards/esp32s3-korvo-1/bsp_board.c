@@ -415,45 +415,14 @@ int bsp_get_feed_channel(void)
     return ADC_I2S_CHANNEL;
 }
 
-esp_err_t bsp_board_init(audio_hal_iface_samples_t sample_rate, int channel_format, int bits_per_chan)
+esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
-    int sample_fre = 16000;
     /*!< Initialize I2C bus, used for audio codec*/
     bsp_i2c_init(I2C_NUM, I2C_CLK);
-    switch (sample_rate) {
-    case AUDIO_HAL_08K_SAMPLES:
-        sample_fre = 8000;
-        break;
-    case AUDIO_HAL_11K_SAMPLES:
-        sample_fre = 11025;
-        break;
-    case AUDIO_HAL_16K_SAMPLES:
-        sample_fre = 16000;
-        break;
-    case AUDIO_HAL_22K_SAMPLES:
-        sample_fre = 22050;
-        break;
-    case AUDIO_HAL_24K_SAMPLES:
-        sample_fre = 24000;
-        break;
-    case AUDIO_HAL_32K_SAMPLES:
-        sample_fre = 32000;
-        break;
-    case AUDIO_HAL_44K_SAMPLES:
-        sample_fre = 44100;
-        break;
-    case AUDIO_HAL_48K_SAMPLES:
-        sample_fre = 48000;
-        break;
-    default:
-        ESP_LOGE(TAG, "Unable to configure sample rate %dHz", sample_fre);
-        break;
-    }
-
-    bsp_i2s_init(I2S_NUM_0, sample_fre, channel_format, bits_per_chan);
+    bsp_i2s_init(I2S_NUM_0, sample_rate, channel_format, bits_per_chan);
     bsp_i2s_init(I2S_NUM_1, 16000, 2, 32);
 
-    bsp_codec_init(16000, sample_fre, channel_format, bits_per_chan);
+    bsp_codec_init(16000, sample_rate, channel_format, bits_per_chan);
     /* Initialize PA */
     // gpio_config_t  io_conf;
     // memset(&io_conf, 0, sizeof(io_conf));
