@@ -64,7 +64,7 @@ before_script:
   variables:
     EXAMPLES_PATH: "test"
   script:
-    - *build_test_script 
+    - *build_test_script
 
 .test_template: &test_template
   image: DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
@@ -121,7 +121,7 @@ build_all_tests:
   extends: .build_test_template
   image: espressif/idf:release-v5.0
 
-# Rules to trigger wakenet test 
+# Rules to trigger wakenet test
 .rules:test:test_wakenet:
   rules:
     - <<: *if-protected
@@ -136,12 +136,45 @@ test_wakenet:
     - job: "build_all_tests"
       artifacts: true
       optional: true
-  tags: 
+  tags:
     - 'korvo-2'
   image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
   variables:
     TEST_TARGET: 'esp32s3'
     TEST_FOLDER: './test/wakenet'
+    TEST_ENV: 'korvo-2'
+    IDF_VERSION: "5.0"
+
+.patterns-test_multinet: &patterns-test_multinet
+  - "components/esp-sr/lib/**/*"
+  - "components/esp-sr/include/**/*"
+  - "components/esp-sr/src/**/*"
+  - "test/multinet/**/*"
+
+.if-multinet_test: &if-multinet_test
+  if: '($CI_COMMIT_BRANCH =~ /^test\/mn/)'
+
+# Rules to trigger multinet test
+.rules:test:test_multinet:
+  rules:
+    - <<: *if-protected
+      changes: *patterns-test_multinet
+    - <<: *if-multinet_test
+
+test_multinet:
+  extends:
+    - .pytest_template
+    - .rules:test:test_multinet
+  needs:
+    - job: "build_all_tests"
+      artifacts: true
+      optional: true
+  tags:
+    - 'korvo-2'
+  image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
+  variables:
+    TEST_TARGET: 'esp32s3'
+    TEST_FOLDER: './test/multinet'
     TEST_ENV: 'korvo-2'
     IDF_VERSION: "5.0"
 
