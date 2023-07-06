@@ -1,4 +1,4 @@
-#include "wn_perf_tester.h"
+#include "mn_perf_tester.h"
 #include "model_path.h"
 #include "esp_board_init.h"
 #include "esp_mn_speech_commands.h"
@@ -12,10 +12,11 @@ void app_main()
 
     srmodel_list_t *models = esp_srmodel_init("model");
     char *wn_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);
+    char *mn_name = esp_srmodel_filter(models, ESP_MN_PREFIX, NULL);
     char csv_file[128];
     char log_file[128];
-    sprintf(csv_file, "/sdcard/%s.csv", wn_name);
-    sprintf(log_file, "/sdcard/%s.log", wn_name);
+    sprintf(csv_file, "/sdcard/%s.csv", mn_name);
+    sprintf(log_file, "/sdcard/%s.log", mn_name);
     printf("test:%s, log:%s\n", csv_file, log_file);
 
     // Select speech enhancement pipeline
@@ -23,5 +24,9 @@ void app_main()
     afe_config.wakenet_model_name = wn_name;
     afe_config.wakenet_mode = DET_MODE_3CH_90;
 
-    offline_wn_tester(csv_file, log_file, &ESP_AFE_SR_HANDLE, &afe_config, TESTER_WAV_3CH);
+    // Multinet
+    esp_mn_iface_t *multinet = esp_mn_handle_from_name(mn_name);
+
+    offline_mn_tester(csv_file, log_file, &ESP_AFE_SR_HANDLE, &afe_config,
+                      multinet, mn_name, TESTER_WAV_3CH);
 }

@@ -7,9 +7,8 @@
 #include "assert.h"
 #include "wav_decoder.h"
 #include "esp_skainet_player.h"
-#include "perf_tester.h"
+#include "wn_perf_tester.h"
 #include "esp_board_init.h"
-#include "esp_mn_speech_commands.h"
 #include "esp_process_sdkconfig.h"
 
 
@@ -26,33 +25,22 @@ typedef struct {
     int file_id;
     int nch;
     int *file_det_times;
-    int *mn_det_times;
     int sample_rate;
     int64_t wave_time;
     int tester_mem_size;        //total memory for tester, include PSRAM and SRAM
     int tester_sram_size;       //internal SRAM size for tester
 
-    //void *afe_handle;
     esp_afe_sr_iface_t *afe_handle;
     esp_afe_sr_data_t *afe_data;
     int64_t running_time;
     int afe_mem_size;            //total memory for afe, include PSRAM and SRAM
     int afe_sram_size;           //internal SRAM size for afe module
-    int enable_afe_out;
 
-    //multinet
-    esp_mn_iface_t *multinet;
-    model_iface_data_t *mn_data;
-    int mn_frame_size;
-    int64_t mn_running_time;
-    int mn_running;
-    int *command_no_trigger;
-    int *command_false_trigger;
-    int *command_right;
     tester_audio_t audio_type;
     int test_done;
 
 } skainet_perf_tester;
+
 
 int sdcard_scan(void *handle, const char *path, int audio_type)
 {
@@ -105,6 +93,7 @@ int sdcard_scan(void *handle, const char *path, int audio_type)
     return tester->file_num;
 }
 
+
 long get_file_size(FILE *fp)
 {
     fseek(fp, 0L, SEEK_END);
@@ -113,6 +102,7 @@ long get_file_size(FILE *fp)
 
     return size;
 }
+
 
 int read_csv_file(skainet_perf_tester *tester)
 {
@@ -148,6 +138,7 @@ int read_csv_file(skainet_perf_tester *tester)
     return tester->file_num;
 }
 
+
 void print_wn_report(skainet_perf_tester *tester)
 {
     assert(tester != NULL);
@@ -160,11 +151,11 @@ void print_wn_report(skainet_perf_tester *tester)
 
     if (tester->afe_handle != NULL) {
         float running_time = tester->running_time * 1.0 / 240 / 1000 / 1000;
-        printf("FAR CPU: %d%%\n", (int)(100 * running_time / wave_time));
-        printf("FAR PSRAM: %d KB\n", (tester->afe_mem_size - tester->afe_sram_size) / 1024);
-        printf("FAR SRAM: %d KB\n", tester->afe_sram_size / 1024);
+        printf("AFE CPU: %d%%\n", (int)(100 * running_time / wave_time));
+        printf("AFE PSRAM: %d KB\n", (tester->afe_mem_size - tester->afe_sram_size) / 1024);
+        printf("AFE SRAM: %d KB\n", tester->afe_sram_size / 1024);
     } else {
-        printf("Disable FAR Pipeline\n\n");
+        printf("Disable AFE Pipeline\n\n");
     }
 
     if (tester->file_num > 0) {
@@ -188,6 +179,7 @@ void print_wn_report(skainet_perf_tester *tester)
     printf("TEST DONE\n");
 }
 
+
 void wav_feed_task(void *arg)
 {
     printf("Create wav feed task ...\n");
@@ -204,7 +196,6 @@ void wav_feed_task(void *arg)
     int i2s_buffer_size = frame_size * (nch + 1) * sizeof(int16_t);
 
     int16_t *i2s_buffer = calloc(frame_size * (nch + 1), sizeof(int16_t)); // nch channel MIC data and one channel reference data
-    tester->running_time = 0;
     tester->wave_time = 0;
 
     for (int i = 0; i < tester->file_num; i++) {
@@ -231,6 +222,7 @@ void wav_feed_task(void *arg)
 
         tester->file_id = i;
         tester->file_det_times[i] = 0;
+
         int out_samples = 0;
         int size = i2s_buffer_size;
 
@@ -259,6 +251,7 @@ void wav_feed_task(void *arg)
     print_wn_report(tester);
     vTaskDelete(NULL);
 }
+
 
 void fetch_task(void *arg)
 {
@@ -294,6 +287,7 @@ void fetch_task(void *arg)
     }
     vTaskDelete(NULL);
 }
+
 
 void offline_wn_tester(const char *csv_file,
                        const char *log_file,

@@ -1,5 +1,6 @@
 set(srcs
-    perf_tester.c
+    wn_perf_tester.c
+    mn_perf_tester.c
     )
 
 set(requires
