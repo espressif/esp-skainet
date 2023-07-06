@@ -22,12 +22,14 @@ def save_report(results):
 
 
 @pytest.mark.target('esp32s3')
-@pytest.mark.env('korvo-1')
+@pytest.mark.env('korvo-2')
 @pytest.mark.timeout(60000)
 @pytest.mark.parametrize(
     'config',
     [
         'hiesp_mn6_en',
+        'hilexin_mn6_cn',
+        'hilexin_mn6_cn_ac',
     ],
 )
 def test_multinet(dut: Dut)-> None:
