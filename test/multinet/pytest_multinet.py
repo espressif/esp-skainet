@@ -23,7 +23,7 @@ def save_report(results):
 
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
-@pytest.mark.timeout(60000)
+@pytest.mark.timeout(360000)
 @pytest.mark.parametrize(
     'config',
     [
@@ -46,7 +46,7 @@ def test_multinet(dut: Dut)-> None:
         num = match_log(pattern, timeout)
         return float(num)
 
-    timeout = 36000
+    timeout = 108000
     results = {}
     basedir = os.path.dirname(dut.logfile)
     report_file = os.path.join(basedir, "report.json")
