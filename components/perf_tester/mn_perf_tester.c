@@ -37,6 +37,7 @@ typedef struct {
     int *file_wn_det_times;      // wake times for each file
     int *file_wn_miss_times;     // missed wake word times for each file
     float *file_wn_delay_seconds;  // trigger delay of detected wake words for each file
+    float *file_wn_max_delay_seconds;  // max trigger delay of detected wake words for each file
 
     // multinet
     esp_mn_iface_t *multinet;
@@ -51,6 +52,7 @@ typedef struct {
     int *file_mn_incorrect_times;  // incorrect detected cmd times for each file
     int *file_mn_miss_times;       // missed cmd times for each file
     float *file_mn_delay_seconds;        // trigger delay of correctly detected cmd for each file
+    float *file_mn_max_delay_seconds;    // max trigger delay of correctly detected cmd for each file
 
     // ground truth labels
     int *gt_region_type;           // region type, -1: wake word, 0: null, > 0: command id
@@ -157,6 +159,7 @@ void print_mn_report(skainet_perf_tester *tester)
             printf("File%d, required times: %d\n", i, tester->file_required_num_wake[i]);
             printf("File%d, truth times: %d\n", i, tester->file_gt_num_wake[i]);
             printf("File%d, wn averaged delay: %f\n", i, tester->file_wn_delay_seconds[i] / (tester->file_wn_det_times[i] + 0.01));
+            printf("File%d, wn max delay: %f\n", i, tester->file_wn_max_delay_seconds[i]);
             wn_det += tester->file_wn_det_times[i];
             wn_required += tester->file_required_num_wake[i];
             wn_gt += tester->file_gt_num_wake[i];
@@ -168,6 +171,7 @@ void print_mn_report(skainet_perf_tester *tester)
             printf("File%d, required correct: %d\n", i, tester->file_required_num_cmd[i]);
             printf("File%d, truth commands: %d\n", i, tester->file_gt_num_cmd[i]);
             printf("File%d, mn averaged delay: %f\n", i, tester->file_mn_delay_seconds[i] / (tester->file_mn_correct_times[i] + 0.01));
+            printf("File%d, mn max delay: %f\n", i, tester->file_mn_max_delay_seconds[i]);
             mn_correct += tester->file_mn_correct_times[i];
             mn_miss += tester->file_mn_miss_times[i];
             mn_incorrect += tester->file_mn_incorrect_times[i];
@@ -320,10 +324,12 @@ void wav_feed_task(void *arg)
         tester->file_wn_det_times[i] = 0;
         tester->file_wn_miss_times[i] = 0;
         tester->file_wn_delay_seconds[i] = 0.0;
+        tester->file_wn_max_delay_seconds[i] = 0.0;
         tester->file_mn_correct_times[i] = 0;
         tester->file_mn_incorrect_times[i] = 0;
         tester->file_mn_miss_times[i] = 0;
         tester->file_mn_delay_seconds[i] = 0.0;
+        tester->file_mn_max_delay_seconds[i] = 0.0;
 
         int out_samples = 0;
         int size = i2s_buffer_size;
@@ -413,6 +419,7 @@ void detect_task(void *arg)
                 } else {
                     tester->file_wn_det_times[file_id]++;
                     tester->file_wn_delay_seconds[file_id] += (curr_time_s - tester->gt_region_end[gt_idx]);
+                    tester->file_wn_max_delay_seconds[file_id] = max(tester->file_wn_max_delay_seconds[file_id], curr_time_s - tester->gt_region_end[gt_idx]);
                     current_region_detected = 1;
                     // printf("wn detected, %f, %f\n",curr_time_s, tester->gt_region_end[gt_idx]);
                 }
@@ -443,6 +450,7 @@ void detect_task(void *arg)
                             // correct command
                             tester->file_mn_correct_times[file_id]++;
                             tester->file_mn_delay_seconds[file_id] += (curr_time_s - tester->gt_region_end[gt_idx]);
+                            tester->file_mn_max_delay_seconds[file_id] = max(tester->file_mn_max_delay_seconds[file_id], curr_time_s - tester->gt_region_end[gt_idx]);
                             // printf("command correct, %f %f %f\n", curr_time_s, tester->gt_region_end[gt_idx], tester->file_mn_delay_seconds[file_id]);
                         } else {
                             // incorrect command
@@ -614,11 +622,13 @@ void offline_mn_tester(const char *csv_file,
     tester->file_wn_det_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_wn_miss_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_wn_delay_seconds = calloc(tester->max_file_num, sizeof(float));
+    tester->file_mn_max_delay_seconds = calloc(tester->max_file_num, sizeof(float));
 
     tester->file_mn_correct_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_mn_incorrect_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_mn_miss_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_mn_delay_seconds = calloc(tester->max_file_num, sizeof(float));
+    tester->file_mn_max_delay_seconds = calloc(tester->max_file_num, sizeof(float));
 
     tester->audio_type = audio_type;
     for (int i = 0; i < tester->max_file_num; i++) {
