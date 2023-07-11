@@ -506,6 +506,83 @@ void detect_task(void *arg)
 }
 
 
+void add_test_commands(void *arg)
+{
+    printf("Clear pre-defined command list and create one for perf_tester.");
+    esp_mn_commands_clear();
+    skainet_perf_tester *tester = arg;
+    if (strcmp(tester->multinet->get_language(tester->mn_data), ESP_MN_ENGLISH) == 0) {
+        esp_mn_commands_add(1, "TELL ME A JOKE");
+        esp_mn_commands_add(2, "SING A SONG");
+        esp_mn_commands_add(3, "PLAY NEWS CHANNEL");
+        esp_mn_commands_add(4, "TURN ON MY SOUNDBOX");
+        esp_mn_commands_add(5, "TURN OFF MY SOUNDBOX");
+        esp_mn_commands_add(5, "TURN OF MY SOUNDBOX");
+        esp_mn_commands_add(6, "HIGHEST VOLUME");
+        esp_mn_commands_add(7, "LOWEST VOLUME");
+        esp_mn_commands_add(8, "INCREASE THE VOLUME");
+        esp_mn_commands_add(9, "DECREASE THE VOLUME");
+        esp_mn_commands_add(10, "TURN ON THE TV");
+        esp_mn_commands_add(11, "TURN OFF THE TV");
+        esp_mn_commands_add(11, "TURN OF THE TV");
+        esp_mn_commands_add(12, "MAKE ME A TEA");
+        esp_mn_commands_add(13, "MAKE ME A COFFEE");
+        esp_mn_commands_add(14, "TURN ON THE LIGHT");
+        esp_mn_commands_add(15, "TURN OFF THE LIGHT");
+        esp_mn_commands_add(15, "TURN OF THE LIGHT");
+        esp_mn_commands_add(16, "CHANGE THE COLOR TO RED");
+        esp_mn_commands_add(17, "CHANGE THE COLOR TO GREEN");
+        esp_mn_commands_add(18, "TURN ON ALL THE LIGHTS");
+        esp_mn_commands_add(19, "TURN OFF ALL THE LIGHTS");
+        esp_mn_commands_add(19, "TURN OF ALL THE LIGHTS");
+        esp_mn_commands_add(20, "TURN ON THE AIR CONDITIONER");
+        esp_mn_commands_add(21, "TURN OFF THE AIR CONDITIONER");
+        esp_mn_commands_add(21, "TURN OF THE AIR CONDITIONER");
+        esp_mn_commands_add(22, "SET THE TEMPERATURE TO SIXTEEN DEGREES");
+        esp_mn_commands_add(23, "SET THE TEMPERATURE TO SEVENTEEN DEGREES");
+        esp_mn_commands_add(24, "SET THE TEMPERATURE TO EIGHTEEN DEGREES");
+        esp_mn_commands_add(25, "SET THE TEMPERATURE TO NINETEEN DEGREES");
+        esp_mn_commands_add(26, "SET THE TEMPERATURE TO TWENTY DEGREES");
+        esp_mn_commands_add(27, "SET THE TEMPERATURE TO TWENTY ONE DEGREES");
+        esp_mn_commands_add(28, "SET THE TEMPERATURE TO TWENTY TWO DEGREES");
+        esp_mn_commands_add(29, "SET THE TEMPERATURE TO TWENTY THREE DEGREES");
+        esp_mn_commands_add(30, "SET THE TEMPERATURE TO TWENTY FOUR DEGREES");
+        esp_mn_commands_add(31, "SET THE TEMPERATURE TO TWENTY FIVE DEGREES");
+        esp_mn_commands_add(32, "SET THE TEMPERATURE TO TWENTY SIX DEGREES");
+        esp_mn_commands_add(33, "LOWEST FAN SPEED");
+        esp_mn_commands_add(34, "MEDIUM FAN SPEED");
+        esp_mn_commands_add(35, "HIGHEST FAN SPEED");
+        esp_mn_commands_add(36, "AUTO ADJUST THE FAN SPEED");
+        esp_mn_commands_add(37, "DECREASE THE FAN SPEED");
+        esp_mn_commands_add(38, "INCREASE THE FAN SPEED");
+        esp_mn_commands_add(39, "INCREASE THE TEMPERATURE");
+        esp_mn_commands_add(40, "DECREASE THE TEMPERATURE");
+        esp_mn_commands_add(41, "COOLING MODE");
+        esp_mn_commands_add(42, "HEATING MODE");
+        esp_mn_commands_add(43, "VENTILATION MODE");
+        esp_mn_commands_add(44, "DEHUMIDIFY MODE");
+    } else {
+        esp_mn_commands_add(25, "da kai kong tiao");
+        esp_mn_commands_add(74, "tiao dao er shi ba du");
+        esp_mn_commands_add(75, "tiao dao er shi du");
+        esp_mn_commands_add(79, "tiao dao er shi qi du");
+        esp_mn_commands_add(85, "tiao dao shi ba du");
+        esp_mn_commands_add(88, "tiao dao shi qi du");
+        esp_mn_commands_add(93, "tiao di yi du");
+        esp_mn_commands_add(98, "tiao gao yi du");
+        esp_mn_commands_add(120, "feng xiang shang chui");
+        esp_mn_commands_add(121, "feng xiang xia chui");
+        esp_mn_commands_add(142, "guan bi kong tiao");
+        esp_mn_commands_add(288, "zhi leng mo shi");
+        esp_mn_commands_add(289, "zhi re mo shi");
+        esp_mn_commands_add(301, "zui da feng su");
+        esp_mn_commands_add(304, "zui xiao feng su");
+    }
+    esp_mn_commands_update();
+    esp_mn_commands_print();
+}
+
+
 void offline_mn_tester(const char *csv_file,
                        const char *log_file,
                        const esp_afe_sr_iface_t *afe_handle,
@@ -580,6 +657,9 @@ void offline_mn_tester(const char *csv_file,
     tester->multinet = multinet;
     tester->mn_data = multinet->create(mn_coeff, 6000);
     esp_mn_commands_update_from_sdkconfig(tester->multinet, tester->mn_data);
+
+    // add commands for testing
+    add_test_commands(tester);
 
     // the memory after AFE init
     m2 = heap_caps_get_free_size(MALLOC_CAP_8BIT);
