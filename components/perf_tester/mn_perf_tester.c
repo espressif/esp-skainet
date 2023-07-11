@@ -418,8 +418,11 @@ void detect_task(void *arg)
                     printf("wn detected too early, %f, %f\n",curr_time_s, tester->gt_region_end[gt_idx]);
                 } else {
                     tester->file_wn_det_times[file_id]++;
-                    tester->file_wn_delay_seconds[file_id] += (curr_time_s - tester->gt_region_end[gt_idx]);
-                    tester->file_wn_max_delay_seconds[file_id] = max(tester->file_wn_max_delay_seconds[file_id], curr_time_s - tester->gt_region_end[gt_idx]);
+                    float delay = curr_time_s - tester->gt_region_end[gt_idx];
+                    tester->file_wn_delay_seconds[file_id] += delay;
+                    if (delay > tester->file_wn_max_delay_seconds[file_id]) {
+                        tester->file_wn_max_delay_seconds[file_id] = delay;
+                    }
                     current_region_detected = 1;
                     // printf("wn detected, %f, %f\n",curr_time_s, tester->gt_region_end[gt_idx]);
                 }
@@ -449,8 +452,11 @@ void detect_task(void *arg)
                         if (mn_result->command_id[0] == tester->gt_region_type[gt_idx]) {
                             // correct command
                             tester->file_mn_correct_times[file_id]++;
-                            tester->file_mn_delay_seconds[file_id] += (curr_time_s - tester->gt_region_end[gt_idx]);
-                            tester->file_mn_max_delay_seconds[file_id] = max(tester->file_mn_max_delay_seconds[file_id], curr_time_s - tester->gt_region_end[gt_idx]);
+                            float delay = curr_time_s - tester->gt_region_end[gt_idx];
+                            tester->file_mn_delay_seconds[file_id] += delay;
+                            if (delay > tester->file_mn_max_delay_seconds[file_id]) {
+                                tester->file_mn_max_delay_seconds[file_id] = delay;
+                            }
                             // printf("command correct, %f %f %f\n", curr_time_s, tester->gt_region_end[gt_idx], tester->file_mn_delay_seconds[file_id]);
                         } else {
                             // incorrect command
