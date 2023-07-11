@@ -156,7 +156,7 @@ void print_mn_report(skainet_perf_tester *tester)
             printf("File%d, trigger times: %d\n", i, tester->file_wn_det_times[i]);
             printf("File%d, required times: %d\n", i, tester->file_required_num_wake[i]);
             printf("File%d, truth times: %d\n", i, tester->file_gt_num_wake[i]);
-            printf("File%d, wn averaged delay: %f\n", i, tester->file_wn_delay_seconds[i] / tester->file_wn_det_times[i]);
+            printf("File%d, wn averaged delay: %f\n", i, tester->file_wn_delay_seconds[i] / (tester->file_wn_det_times[i] + 0.01));
             wn_det += tester->file_wn_det_times[i];
             wn_required += tester->file_required_num_wake[i];
             wn_gt += tester->file_gt_num_wake[i];
@@ -167,7 +167,7 @@ void print_mn_report(skainet_perf_tester *tester)
             printf("File%d, missed commands: %d\n", i, tester->file_mn_miss_times[i]);
             printf("File%d, required correct: %d\n", i, tester->file_required_num_cmd[i]);
             printf("File%d, truth commands: %d\n", i, tester->file_gt_num_cmd[i]);
-            printf("File%d, mn averaged delay: %f\n", i, tester->file_mn_delay_seconds[i] / tester->file_mn_correct_times[i]);
+            printf("File%d, mn averaged delay: %f\n", i, tester->file_mn_delay_seconds[i] / (tester->file_mn_correct_times[i] + 0.01));
             mn_correct += tester->file_mn_correct_times[i];
             mn_miss += tester->file_mn_miss_times[i];
             mn_incorrect += tester->file_mn_incorrect_times[i];
