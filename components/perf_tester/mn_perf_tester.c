@@ -522,7 +522,7 @@ void detect_task(void *arg)
 
 void add_test_commands(void *arg)
 {
-    printf("Clear pre-defined command list and create one for perf_tester.");
+    printf("Clear pre-defined command list and create one for perf_tester.\n");
     esp_mn_commands_clear();
     skainet_perf_tester *tester = arg;
     if (strcmp(tester->multinet->get_language(tester->mn_data), ESP_MN_ENGLISH) == 0) {
@@ -628,7 +628,7 @@ void offline_mn_tester(const char *csv_file,
     tester->file_wn_det_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_wn_miss_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_wn_delay_seconds = calloc(tester->max_file_num, sizeof(float));
-    tester->file_mn_max_delay_seconds = calloc(tester->max_file_num, sizeof(float));
+    tester->file_wn_max_delay_seconds = calloc(tester->max_file_num, sizeof(float));
 
     tester->file_mn_correct_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_mn_incorrect_times = calloc(tester->max_file_num, sizeof(int));
