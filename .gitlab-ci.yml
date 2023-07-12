@@ -177,6 +177,7 @@ test_multinet:
     TEST_FOLDER: './test/multinet'
     TEST_ENV: 'korvo-2'
     IDF_VERSION: "5.0"
+  timeout: 72 hour
 
 push_to_github:
   stage: deploy
