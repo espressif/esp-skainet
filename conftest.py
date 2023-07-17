@@ -55,6 +55,16 @@ def config(request: FixtureRequest) -> str:
     config_marker = list(request.node.iter_markers(name='config'))
     return config_marker[0].args[0] if config_marker else 'default'
 
+@pytest.fixture
+@multi_dut_argument
+def noise(request: FixtureRequest) -> str:
+    return request.config.getoption("--noise")
+
+@pytest.fixture
+@multi_dut_argument
+def snr(request: FixtureRequest) -> str:
+    return request.config.getoption("--snr")
+
 
 @pytest.fixture
 @multi_dut_argument
@@ -148,6 +158,18 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         '--env',
         help='only run tests matching the environment NAME.',
     )
+    base_group.addoption(
+        '--config',
+        help='only run tests matching the config NAME.',
+    )
+    base_group.addoption(
+        '--noise',
+        help='only run tests matching the noise NAME.',
+    )
+    base_group.addoption(
+        '--snr',
+        help='only run tests with the snr dB.',
+    )
 
 
 def pytest_configure(config: Config) -> None:
@@ -165,6 +187,9 @@ def pytest_configure(config: Config) -> None:
     config.stash[_idf_pytest_embedded_key] = IdfPytestEmbedded(
         target=target,
         env_name=config.getoption('env'),
+        config=config.getoption('config'),
+        noise=config.getoption('noise'),
+        snr=config.getoption('snr'),
     )
     config.pluginmanager.register(config.stash[_idf_pytest_embedded_key])
 
@@ -181,10 +206,16 @@ class IdfPytestEmbedded:
         self,
         target: Optional[str] = None,
         env_name: Optional[str] = None,
+        config: Optional[str] = None,
+        noise: Optional[str] = None,
+        snr: Optional[str] = None,
     ):
         # CLI options to filter the test cases
         self.target = target
         self.env_name = env_name
+        self.config = config
+        self.noise = noise
+        self.snr = snr
 
         self._failed_cases: List[
             Tuple[str, bool, bool]
@@ -213,3 +244,15 @@ class IdfPytestEmbedded:
         if self.env_name:
             def item_envs(item): return [m.args[0] for m in item.iter_markers(name='env')]
             items[:] = [item for item in items if self.env_name in item_envs(item)]
+        
+        if self.config:
+            def item_config(item): return [m.args[0] for m in item.iter_markers(name='config')]
+            items[:] = [item for item in items if self.config in item_config(item)]
+        
+        # if self.noise:
+        #     def item_noise(item): return [m.args[0] for m in item.iter_markers(name='noise')]
+        #     items[:] = [item for item in items if self.noise in item_noise(item)]
+        
+        # if self.snr:
+        #     def item_snr(item): return [m.args[0] for m in item.iter_markers(name='snr')]
+        #     items[:] = [item for item in items if self.snr in item_snr(item)]
