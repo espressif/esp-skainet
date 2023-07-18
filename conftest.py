@@ -52,8 +52,7 @@ def session_tempdir() -> str:
 @pytest.fixture
 @multi_dut_argument
 def config(request: FixtureRequest) -> str:
-    config_marker = list(request.node.iter_markers(name='config'))
-    return config_marker[0].args[0] if config_marker else 'default'
+    return request.config.getoption("--config")
 
 @pytest.fixture
 @multi_dut_argument
@@ -226,6 +225,12 @@ class IdfPytestEmbedded:
         if self.target:
             self.target = self.target.lower()
             session.config.option.target = self.target
+    
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_sessionstart(self, session: Session) -> None:
+        if self.config:
+            self.config = self.config.lower()
+            session.config.option.config = self.config
 
     # @pytest.hookimpl(tryfirst=True)
     def pytest_collection_modifyitems(self, items: List[Function]) -> None:
@@ -246,13 +251,6 @@ class IdfPytestEmbedded:
             items[:] = [item for item in items if self.env_name in item_envs(item)]
         
         if self.config:
-            def item_config(item): return [m.args[0] for m in item.iter_markers(name='config')]
-            items[:] = [item for item in items if self.config in item_config(item)]
+            def item_configs(item): return [m.args[0] for m in item.iter_markers(name='config')]
+            items[:] = [item for item in items if self.config in item_configs(item)]
         
-        # if self.noise:
-        #     def item_noise(item): return [m.args[0] for m in item.iter_markers(name='noise')]
-        #     items[:] = [item for item in items if self.noise in item_noise(item)]
-        
-        # if self.snr:
-        #     def item_snr(item): return [m.args[0] for m in item.iter_markers(name='snr')]
-        #     items[:] = [item for item in items if self.snr in item_snr(item)]
