@@ -138,5 +138,5 @@ bool check_snr(const char *filename, const char *snr)
             return true;
         }
     }
-    return true;
+    return false;
 }

@@ -95,7 +95,7 @@ before_script:
     TEST_FOLDER: './test'
     TEST_ENV: 'korvo-2'
   script:
-    - pytest ${TEST_FOLDER} --target ${TEST_TARGET} --env ${TEST_ENV} --config {MODEL} --noise {NOISE} --snr {SNR} --junitxml=XUNIT_RESULT.xml
+    - pytest ${TEST_FOLDER} --target ${TEST_TARGET} --env ${TEST_ENV} --config ${MODEL} --noise ${NOISE} --snr ${SNR} --junitxml=XUNIT_RESULT.xml
 
 .if-protected: &if-protected
   if: '($CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_BRANCH =~ /^release\/v/ || $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?($|-)/)'
@@ -118,10 +118,6 @@ build_idf_v5.0:
   extends: .build_examples_template
   image: espressif/idf:release-v5.0
 
-build_all_tests:
-  extends: .build_test_template
-  image: espressif/idf:release-v5.0
-
 # Rules to trigger wakenet test
 .rules:test:test_wakenet:
   rules:
@@ -129,12 +125,20 @@ build_all_tests:
       changes: *patterns-test_wakenet
     - <<: *if-wakenet_test
 
+build_wakenet_test:
+  extends: 
+    - .build_test_template
+    - .rules:test:test_wakenet
+  image: espressif/idf:release-v5.0
+  variables:
+    EXAMPLES_PATH: "test/wakenet"
+
 test_wakenet:
   extends:
     - .pytest_template
     - .rules:test:test_wakenet
   needs:
-    - job: "build_all_tests"
+    - job: "build_wakenet_test"
       artifacts: true
       optional: true
   tags:
@@ -168,12 +172,20 @@ test_wakenet:
       changes: *patterns-test_multinet
     - <<: *if-multinet_test
 
+build_multinet_test:
+  extends: 
+    - .build_test_template
+    - .rules:test:test_multinet
+  image: espressif/idf:release-v5.0
+  variables:
+    EXAMPLES_PATH: "test/multinet"
+
 test_multinet:
   extends:
     - .pytest_template
     - .rules:test:test_multinet
   needs:
-    - job: "build_all_tests"
+    - job: "build_multinet_test"
       artifacts: true
       optional: true
   tags:
