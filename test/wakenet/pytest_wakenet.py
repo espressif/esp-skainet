@@ -23,14 +23,9 @@ def save_report(results):
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
 @pytest.mark.timeout(60000)
-@pytest.mark.parametrize(
-    'config',
-    [
-        'hilexin',
-        'hiesp',
-    ],
-)
-def test_wakenet(dut: Dut)-> None:
+@pytest.mark.config('hiesp')
+@pytest.mark.config('hilexin')
+def test_wakenet(config, noise, snr, dut: Dut)-> None:
 
     def match_log(pattern, timeout=18000):
         str = dut.expect(pattern, timeout=timeout).group(1).decode()
@@ -39,7 +34,12 @@ def test_wakenet(dut: Dut)-> None:
     def match_log_int(pattern, timeout=18000):
         num = match_log(pattern, timeout)
         return int(num)
-
+    
+    dut.expect('perf_tester>', timeout=20)
+    mode = 'norm'
+    dut.write('config {} {} {}'.format(mode, noise, snr))
+    dut.expect('mode:{}, noise:{}, snr:{}'.format(mode, noise, snr), timeout=20)
+    dut.write('start')
     timeout = 36000
     results = {}
     basedir = os.path.dirname(dut.logfile)
@@ -84,3 +84,4 @@ def test_wakenet(dut: Dut)-> None:
 
     save_report(results)
     dut.expect('TEST DONE', timeout=timeout)
+    dut.write('\x03')

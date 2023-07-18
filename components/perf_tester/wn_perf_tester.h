@@ -6,7 +6,7 @@
 #include "esp_afe_sr_models.h"
 #include "esp_wn_iface.h"
 #include "esp_wn_models.h"
-
+#include "perf_tester_cmd.h"
 
 typedef enum {
     TESTER_PCM_3CH = 0,        // input 3 channel PCM [mic1, mic2, ref, ...]
@@ -24,9 +24,11 @@ typedef enum {
  * @param afe_handle     Handle of speech front end
  * @param afe_config     Config of afe handle
  * @param audio_type     Input audio type, 0: 3channel-PCM; 1: 3channel-WAV
+ * @param tester_config  Perf tester config
  */
 void offline_wn_tester(const char *csv_file,
                        const char *log_file,
                        const esp_afe_sr_iface_t *afe_handle,
                        afe_config_t *afe_config,
-                       int audio_type);
+                       int audio_type,
+                       perf_tester_config_t *config);
