@@ -28,7 +28,7 @@ def save_report(results):
 @pytest.mark.config('hilexin_mn6_cn')
 @pytest.mark.config('hilexin_mn6_cn_ac')
 
-def test_multinet(config, noise, snr, dut: Dut)-> None:
+def test_multinet6(config, noise, snr, dut: Dut)-> None:
 
     def match_log(pattern, timeout=18000):
         str = dut.expect(pattern, timeout=timeout).group(1).decode()

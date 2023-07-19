@@ -203,7 +203,6 @@ test_multinet6:
       - MODEL: ["hiesp_mn6_en", "hilexin_mn6_cn", "hilexin_mn6_cn_ac"]
         NOISE: ["pink", "pub", "none"]
         SNR: ["5", "10"]
-  timeout: 72 hour
 
 push_to_github:
   stage: deploy
