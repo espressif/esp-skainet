@@ -126,7 +126,7 @@ build_idf_v5.0:
     - <<: *if-wakenet_test
 
 build_wakenet_test:
-  extends: 
+  extends:
     - .build_test_template
     - .rules:test:test_wakenet
   image: espressif/idf:release-v5.0
@@ -155,35 +155,37 @@ test_wakenet:
         NOISE: ["pink", "pub"]
         SNR: ["0", "5"]
 
-.patterns-test_multinet: &patterns-test_multinet
+.patterns-test_multinet6: &patterns-test_multinet6
   - "components/esp-sr/lib/**/*"
   - "components/esp-sr/include/**/*"
   - "components/esp-sr/src/**/*"
-  - "components/esp-sr/model/multinet_model/**/*"
-  - "test/multinet/**/*"
+  - "components/esp-sr/model/multinet_model/mn6*/*"
+  - "test/multinet/main/*"
+  - "test/multinet/pytest_multinet6.py"
+  - "test/multinet/*mn6*"
 
-.if-multinet_test: &if-multinet_test
-  if: '($CI_COMMIT_BRANCH =~ /^test\/mn/)'
+.if-multinet_test6: &if-multinet_test6
+  if: '($CI_COMMIT_BRANCH =~ /^test\/mn6/)'
 
 # Rules to trigger multinet test
-.rules:test:test_multinet:
+.rules:test:test_multinet6:
   rules:
     - <<: *if-protected
-      changes: *patterns-test_multinet
-    - <<: *if-multinet_test
+      changes: *patterns-test_multinet6
+    - <<: *if-multinet_test6
 
 build_multinet_test:
-  extends: 
+  extends:
     - .build_test_template
     - .rules:test:test_multinet
   image: espressif/idf:release-v5.0
   variables:
     EXAMPLES_PATH: "test/multinet"
 
-test_multinet:
+test_multinet6:
   extends:
     - .pytest_template
-    - .rules:test:test_multinet
+    - .rules:test:test_multinet6
   needs:
     - job: "build_multinet_test"
       artifacts: true
@@ -193,9 +195,14 @@ test_multinet:
   image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
   variables:
     TEST_TARGET: 'esp32s3'
-    TEST_FOLDER: './test/multinet'
+    TEST_FOLDER: './test/multinet/pytest_multinet6.py'
     TEST_ENV: 'korvo-2'
     IDF_VERSION: "5.0"
+  parallel:
+    matrix:
+      - MODEL: ["hiesp_mn6_en", "hilexin_mn6_cn", "hilexin_mn6_cn_ac"]
+        NOISE: ["pink", "pub", "none"]
+        SNR: ["5", "10"]
   timeout: 72 hour
 
 push_to_github:

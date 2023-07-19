@@ -8,6 +8,7 @@
 #include "esp_wn_models.h"
 #include "esp_mn_iface.h"
 #include "esp_mn_models.h"
+#include "perf_tester_cmd.h"
 
 
 typedef enum {
@@ -28,6 +29,7 @@ typedef enum {
  * @param multinet       Handle of multinet
  * @param mn_coeff       Model name of multinet
  * @param audio_type     Input audio type, 0: 3channel-PCM; 1: 3channel-WAV
+ * @param tester_config  Perf tester config
  */
 void offline_mn_tester(const char *csv_file,
                        const char *log_file,
@@ -35,4 +37,5 @@ void offline_mn_tester(const char *csv_file,
                        afe_config_t *afe_config,
                        esp_mn_iface_t *multinet,
                        char *mn_coeff,
-                       int audio_type);
+                       int audio_type,
+                       perf_tester_config_t *config);
