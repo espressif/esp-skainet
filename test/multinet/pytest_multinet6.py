@@ -56,8 +56,8 @@ def test_multinet(config, noise, snr, dut: Dut)-> None:
 
     # Get the number of test file
     file_num_pattern = re.compile(rb'Number of files: (\d+)')
-    file_num = match_log_int(file_num_pattern, 50)
-    dut.expect('Quantized MultiNet6:', timeout=100)
+    file_num = match_log_int(file_num_pattern, 20)
+    dut.expect('Quantized MultiNet6:', timeout=50)
     results["file_num"] = file_num
 
     # Get the trigger times and memory siize
