@@ -228,15 +228,12 @@ int read_csv_file(skainet_perf_tester *tester)
     }
     char csv_line[512];
     char *token = NULL;
+    char *rest = NULL;
     fgets(csv_line, 512, fp);  //skip csv header
     while (fgets(csv_line, 512, fp) != NULL && tester->file_num < tester->max_file_num) {
-        token = strtok(csv_line, ",");
+        token = strtok_r(csv_line, ",", &rest);
         memset(tester->file_list[tester->file_num], 0, FATFS_PATH_LENGTH_MAX);
         memcpy(tester->file_list[tester->file_num], token, strlen(token));
-
-        token = strtok(NULL, ",");
-        memset(tester->gt_file_list[tester->file_num], 0, FATFS_PATH_LENGTH_MAX);
-        memcpy(tester->gt_file_list[tester->file_num], token, strlen(token));
 
         printf("%s\n", token);
 
@@ -246,16 +243,20 @@ int read_csv_file(skainet_perf_tester *tester)
         }
         printf("input:%s\n", tester->file_list[tester->file_num]);
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
+        memset(tester->gt_file_list[tester->file_num], 0, FATFS_PATH_LENGTH_MAX);
+        memcpy(tester->gt_file_list[tester->file_num], token, strlen(token));
+
+        token = strtok_r(NULL, ",", &rest);
         tester->file_gt_num_wake[tester->file_num] = atoi(token);
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
         tester->file_required_num_wake[tester->file_num] = atoi(token);
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
         tester->file_gt_num_cmd[tester->file_num] = atoi(token);
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
         tester->file_required_num_cmd[tester->file_num] = atoi(token);
 
         printf("file %d, gt file %s, number of wake words %d, number of commands %d\n",

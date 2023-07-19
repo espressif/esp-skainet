@@ -64,7 +64,7 @@ void register_perf_tester_start_cmd(esp_console_cmd_func_t start_func)
     ESP_ERROR_CHECK(esp_console_cmd_register(&start_cmd));
 }
 
-perf_tester_config_t* get_perf_tester_config(void) 
+perf_tester_config_t* get_perf_tester_config(void)
 {
     if (config == NULL) {
         config = (perf_tester_config_t*) malloc(sizeof(perf_tester_config_t));
@@ -108,7 +108,7 @@ bool check_snr(const char *filename, const char *snr)
         return true;
     } else if (strcmp(snr, "None") == 0 || strcmp(snr, "none") == 0) {
         return true;
-    } 
+    }
     int snr_num = atoi(snr);
     if (snr_num < -30 || snr_num > 30) {
         return false;
@@ -117,7 +117,9 @@ bool check_snr(const char *filename, const char *snr)
     char name_copy[256];
     char num_copy[128];
     strcpy(name_copy, filename);
-    char *token = strtok(name_copy, "_");
+
+    char *rest = NULL;
+    char *token = strtok_r(name_copy, "_", &rest);
     int db_num[2];
     int index = 0;
 
@@ -130,7 +132,7 @@ bool check_snr(const char *filename, const char *snr)
             db_num[index] = atoi(num_copy);
             index ++;
         }
-        token = strtok(NULL, "_");
+        token = strtok_r(NULL, "_", &rest);
     }
     if (index == 2) {
         int file_snr = db_num[0] - db_num[1];
