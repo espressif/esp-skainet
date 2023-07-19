@@ -71,7 +71,6 @@ typedef struct {
     int64_t processed_sample_num;    // number of processed samples
     tester_audio_t audio_type;
 
-    int fast_test;       // test only first 100 wake words
     int force_reset;     // manually reset multinet before each command starts
     int test_done;
 
@@ -374,10 +373,6 @@ void wav_feed_task(void *arg)
         int size = i2s_buffer_size;
 
         while (1) {
-            if (tester->fast_test && out_samples >= 28800000) {
-                printf("fast test is enabled, process the first 30 min only.\n");
-                break;
-            }
             size = wav_decoder_run(wav_decoder, (unsigned char *)i2s_buffer, i2s_buffer_size);
             out_samples += frame_size;
 
@@ -395,25 +390,6 @@ void wav_feed_task(void *arg)
         }
 
         tester->wave_time += out_samples;
-
-        printf("File%d: %s\n", i, tester->file_list[i]);
-        printf("File%d, trigger times: %d\n", i, tester->file_wn_det_times[i]);
-        printf("File%d, required times: %d\n", i, tester->file_required_num_wake[i]);
-        printf("File%d, truth times: %d\n", i, tester->file_gt_num_wake[i]);
-        printf("File%d, wn averaged delay: %f\n", i, tester->file_wn_delay_seconds[i] / (tester->file_wn_det_times[i] + 0.01));
-        printf("File%d, wn max delay: %f\n", i, tester->file_wn_max_delay_seconds[i]);
-
-        printf("File%d, correct commands: %d\n", i, tester->file_mn_correct_times[i]);
-        printf("File%d, incorrect commands: %d\n", i, tester->file_mn_incorrect_times[i]);
-        printf("File%d, missed commands: %d\n", i, tester->file_mn_miss_times[i]);
-        printf("file%d, missed commands caused by wn: %d\n", i, tester->file_mn_miss_by_wn_times[i]);
-        printf("file%d, missed commands caused by early time out: %d\n", i, tester->file_mn_miss_by_early_timeout_times[i]);
-        printf("File%d, timeout times: %d\n", i, tester->file_mn_timeout_times[i]);
-        printf("File%d, early timeout times: %d\n", i, tester->file_mn_early_timeout_times[i]);
-        printf("File%d, required correct: %d\n", i, tester->file_required_num_cmd[i]);
-        printf("File%d, truth commands: %d\n", i, tester->file_gt_num_cmd[i]);
-        printf("File%d, mn averaged delay: %f\n", i, tester->file_mn_delay_seconds[i] / (tester->file_mn_correct_times[i] + 0.01));
-        printf("File%d, mn max delay: %f\n", i, tester->file_mn_max_delay_seconds[i]);
     }
 
     tester->test_done = 1;
@@ -633,8 +609,6 @@ void detect_task(void *arg)
             woke_up = 0;
             early_timeout = 0;
 
-            // tester->afe_handle->reset_buffer(tester->afe_data);
-
         } else if (tester->test_done) {
             // finish up last region of current file first
             if (current_region_detected == 0) {
@@ -807,12 +781,10 @@ void offline_mn_tester(const char *csv_file,
     tester->gt_region_end = NULL;
     tester->gt_region_boundary = NULL;
 
-    // sdcard_scan(tester, test_path, audio_type);
     tester->csv_file = (char *)csv_file;
     read_csv_file(tester);
     tester->log_file = (char *) log_file;
 
-    tester->fast_test = 0;
     tester->force_reset = 1;
     tester->test_done = 0;
 
