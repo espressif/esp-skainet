@@ -22,7 +22,7 @@ def save_report(results):
 
 
 @pytest.mark.target('esp32s3')
-@pytest.mark.env('korvo-1')
+@pytest.mark.env('korvo-2')
 @pytest.mark.timeout(360000)
 @pytest.mark.config('hiesp_mn6_en')
 @pytest.mark.config('hilexin_mn6_cn')
