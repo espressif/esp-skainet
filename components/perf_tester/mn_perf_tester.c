@@ -322,7 +322,6 @@ void wav_feed_task(void *arg)
     esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
     esp_afe_sr_data_t *afe_data = tester->afe_data;
     void *wav_decoder = NULL;
-    // printf("create speech enhancement task\n");
     int sample_rate = tester->sample_rate;
     int frame_size = tester->frame_size;
     int nch = tester->nch;
@@ -786,7 +785,7 @@ void offline_mn_tester(const char *csv_file,
     read_csv_file(tester);
     tester->log_file = (char *) log_file;
 
-    tester->force_reset = 1;
+    tester->force_reset = 0;
     tester->test_done = 0;
 
     // init AFE
@@ -797,11 +796,6 @@ void offline_mn_tester(const char *csv_file,
     tester->frame_size = afe_handle->get_feed_chunksize(tester->afe_data);
     tester->sample_rate = afe_handle->get_samp_rate(tester->afe_data);
     tester->nch = afe_handle->get_channel_num(tester->afe_data);
-    // // aec and se disabled for now because
-    // // they contain cache that will cause the results of two exact same files to be different
-    // printf("disable aec and se\n");
-    // tester->afe_handle->disable_aec(tester->afe_data);
-    // tester->afe_handle->disable_se(tester->afe_data);
 
     // the memory before MN init
     m1 = heap_caps_get_free_size(MALLOC_CAP_8BIT);
