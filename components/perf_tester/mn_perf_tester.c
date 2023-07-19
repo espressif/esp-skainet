@@ -826,9 +826,9 @@ void offline_mn_tester(const char *csv_file,
     tester->nch = afe_handle->get_channel_num(tester->afe_data);
     // // aec and se disabled for now because
     // // they contain cache that will cause the results of two exact same files to be different
-    printf("disable aec and se\n");
-    tester->afe_handle->disable_aec(tester->afe_data);
-    tester->afe_handle->disable_se(tester->afe_data);
+    // printf("disable aec and se\n");
+    // tester->afe_handle->disable_aec(tester->afe_data);
+    // tester->afe_handle->disable_se(tester->afe_data);
 
     // the memory before MN init
     m1 = heap_caps_get_free_size(MALLOC_CAP_8BIT);
