@@ -47,7 +47,7 @@ void app_main()
     // Register cmd
     esp_console_register_help_command();
     register_perf_tester_config_cmd();
-    register_perf_tester_start_cmd(&start_wakenet_test);
+    register_perf_tester_start_cmd(&start_multinet_test);
 
     // Start console repl
     ESP_ERROR_CHECK(esp_console_start_repl(repl));

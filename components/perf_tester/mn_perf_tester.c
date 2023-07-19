@@ -855,7 +855,7 @@ void offline_mn_tester(const char *csv_file,
     tester->mn_running_time = 0;
 
     if (tester->file_num == 0) {
-        print_wn_report(tester);
+        print_mn_report(tester);
         return ;
     }
 
