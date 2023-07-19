@@ -114,28 +114,29 @@ int read_csv_file(skainet_perf_tester *tester)
         return tester->file_num;
     }
     char csv_line[512];
+    char *rest = NULL;
     char *token = NULL;
     fgets(csv_line, 512, fp);  //skip csv header
     while (fgets(csv_line, 512, fp) != NULL && tester->file_num < tester->max_file_num) {
-        token = strtok(csv_line, ",");
+        token = strtok_r(csv_line, ",", &rest);
         memset(tester->file_list[tester->file_num], 0, FATFS_PATH_LENGTH_MAX);
         memcpy(tester->file_list[tester->file_num], token, strlen(token));
         printf("%s\n", token);
 
-        if (!check_noise(tester->file_list[tester->file_num], tester->config->noise) || 
+        if (!check_noise(tester->file_list[tester->file_num], tester->config->noise) ||
             !check_snr(tester->file_list[tester->file_num], tester->config->snr)) {
             continue;
         }
         printf("input:%s\n", tester->file_list[tester->file_num]);
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
         if (token != NULL) {
             tester->csv_col2[tester->file_num] = atoi(token);
         } else {
             tester->csv_col2[tester->file_num] = 0;
         }
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
         if (token != NULL) {
             tester->csv_col3[tester->file_num] = atoi(token);
         } else {

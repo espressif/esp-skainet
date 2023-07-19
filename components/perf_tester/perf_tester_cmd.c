@@ -117,7 +117,6 @@ bool check_snr(const char *filename, const char *snr)
     char name_copy[256];
     char num_copy[128];
     strcpy(name_copy, filename);
-
     char *rest = NULL;
     char *token = strtok_r(name_copy, "_", &rest);
     int db_num[2];
