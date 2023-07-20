@@ -24,15 +24,11 @@ def save_report(results):
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
 @pytest.mark.timeout(360000)
-@pytest.mark.parametrize(
-    'config',
-    [
-        'hiesp_mn6_en',
-        'hilexin_mn6_cn',
-        'hilexin_mn6_cn_ac',
-    ],
-)
-def test_multinet(dut: Dut)-> None:
+@pytest.mark.config('hiesp_mn6_en')
+@pytest.mark.config('hilexin_mn6_cn')
+@pytest.mark.config('hilexin_mn6_cn_ac')
+
+def test_multinet6(config, noise, snr, dut: Dut)-> None:
 
     def match_log(pattern, timeout=18000):
         str = dut.expect(pattern, timeout=timeout).group(1).decode()
@@ -45,6 +41,12 @@ def test_multinet(dut: Dut)-> None:
     def match_log_float(pattern, timeout=18000):
         num = match_log(pattern, timeout)
         return float(num)
+
+    dut.expect('perf_tester>', timeout=20)
+    mode = 'norm'
+    dut.write('config {} {} {}'.format(mode, noise, snr))
+    dut.expect('mode:{}, noise:{}, snr:{}'.format(mode, noise, snr), timeout=20)
+    dut.write('start')
 
     timeout = 108000
     results = {}
@@ -117,3 +119,4 @@ def test_multinet(dut: Dut)-> None:
 
     save_report(results)
     dut.expect('TEST DONE', timeout=timeout)
+    dut.write('\x03')

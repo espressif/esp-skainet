@@ -4,11 +4,9 @@
 #include "esp_mn_speech_commands.h"
 #include "esp_process_sdkconfig.h"
 
-void app_main()
+static int start_multinet_test(int argc, char **argv)
 {
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
-    ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
-    heap_caps_print_heap_info(MALLOC_CAP_8BIT);
+    printf("Start to test MultiNet:\n");
 
     srmodel_list_t *models = esp_srmodel_init("model");
     char *wn_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);
@@ -27,6 +25,30 @@ void app_main()
     // Multinet
     esp_mn_iface_t *multinet = esp_mn_handle_from_name(mn_name);
 
+    perf_tester_config_t *tester_config = get_perf_tester_config();
     offline_mn_tester(csv_file, log_file, &ESP_AFE_SR_HANDLE, &afe_config,
-                      multinet, mn_name, TESTER_WAV_3CH);
+                      multinet, mn_name, TESTER_WAV_3CH, tester_config);
+    return 0;
+}
+
+void app_main()
+{
+    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
+    heap_caps_print_heap_info(MALLOC_CAP_8BIT);
+
+    // Init console repl
+    esp_console_repl_t *repl = NULL;
+    esp_console_repl_config_t repl_config = ESP_CONSOLE_REPL_CONFIG_DEFAULT();
+    repl_config.prompt = "perf_tester>";
+    esp_console_dev_uart_config_t uart_config = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_console_new_repl_uart(&uart_config, &repl_config, &repl));
+
+    // Register cmd
+    esp_console_register_help_command();
+    register_perf_tester_config_cmd();
+    register_perf_tester_start_cmd(&start_multinet_test);
+
+    // Start console repl
+    ESP_ERROR_CHECK(esp_console_start_repl(repl));
 }
