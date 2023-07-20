@@ -39,6 +39,8 @@ typedef struct {
     tester_audio_t audio_type;
     int test_done;
 
+    perf_tester_config_t *config;
+
 } skainet_perf_tester;
 
 
@@ -112,20 +114,29 @@ int read_csv_file(skainet_perf_tester *tester)
         return tester->file_num;
     }
     char csv_line[512];
+    char *rest = NULL;
     char *token = NULL;
     fgets(csv_line, 512, fp);  //skip csv header
     while (fgets(csv_line, 512, fp) != NULL && tester->file_num < tester->max_file_num) {
-        token = strtok(csv_line, ",");
+        token = strtok_r(csv_line, ",", &rest);
         memset(tester->file_list[tester->file_num], 0, FATFS_PATH_LENGTH_MAX);
         memcpy(tester->file_list[tester->file_num], token, strlen(token));
-        token = strtok(NULL, ",");
+        printf("%s\n", token);
+
+        if (!check_noise(tester->file_list[tester->file_num], tester->config->noise) ||
+            !check_snr(tester->file_list[tester->file_num], tester->config->snr)) {
+            continue;
+        }
+        printf("input:%s\n", tester->file_list[tester->file_num]);
+
+        token = strtok_r(NULL, ",", &rest);
         if (token != NULL) {
             tester->csv_col2[tester->file_num] = atoi(token);
         } else {
             tester->csv_col2[tester->file_num] = 0;
         }
 
-        token = strtok(NULL, ",");
+        token = strtok_r(NULL, ",", &rest);
         if (token != NULL) {
             tester->csv_col3[tester->file_num] = atoi(token);
         } else {
@@ -293,9 +304,11 @@ void offline_wn_tester(const char *csv_file,
                        const char *log_file,
                        const esp_afe_sr_iface_t *afe_handle,
                        afe_config_t *afe_config,
-                       int audio_type)
+                       int audio_type,
+                       perf_tester_config_t *config)
 {
     skainet_perf_tester *tester = malloc(sizeof(skainet_perf_tester));
+    tester->config = config;
     // ringbuffer init
     tester->tester_mem_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
     tester->tester_sram_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
@@ -344,6 +357,10 @@ void offline_wn_tester(const char *csv_file,
     // running time init
     tester->wave_time = 0;
     tester->running_time = 0;
+    if (tester->file_num == 0) {
+        print_wn_report(tester);
+        return ;
+    }
 
     // printf("The memory info after init:\n");
     if (audio_type == TESTER_WAV_3CH) {

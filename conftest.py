@@ -52,8 +52,17 @@ def session_tempdir() -> str:
 @pytest.fixture
 @multi_dut_argument
 def config(request: FixtureRequest) -> str:
-    config_marker = list(request.node.iter_markers(name='config'))
-    return config_marker[0].args[0] if config_marker else 'default'
+    return request.config.getoption("--config")
+
+@pytest.fixture
+@multi_dut_argument
+def noise(request: FixtureRequest) -> str:
+    return request.config.getoption("--noise")
+
+@pytest.fixture
+@multi_dut_argument
+def snr(request: FixtureRequest) -> str:
+    return request.config.getoption("--snr")
 
 
 @pytest.fixture
@@ -148,6 +157,18 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         '--env',
         help='only run tests matching the environment NAME.',
     )
+    base_group.addoption(
+        '--config',
+        help='only run tests matching the config NAME.',
+    )
+    base_group.addoption(
+        '--noise',
+        help='only run tests matching the noise NAME.',
+    )
+    base_group.addoption(
+        '--snr',
+        help='only run tests with the snr dB.',
+    )
 
 
 def pytest_configure(config: Config) -> None:
@@ -165,6 +186,9 @@ def pytest_configure(config: Config) -> None:
     config.stash[_idf_pytest_embedded_key] = IdfPytestEmbedded(
         target=target,
         env_name=config.getoption('env'),
+        config=config.getoption('config'),
+        noise=config.getoption('noise'),
+        snr=config.getoption('snr'),
     )
     config.pluginmanager.register(config.stash[_idf_pytest_embedded_key])
 
@@ -181,10 +205,16 @@ class IdfPytestEmbedded:
         self,
         target: Optional[str] = None,
         env_name: Optional[str] = None,
+        config: Optional[str] = None,
+        noise: Optional[str] = None,
+        snr: Optional[str] = None,
     ):
         # CLI options to filter the test cases
         self.target = target
         self.env_name = env_name
+        self.config = config
+        self.noise = noise
+        self.snr = snr
 
         self._failed_cases: List[
             Tuple[str, bool, bool]
@@ -195,6 +225,12 @@ class IdfPytestEmbedded:
         if self.target:
             self.target = self.target.lower()
             session.config.option.target = self.target
+    
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_sessionstart(self, session: Session) -> None:
+        if self.config:
+            self.config = self.config.lower()
+            session.config.option.config = self.config
 
     # @pytest.hookimpl(tryfirst=True)
     def pytest_collection_modifyitems(self, items: List[Function]) -> None:
@@ -213,3 +249,8 @@ class IdfPytestEmbedded:
         if self.env_name:
             def item_envs(item): return [m.args[0] for m in item.iter_markers(name='env')]
             items[:] = [item for item in items if self.env_name in item_envs(item)]
+        
+        if self.config:
+            def item_configs(item): return [m.args[0] for m in item.iter_markers(name='config')]
+            items[:] = [item for item in items if self.config in item_configs(item)]
+        

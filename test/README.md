@@ -20,7 +20,7 @@ build rules are determined in `esp-skainet/test/.build-relus.yml`. You can modif
 ```
 # test wakenet performance
 
-pytest ./test/wakenet --target esp32s3
+pytest ./test/wakenet --target esp32s3 --config hilexin --noise all|pink|pub|none --snr all|0|5
 ```
 The test report will be generated in `./pytest_log/`.
 

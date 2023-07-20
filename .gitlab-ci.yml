@@ -95,7 +95,7 @@ before_script:
     TEST_FOLDER: './test'
     TEST_ENV: 'korvo-2'
   script:
-    - pytest ${TEST_FOLDER} --target ${TEST_TARGET} --env ${TEST_ENV} --junitxml=XUNIT_RESULT.xml
+    - pytest ${TEST_FOLDER} --target ${TEST_TARGET} --env ${TEST_ENV} --config ${MODEL} --noise ${NOISE} --snr ${SNR} --junitxml=XUNIT_RESULT.xml
 
 .if-protected: &if-protected
   if: '($CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_BRANCH =~ /^release\/v/ || $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?($|-)/)'
@@ -107,6 +107,7 @@ before_script:
   - "components/esp-sr/lib/**/*"
   - "components/esp-sr/include/**/*"
   - "components/esp-sr/src/**/*"
+  - "components/esp-sr/model/wakenet_model/**/*"
   - "test/wakenet/**/*"
 
 build_idf_v4.4:
@@ -117,10 +118,6 @@ build_idf_v5.0:
   extends: .build_examples_template
   image: espressif/idf:release-v5.0
 
-build_all_tests:
-  extends: .build_test_template
-  image: espressif/idf:release-v5.0
-
 # Rules to trigger wakenet test
 .rules:test:test_wakenet:
   rules:
@@ -128,12 +125,20 @@ build_all_tests:
       changes: *patterns-test_wakenet
     - <<: *if-wakenet_test
 
+build_wakenet_test:
+  extends: 
+    - .build_test_template
+    - .rules:test:test_wakenet
+  image: espressif/idf:release-v5.0
+  variables:
+    EXAMPLES_PATH: "test/wakenet"
+
 test_wakenet:
   extends:
     - .pytest_template
     - .rules:test:test_wakenet
   needs:
-    - job: "build_all_tests"
+    - job: "build_wakenet_test"
       artifacts: true
       optional: true
   tags:
@@ -144,11 +149,17 @@ test_wakenet:
     TEST_FOLDER: './test/wakenet'
     TEST_ENV: 'korvo-2'
     IDF_VERSION: "5.0"
+  parallel:
+    matrix:
+      - MODEL: ["hilexin", "hiesp"]
+        NOISE: ["pink", "pub"]
+        SNR: ["0", "5"]
 
 .patterns-test_multinet: &patterns-test_multinet
   - "components/esp-sr/lib/**/*"
   - "components/esp-sr/include/**/*"
   - "components/esp-sr/src/**/*"
+  - "components/esp-sr/model/multinet_model/**/*"
   - "test/multinet/**/*"
 
 .if-multinet_test: &if-multinet_test
@@ -161,12 +172,20 @@ test_wakenet:
       changes: *patterns-test_multinet
     - <<: *if-multinet_test
 
+build_multinet_test:
+  extends: 
+    - .build_test_template
+    - .rules:test:test_multinet
+  image: espressif/idf:release-v5.0
+  variables:
+    EXAMPLES_PATH: "test/multinet"
+
 test_multinet:
   extends:
     - .pytest_template
     - .rules:test:test_multinet
   needs:
-    - job: "build_all_tests"
+    - job: "build_multinet_test"
       artifacts: true
       optional: true
   tags:
