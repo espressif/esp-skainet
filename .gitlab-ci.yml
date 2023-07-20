@@ -229,6 +229,10 @@ test_multinet6:
         SNR: ["5", "10"]
 
 test_multinet7:
+  extends:
+    - .pytest_template
+    - .pytest_multinet_template
+    - .rules:test:test_multinet7
   variables:
     TEST_FOLDER: './test/multinet/pytest_multinet7.py'
   parallel:
