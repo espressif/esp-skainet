@@ -162,13 +162,13 @@ test_wakenet:
   - "test/multinet/main/*"
 
 .patterns-test_multinet6: &patterns-test_multinet6
-  - <<: *patterns-test_multinet
+  - *patterns-test_multinet
   - "components/esp-sr/model/multinet_model/mn6*/*"
   - "test/multinet/pytest_multinet6.py"
   - "test/multinet/*mn6*"
 
 .patterns-test_multinet7: &patterns-test_multinet7
-  - <<: *patterns-test_multinet
+  - *patterns-test_multinet
   - "components/esp-sr/model/multinet_model/mn7*/*"
   - "test/multinet/pytest_multinet7.py"
   - "test/multinet/*mn7*"
