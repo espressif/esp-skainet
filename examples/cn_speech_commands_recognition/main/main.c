@@ -148,7 +148,7 @@ void detect_Task(void *arg)
 void app_main()
 {
     models = esp_srmodel_init("model");
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_08K_SAMPLES, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #if defined CONFIG_ESP32_KORVO_V1_1_BOARD
     led_init();
