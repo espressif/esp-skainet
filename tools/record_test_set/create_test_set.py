@@ -6,6 +6,7 @@ from fileinput import filename
 import os
 import time
 from pydub import AudioSegment
+from pydub.generators import Sine
 from playsound import playsound
 import csv
 import argparse
@@ -14,6 +15,9 @@ import pandas
 import shutil
 import serial
 from serial.tools import list_ports
+import numpy as np
+import scipy
+import fnmatch
 
 def get_serial_port_name(): 	# Get the name of the serial port the computer is using.
     plist = list(list_ports.comports())
@@ -28,6 +32,7 @@ def get_serial_port_name(): 	# Get the name of the serial port the computer is u
                 if "/dev/ttyUSB" in port: 	# Filter the port name.
                     out.append(port)
     return out
+
 
 class AudioTools(object):
     audio_play_count = 0
@@ -120,6 +125,53 @@ class AudioTools(object):
         new_file_path = os.path.join(dest_dir, new_file_name)
         print(f'new_file_path: {new_file_path}')
         stereo_sound.export(new_file_path, format="wav")
+    
+    @classmethod
+    def merge_clean_set(cls, clean_dir, out_dir, header=True, merge_num=200, sep_time=2):
+        """
+        This function will merge clean audio files into one file, and insert a 1KHz sin audio in front of audio.
+        """
+        os.makedirs(out_dir, exist_ok=True)
+        sep_audio = AudioSegment.silent(duration=sep_time*1000, frame_rate=16000)
+        if header:
+            sine_generator = Sine(1000)
+            sine_1khz = sine_generator.to_audio_segment(duration=320)
+        else:
+            sine_1khz = AudioSegment.empty()
+        
+        basename = os.path.basename(clean_dir)
+        # merge all clean audio file into one file
+        count = 0
+        file_data = []
+        merge_audio = sep_audio + sine_1khz + sep_audio
+        for root, _, files in os.walk(clean_dir):
+            for filename in files:
+                count += 1
+                src_file = os.path.join(root, filename)
+                src_audio = cls.read_audio_file(src_file)
+                if src_audio != None:
+                    start = len(merge_audio)
+                    end = start + len(src_audio)
+                    merge_audio += src_audio + sep_audio  # add the separator later on, then add the source file to the final result.
+                    file_data.append((filename, start, end))
+
+                if count % merge_num == 0:
+                    out_wav_file = os.path.join(out_dir, basename + "_merge_" + str(count) + ".wav")
+                    out_csv_file = os.path.join(out_dir, basename + "_merge_" + str(count) + ".csv")
+                    merge_audio.export(out_wav_file, format="wav")
+                    file_set = pandas.DataFrame(data=file_data,
+                                    columns=["wav_filename", "start", "end"])
+                    file_set.to_csv(out_csv_file, index=False)
+                    merge_audio = sep_audio + sine_1khz + sep_audio
+                    file_data = []
+
+        if len(file_data) > 0:
+            out_wav_file = os.path.join(out_dir, "merge_" + str(count) + ".wav")
+            out_csv_file = os.path.join(out_dir, "merge_" + str(count) + ".csv")
+            merge_audio.export(out_wav_file, format="wav")
+            file_set = pandas.DataFrame(data=file_data,
+                            columns=["wav_filename", "start", "end"])
+            file_set.to_csv(out_csv_file, index=False)
 
     #read and play audio file from input path one by one
     @classmethod
@@ -192,35 +244,43 @@ if __name__ == '__main__':
 
     #step1: audio SPL normalization
     clean_set = config["clean_set"]
-    noise_set = config["noise_set"]
     if clean_set["normalization"]:
         for src_path in clean_set["paths"]:
             AudioTools.audio_normalization(src_path, clean_set["target_dB"])
-
-    if noise_set["normalization"]:
-        for src_path in noise_set["paths"]:
-            AudioTools.audio_normalization(src_path, clean_set["target_dB"])
-
-    #step2: merge clean audio and noise audio to generate stereo audio
     output_set = config["output_set"]
-    if output_set["remove_old_files"]:
+    if output_set["overwrite"]:
         shutil.rmtree(output_set["path"], ignore_errors=True)
 
-    for clean_path in clean_set["paths"]:
-        for noise_path in noise_set["paths"]:
-            for snr in output_set["snr"]:
-                print(clean_path, noise_path, snr)
-                clean_gain = snr["clean_gain_dB"]
-                noise_gain = snr["clean_gain_dB"] - snr["snr_dB"]
-                AudioTools.merge_clean_and_noise(clean_path, noise_path, output_set["path"], clean_gain, noise_gain)
+    if "noise_set" in config:
+        # merge noise audio and clean audio
+        noise_set = config["noise_set"]
+        if noise_set["normalization"]:
+            for src_path in noise_set["paths"]:
+                AudioTools.audio_normalization(src_path, clean_set["target_dB"])
+
+        #step2: merge clean audio and noise audio to generate stereo audio
+        for clean_path in clean_set["paths"]:
+            for noise_path in noise_set["paths"]:
+                for snr in output_set["snr"]:
+                    print(clean_path, noise_path, snr)
+                    clean_gain = snr["clean_gain_dB"]
+                    noise_gain = snr["clean_gain_dB"] - snr["snr_dB"]
+                    AudioTools.merge_clean_and_noise(clean_path, noise_path, output_set["path"], clean_gain, noise_gain)
+    else:
+        if "header" in clean_set:
+            header = clean_set["header"]
+        for clean_path in clean_set["paths"]:
+            AudioTools.merge_clean_set(clean_path, output_set["path"], header=header)
+ 
 
     #step3: play merged audio one by one
-    player = config["player"]
+    if "player" in config:
+        player = config["player"]
 
-    if player["play_output"]:
-        AudioTools.audio_play(output_set["path"])
-    elif "path" in player:
-        AudioTools.audio_play(player["path"])
+        if player["play_output"]:
+            AudioTools.audio_play(output_set["path"])
+        elif "path" in player:
+            AudioTools.audio_play(player["path"])
 
 
 
