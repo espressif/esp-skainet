@@ -90,7 +90,7 @@ player:
   play_output: true
 
 ```
-The above configuration will generate 3(the number of noise set) * 3(the number of SNR) = 18 test files.
+The above configuration will generate 3(the number of noise set) * 3(the number of SNR) = 9 test files.
 
 ## 2. JSON file
 The JSON file referred in `config_mn.yml` needs to be generated beforehand, which should use the following format:
