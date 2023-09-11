@@ -38,35 +38,39 @@ class MNAudioTools(AudioTools):
         for item in filelist:
             src_audio = cls.read_audio_file(f"{wake_word_dir}/{item['wake_word_fname']}")
             if src_audio is not None:
-                rnd_sep_samples = item["wake_word_tailing_silence"]
+                rnd_sep_samples = item["wake_word_tailing_silence_ms"] / 16000
                 sep_audio = AudioSegment.silent(duration=rnd_sep_samples, frame_rate=16000)
                 clean_audio += src_audio + sep_audio
             else:
                 print(f"Failed reading {wake_word_dir}/{item['wake_word_fname']}")
                 continue
-            for cmd_item in item["commands"]:
+            between_cmd_samples = item["between_command_length_ms"] / 16000
+            between_cmd_audio = AudioSegment.silent(duration=between_cmd_samples, frame_rate=16000)
+            for i, cmd_item in enumerate(item["commands"]):
                 src_audio = cls.read_audio_file(f"{command_dir}/{cmd_item['command_fname']}")
                 if src_audio is not None:
                     clean_audio += src_audio
                 else:
                     print(f"Failed reading {command_dir}/{cmd_item['command_fname']}")
+                if i < len(item["commands"]) - 1:
+                    clean_audio += between_cmd_audio
             clean_audio += time_out_audio
 
-        # merge all clean audio file into one file
+        # merge all noise audio file into one file
         for root, _, files in os.walk(noise_dir):
             for filename in files:
                 src_file = os.path.join(root, filename)
                 src_audio = cls.read_audio_file(src_file)
                 if src_audio != None:
                     noise_audio += src_audio
-        
+
         clean_audio = clean_audio.apply_gain(clean_gain)
         noise_audio = noise_audio.apply_gain(noise_gain)
-        
+
         # the len() is not exactly, so replace len() with frame_count()
-        while(noise_audio.frame_count() < clean_audio.frame_count()):
+        while noise_audio.frame_count() < clean_audio.frame_count():
             noise_audio = noise_audio + noise_audio
-        
+
         # Returns the raw audio data as an array of (numeric) samples.
         clean_audio_array = clean_audio.get_array_of_samples()
         noise_audio_array = noise_audio.get_array_of_samples()
@@ -87,8 +91,8 @@ class MNAudioTools(AudioTools):
 
 if __name__ == '__main__':
     description = 'Usage: \n' \
-                  'python skainet_test_set.py your_yaml_file \n' \
-                  
+                  'python create_mn_test_set.py your_yaml_file \n' \
+
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('yaml')
     args = parser.parse_args()
