@@ -19,7 +19,6 @@
 
 #include <stdbool.h>
 #include "esp_err.h"
-#include "audio_hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +34,7 @@ extern "C" {
  *    - ESP_OK: Success
  *    - Others: Fail
  */
-esp_err_t esp_board_init(audio_hal_iface_samples_t sample_rate, int channel_format, int bits_per_chan);
+esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan);
 
 /**
  * @brief Init SD crad

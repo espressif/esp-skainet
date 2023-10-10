@@ -165,7 +165,7 @@ void uart_ctrl_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     ringbuf_handle_t audio_rb = rb_create(1024*512, 1);
     ringbuf_handle_t uart_rb = rb_create(UART_BUF_LEN, 1);

@@ -25,7 +25,7 @@
 
 static const char *TAG = "hardware";
 
-esp_err_t esp_board_init(audio_hal_iface_samples_t sample_rate, int channel_format, int bits_per_chan)
+esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     return bsp_board_init(sample_rate, channel_format, bits_per_chan);
 }

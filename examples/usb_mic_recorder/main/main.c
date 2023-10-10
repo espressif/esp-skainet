@@ -76,7 +76,7 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
 
     afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_VC_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();

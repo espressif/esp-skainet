@@ -33,7 +33,7 @@ static int start_multinet_test(int argc, char **argv)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     heap_caps_print_heap_info(MALLOC_CAP_8BIT);
 

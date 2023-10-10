@@ -120,7 +120,7 @@ int bsp_get_feed_channel(void)
     return ADC_I2S_CHANNEL;
 }
 
-esp_err_t bsp_board_init(audio_hal_iface_samples_t sample_rate, int channel_format, int bits_per_chan)
+esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     bsp_i2s_init(I2S_NUM_1, 16000, 2, 32);
 
