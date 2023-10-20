@@ -33,10 +33,10 @@ def get_required_stats():
 
     stats = [
         'hiesp_clean_norm_0dB_silence_-5dB,mn6_en,194,510',
-        'hiesp_clean_norm_0dB_pink_-10dB,mn6_en,194,428',
-        'hiesp_clean_norm_0dB_pink_-5dB,mn6_en,194,303',
-        'hiesp_clean_norm_0dB_pub_-10dB,mn6_en,196,497',
-        'hiesp_clean_norm_0dB_pub_-5dB,mn6_en,193,420',
+        'hiesp_clean_norm_0dB_pink_-10dB,mn6_en,194,421',
+        'hiesp_clean_norm_0dB_pink_-5dB,mn6_en,194,301',
+        'hiesp_clean_norm_0dB_pub_-10dB,mn6_en,196,495',
+        'hiesp_clean_norm_0dB_pub_-5dB,mn6_en,193,417',
         'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn,179,512',
         'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn,178,492',
         'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn,181,454',
