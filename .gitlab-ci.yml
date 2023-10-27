@@ -196,8 +196,10 @@ test_wakenet:
 build_multinet_test:
   extends:
     - .build_test_template
-    - .rules:test:test_multinet6
-    - .rules:test:test_multinet7
+  rules:
+    - !reference [.rules:test:test_multinet6, rules]
+    - !reference [.rules:test:test_multinet7, rules]
+
   image: espressif/idf:release-v5.0
   variables:
     EXAMPLES_PATH: "test/multinet"
