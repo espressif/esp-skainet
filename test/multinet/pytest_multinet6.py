@@ -21,6 +21,45 @@ def save_report(results):
         json.dump(results, f)
 
 
+def get_required_stats():
+    # store required stats here, it's not ideal but it makes our lives easier
+
+    required_stats = {
+        "psram_en": 5000,
+        "psram_cn": 5000,
+        "sram_en": 28,
+        "sram_cn": 32,
+    }
+
+    stats = [
+        'hiesp_clean_norm_0dB_silence_-5dB,mn6_en,194,510',
+        'hiesp_clean_norm_0dB_pink_-10dB,mn6_en,194,421',
+        'hiesp_clean_norm_0dB_pink_-5dB,mn6_en,194,301',
+        'hiesp_clean_norm_0dB_pub_-10dB,mn6_en,196,495',
+        'hiesp_clean_norm_0dB_pub_-5dB,mn6_en,193,417',
+        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn,179,512',
+        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn,178,492',
+        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn,181,454',
+        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn,188,537',
+        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn,184,507',
+        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn_ac,179,524',
+        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn_ac,178,520',
+        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn_ac,181,510',
+        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn_ac,188,556',
+        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn_ac,184,537',
+    ]
+
+    stats = [line.split(',') for line in stats]
+
+    for filename, mn_name, required_wn_times, required_mn_times in stats:
+        key = f"{filename}-{mn_name}"
+        required_stats[key] = {
+            'required_wn_times': int(required_wn_times),
+            'required_mn_times': int(required_mn_times),
+        }
+    return required_stats
+
+
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
 @pytest.mark.timeout(360000)
@@ -57,7 +96,9 @@ def test_multinet6(config, noise, snr, dut: Dut)-> None:
     # Get the number of test file
     file_num_pattern = re.compile(rb'Number of files: (\d+)')
     file_num = match_log_int(file_num_pattern, 20)
-    dut.expect('Quantized MultiNet6:', timeout=50)
+    mn_name_pattern = re.compile(rb'Quantized MultiNet6:rnnt_ctc_1.0, name:([^,]*)')
+    # Get model name
+    mn_name = match_log(mn_name_pattern, timeout=50)
     results["file_num"] = file_num
 
     # Get the trigger times and memory siize
@@ -66,56 +107,63 @@ def test_multinet6(config, noise, snr, dut: Dut)-> None:
     sram_pattern = re.compile(rb'MN SRAM: (\d+) KB')
     psram_size = match_log_int(psram_pattern, timeout)
     sram_size = match_log_int(sram_pattern, timeout)
-    assert psram_size < 5000   # Assert that the psram size is under 5000 kB
-    assert sram_size < 32      # Assert that the internal ram size is under 32 kB
+
+    required_stats = get_required_stats()
+
+    # this size differs due to different number of commands
+    if "en" in mn_name:
+        assert psram_size <= required_stats["psram_en"]
+        assert sram_size <= required_stats["sram_en"]
+    else:
+        assert psram_size <= required_stats["psram_cn"]
+        assert sram_size <= required_stats["sram_cn"]
+
     results["psram"] = psram_size
     results["sram"] = sram_size
 
     for i in range(file_num):
         file_id = f'File{i}'
-        filename_pattern = re.compile(str.encode(f'{file_id}: (\\S+)'))
 
         trigger_times_pattern = re.compile(str.encode(f'{file_id}, trigger times: (\\d+)'))
-        required_times_pattern = re.compile(str.encode(f'{file_id}, required times: (\\d+)'))
         truth_times_pattern = re.compile(str.encode(f'{file_id}, truth times: (\\d+)'))
         wn_delay_pattern = re.compile(str.encode(f'{file_id}, wn averaged delay: ([+-]?([0-9]*[.])?[0-9]+)'))
 
         correct_commands_pattern = re.compile(str.encode(f'{file_id}, correct commands: (\\d+)'))
         incorrect_commands_pattern = re.compile(str.encode(f'{file_id}, incorrect commands: (\\d+)'))
         missed_commands_pattern = re.compile(str.encode(f'{file_id}, missed commands: (\\d+)'))
-        required_correct_pattern = re.compile(str.encode(f'{file_id}, required correct: (\\d+)'))
         truth_commands_pattern = re.compile(str.encode(f'{file_id}, truth commands: (\\d+)'))
         mn_delay_pattern = re.compile(str.encode(f'{file_id}, mn averaged delay: ([+-]?([0-9]*[.])?[0-9]+)'))
 
-        filename = match_log(filename_pattern, timeout)
+        filename_pattern = re.compile(str.encode(f'{file_id}: /sdcard/test_multinet/(.*).wav'))
+        filename = match_log(filename_pattern, timeout).strip()
+        key = f'{filename}-{mn_name}'
+        required_stats = required_stats[key]
 
         trigger_times = match_log_int(trigger_times_pattern, timeout)
-        required_times = match_log_int(required_times_pattern, timeout)
         truth_times = match_log_int(truth_times_pattern, timeout)
         wn_delay = match_log_float(wn_delay_pattern, timeout)
 
         correct_commands = match_log_int(correct_commands_pattern, timeout)
         incorrect_commands = match_log_int(incorrect_commands_pattern, timeout)
         missed_commands = match_log_int(missed_commands_pattern, timeout)
-        required_correct = match_log_int(required_correct_pattern)
         truth_commands = match_log_int(truth_commands_pattern, timeout)
         mn_delay = match_log_float(mn_delay_pattern, timeout)
 
         results[file_id] = {}
         results[file_id]["filename"] = filename
         results[file_id]["trigger_times"] = trigger_times
-        results[file_id]["required_times"] = required_times
+        results[file_id]["required_times"] = required_stats["required_wn_times"]
         results[file_id]["truth_times"] = truth_times
         results[file_id]["wn_delay"] = wn_delay
         results[file_id]["correct_commands"] = correct_commands
         results[file_id]["incorrect_commands"] = incorrect_commands
         results[file_id]["missed_commands"] = missed_commands
         results[file_id]["truth_commands"] = truth_commands
-        results[file_id]["required_correct"] = required_correct
+        results[file_id]["required_correct"] = required_stats["required_mn_times"]
         results[file_id]["mn_delay"] = mn_delay
 
-        assert trigger_times >= required_times
-        assert correct_commands >= required_correct
+        assert trigger_times >= required_stats["required_wn_times"]
+        assert correct_commands >= required_stats["required_mn_times"]
 
     save_report(results)
     dut.expect('TEST DONE', timeout=timeout)

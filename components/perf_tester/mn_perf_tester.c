@@ -65,14 +65,19 @@ typedef struct {
     float *gt_region_boundary;     // region boundary (equals to the start time of next wake word / command)
     int *file_gt_num_wake;         // number of wake words of each file
     int *file_gt_num_cmd;          // number of commands of each file
-    int *file_required_num_wake;   // number of required detected wake word
-    int *file_required_num_cmd;    // number of required correct commands
 
     int64_t processed_sample_num;    // number of processed samples
     tester_audio_t audio_type;
 
     int force_reset;     // manually reset multinet before each command starts
     int test_done;
+
+    // inside section params
+    int woke_up;   // whether wakenet is activated
+    int current_region_wn_detected;  // whether a wn detection is made in this region
+    int current_region_mn_detected;  // whether a mn detection is made in this region
+    int early_timeout;  // whether there is a early timeout in current section
+    int mn_reseted;  // whether mn is reset in this region
 
     perf_tester_config_t *config;
 
@@ -153,7 +158,6 @@ void print_mn_report(skainet_perf_tester *tester)
     if (tester->file_num > 0) {
         int wn_det = 0;
         float wn_delay = 0.0;
-        int wn_required = 0;
         int wn_gt = 0;
 
         int mn_correct = 0;
@@ -169,12 +173,10 @@ void print_mn_report(skainet_perf_tester *tester)
         for (int i = 0; i < tester->file_num; i++) {
             printf("File%d: %s\n", i, tester->file_list[i]);
             printf("File%d, trigger times: %d\n", i, tester->file_wn_det_times[i]);
-            printf("File%d, required times: %d\n", i, tester->file_required_num_wake[i]);
             printf("File%d, truth times: %d\n", i, tester->file_gt_num_wake[i]);
             printf("File%d, wn averaged delay: %f\n", i, tester->file_wn_delay_seconds[i] / (tester->file_wn_det_times[i] + 0.01));
             printf("File%d, wn max delay: %f\n", i, tester->file_wn_max_delay_seconds[i]);
             wn_det += tester->file_wn_det_times[i];
-            wn_required += tester->file_required_num_wake[i];
             wn_gt += tester->file_gt_num_wake[i];
             wn_delay += tester->file_wn_delay_seconds[i];
 
@@ -185,7 +187,6 @@ void print_mn_report(skainet_perf_tester *tester)
             printf("file%d, missed commands caused by early time out: %d\n", i, tester->file_mn_miss_by_early_timeout_times[i]);
             printf("File%d, timeout times: %d\n", i, tester->file_mn_timeout_times[i]);
             printf("File%d, early timeout times: %d\n", i, tester->file_mn_early_timeout_times[i]);
-            printf("File%d, required correct: %d\n", i, tester->file_required_num_cmd[i]);
             printf("File%d, truth commands: %d\n", i, tester->file_gt_num_cmd[i]);
             printf("File%d, mn averaged delay: %f\n", i, tester->file_mn_delay_seconds[i] / (tester->file_mn_correct_times[i] + 0.01));
             printf("File%d, mn max delay: %f\n", i, tester->file_mn_max_delay_seconds[i]);
@@ -200,7 +201,6 @@ void print_mn_report(skainet_perf_tester *tester)
             mn_delay += tester->file_mn_delay_seconds[i];
         }
         printf("Total trigger times: %d\n", wn_det);
-        printf("Total required times: %d\n", wn_required);
         printf("Total truth times: %d\n", wn_gt);
         printf("Total wn averaged delay: %f\n", wn_delay / wn_det);
 
@@ -251,13 +251,13 @@ int read_csv_file(skainet_perf_tester *tester)
         tester->file_gt_num_wake[tester->file_num] = atoi(token);
 
         token = strtok_r(NULL, ",", &rest);
-        tester->file_required_num_wake[tester->file_num] = atoi(token);
+        // tester->file_required_num_wake[tester->file_num] = atoi(token);
 
         token = strtok_r(NULL, ",", &rest);
         tester->file_gt_num_cmd[tester->file_num] = atoi(token);
 
         token = strtok_r(NULL, ",", &rest);
-        tester->file_required_num_cmd[tester->file_num] = atoi(token);
+        // tester->file_required_num_cmd[tester->file_num] = atoi(token);
 
         printf("file %d, gt file %s, number of wake words %d, number of commands %d\n",
                 tester->file_num,
@@ -415,11 +415,12 @@ void detect_task(void *arg)
     uint32_t c0, c1;
 
     int gt_idx = 0;
-    int current_region_detected = 0;
     float curr_time_s;
-    int woke_up = 0;
-    int early_timeout = 0;
-    int reseted = 0;
+    tester->woke_up = 0;
+    tester->current_region_mn_detected = 0;
+    tester->current_region_wn_detected = 0;
+    tester->early_timeout = 0;
+    tester->mn_reseted = 0;
 
     while (1) {
         afe_fetch_result_t* res = tester->afe_handle->fetch(tester->afe_data);
@@ -431,57 +432,58 @@ void detect_task(void *arg)
         curr_time_s = (float) tester->processed_sample_num / 16000.0;
 
         if (curr_time_s > tester->gt_region_boundary[gt_idx]) {
-            reseted = 0;
             // we need to move to next region
             // printf("move from region %d to %d, %d\n", gt_idx, gt_idx+1, current_region_detected);
-            if (current_region_detected == 0) {
-                // no detection is made in current region
-                if (tester->gt_region_type[gt_idx] == -1) {
-                    // printf("wake miss\n");
-                    tester->file_wn_miss_times[file_id]++;
-                    woke_up = 0;
+            if (tester->gt_region_type[gt_idx] == -1 && tester->current_region_wn_detected == 0) {
+                // current region is wake word but not detected
+                tester->file_wn_miss_times[file_id]++;
+                tester->woke_up = 0;
+            } else if (tester->gt_region_type[gt_idx] > 0 && tester->current_region_mn_detected == 0) {
+                // current region is command but not detected
+                if (tester->mn_active == 1) {
+                    // mn still active
+                    // printf("command miss, mn active\n");
+                    tester->file_mn_miss_times[file_id]++;
                 } else {
-                    if (tester->mn_active == 1) {
-                        // mn still active
-                        // printf("command miss, mn active\n");
-                        tester->file_mn_miss_times[file_id]++;
+                    // mn not active, three cases
+                    if (tester->early_timeout == 1) {
+                        // case 1 early timeout
+                        // printf("command miss by early timeout\n");
+                        tester->file_mn_miss_by_early_timeout_times[file_id]++;
+                    } else if (tester->woke_up == 0) {
+                        // case 2 wake net is not triggered
+                        // printf("command miss by wn\n");
+                        tester->file_mn_miss_by_wn_times[file_id]++;
                     } else {
-                        // mn not active, three cases
-                        if (early_timeout == 1) {
-                            // case 1 early timeout
-                            // printf("command miss by early timeout\n");
-                            tester->file_mn_miss_by_early_timeout_times[file_id]++;
-                        } else if (woke_up == 0) {
-                            // case 2 wake net is not triggered
-                            // printf("command miss by wn\n");
-                            tester->file_mn_miss_by_wn_times[file_id]++;
-                        } else {
-                            // case 3, normal time out, this is the last command in region
-                            // printf("command miss, mn inactive\n");
-                            tester->file_mn_miss_times[file_id]++;
-                        }
+                        // case 3, normal time out, this is the last command in region
+                        // printf("command miss, mn inactive\n");
+                        tester->file_mn_miss_times[file_id]++;
                     }
-                    // printf("command miss\n");
                 }
             }
             gt_idx += 1;
             curr_time_s = (float) tester->processed_sample_num / 16000.0;
-            current_region_detected = 0;
-        } else if (tester->gt_region_boundary[gt_idx] - curr_time_s <= 1.0 && tester->force_reset == 1 && reseted == 0) {
-            if (gt_idx < tester->gt_num_regions - 1 && tester->gt_region_type[gt_idx+1] > 0) {
-                // if current time is within 1 second to next command region, clean model cache
-                // printf("curr time %f, boundary %f, reset mn\n", curr_time_s, tester->gt_region_boundary[gt_idx]);
-                tester->multinet->clean(tester->mn_data);
-                reseted = 1;
-            } else {
+
+            // reset some parameters
+            tester->mn_reseted = 0;
+            tester->current_region_mn_detected = 0;
+            tester->current_region_wn_detected = 0;
+
+            if (tester->gt_region_type[gt_idx] == -1) {
+                // new region is wn region, it is a new section
+                tester->woke_up = 0;
+                tester->early_timeout = 0;
+            }
+        } else if (tester->force_reset == 1 && tester->mn_reseted == 0 && tester->gt_region_type[gt_idx] > 0 && tester->gt_region_boundary[gt_idx] - curr_time_s <= 1.0) {
+            // if force reset, current region has not been reseted yet and current time is within 1 sec to the boundary
+            tester->multinet->clean(tester->mn_data);
+            tester->mn_reseted = 1;
+            if (gt_idx < tester->gt_num_regions - 1 && tester->gt_region_type[gt_idx+1] == -1 && tester->mn_active == 1){
                 // if next region is wake word and mn hasn't time out, force time out
-                if (tester->mn_active == 1) {
-                    // printf("force timeout\n");
-                    tester->mn_active = 0;
-                    tester->multinet->clean(tester->mn_data);
-                    woke_up = 0;
-                    early_timeout = 0;
-                }
+                // printf("force timeout\n");
+                tester->mn_active = 0;
+                tester->woke_up = 1;  // this section is woke up because mn_active was 1
+                tester->early_timeout = 0;  // this is the last region in section, so not a early timeout
             }
         }
 
@@ -490,6 +492,7 @@ void detect_task(void *arg)
         assert(curr_time_s <= tester->gt_region_boundary[gt_idx]);
 
         if (res->wakeup_state == WAKENET_DETECTED) {
+            tester->woke_up = 1;
             if (tester->gt_region_type[gt_idx] == -1) {
                 // wake word region
                 if (curr_time_s < (tester->gt_region_end[gt_idx] - 1.0)) {
@@ -502,11 +505,9 @@ void detect_task(void *arg)
                     if (delay > tester->file_wn_max_delay_seconds[file_id]) {
                         tester->file_wn_max_delay_seconds[file_id] = delay;
                     }
-                    current_region_detected = 1;
+                    tester->current_region_wn_detected = 1;
                     // printf("wn detected, %f, %f\n",curr_time_s, tester->gt_region_end[gt_idx]);
-                    woke_up = 1;
                 }
-
             } else {
                 printf("wake word is detected at a command region. %d\n", gt_idx);
             }
@@ -544,7 +545,7 @@ void detect_task(void *arg)
                             tester->file_mn_incorrect_times[file_id]++;
                             // printf("command incorrect, %f %f %f\n", curr_time_s, tester->gt_region_end[gt_idx], tester->file_mn_delay_seconds[file_id]);
                         }
-                        current_region_detected = 1;
+                        tester->current_region_mn_detected = 1;
                     }
                 } else {
                     printf("command is detected at a wake word region\n");
@@ -556,88 +557,63 @@ void detect_task(void *arg)
                 tester->mn_active = 0;
                 tester->multinet->clean(tester->mn_data);
                 tester->file_mn_timeout_times[file_id]++;
-                if (gt_idx < tester->gt_num_regions - 1 && tester->gt_region_type[gt_idx+1] > 0) {
+                if (gt_idx < tester->gt_num_regions - 1 && tester->gt_region_type[gt_idx+1] > 0 && tester->gt_region_type[gt_idx] > 0) {
                     // next region is not wake word, means this time out is early
                     // printf("early time out, %f\n", curr_time_s);
                     tester->file_mn_early_timeout_times[file_id]++;
-                    early_timeout = 1;
+                    tester->early_timeout = 1;
                 } else {
                     // printf("time out, %f\n", curr_time_s);
-                    early_timeout = 0;
+                    tester->early_timeout = 0;
+                }
+            }
+        }
+
+        if (file_id != tester->file_id || tester->test_done) {
+            // finish up last region of current file first
+            if (tester->gt_region_type[gt_idx] == -1 && tester->current_region_wn_detected == 0) {
+                // current region is wake word but not detected
+                tester->file_wn_miss_times[file_id]++;
+            } else if (tester->gt_region_type[gt_idx] > 0 && tester->current_region_mn_detected == 0) {
+                // current region is command but not detected
+                if (tester->mn_active == 1) {
+                    // mn still active
+                    // printf("command miss, mn active\n");
+                    tester->file_mn_miss_times[file_id]++;
+                } else {
+                    // mn not active, three cases
+                    if (tester->early_timeout == 1) {
+                        // case 1 early timeout
+                        // printf("command miss by early timeout\n");
+                        tester->file_mn_miss_by_early_timeout_times[file_id]++;
+                    } else if (tester->woke_up == 0) {
+                        // case 2 wake net is not triggered
+                        // printf("command miss by wn\n");
+                        tester->file_mn_miss_by_wn_times[file_id]++;
+                    } else {
+                        // case 3, normal time out, this is the last command in region
+                        // printf("command miss, mn inactive\n");
+                        tester->file_mn_miss_times[file_id]++;
+                    }
                 }
             }
         }
 
         if (file_id != tester->file_id) {
-            // finish up last region of current file first
-            if (current_region_detected == 0) {
-                // no detection is made in current region
-                if (tester->gt_region_type[gt_idx] == -1) {
-                    tester->file_wn_miss_times[file_id]++;
-                } else {
-                    if (tester->mn_active == 1) {
-                        // mn still active
-                        // printf("command miss, mn active\n");
-                        tester->file_mn_miss_times[file_id]++;
-                    } else {
-                        // mn not active, three cases
-                        if (early_timeout == 1) {
-                            // case 1 early timeout
-                            // printf("command miss by early timeout\n");
-                            tester->file_mn_miss_by_early_timeout_times[file_id]++;
-                        } else if (woke_up == 0) {
-                            // case 2 wake net is not triggered
-                            // printf("command miss by wn\n");
-                            tester->file_mn_miss_by_wn_times[file_id]++;
-                        } else {
-                            // case 3, normal time out, this is the last command in region
-                            // printf("command miss, mn inactive\n");
-                            tester->file_mn_miss_times[file_id]++;
-                        }
-                    }
-                }
-            }
             // new file
             file_id = tester->file_id;
             // reset ground truth
             gt_idx = 0;
-            current_region_detected = 0;
             tester->processed_sample_num = 0;
             read_gt_csv_file(tester, file_id);
             tester->mn_active = 0;
             tester->multinet->clean(tester->mn_data);
-            woke_up = 0;
-            early_timeout = 0;
-
+            tester->current_region_mn_detected = 0;
+            tester->current_region_wn_detected = 0;
+            tester->woke_up = 0;
+            tester->early_timeout = 0;
         } else if (tester->test_done) {
             // finish up last region of current file first
-            if (current_region_detected == 0) {
-                // no detection is made in current region
-                if (tester->gt_region_type[gt_idx] == -1) {
-                    tester->file_wn_miss_times[file_id]++;
-                } else {
-                    if (tester->mn_active == 1) {
-                        // mn still active
-                        // printf("command miss, mn active\n");
-                        tester->file_mn_miss_times[file_id]++;
-                    } else {
-                        // mn not active, three cases
-                        if (early_timeout == 1) {
-                            // case 1 early timeout
-                            // printf("command miss by early timeout\n");
-                            tester->file_mn_miss_by_early_timeout_times[file_id]++;
-                        } else if (woke_up == 0) {
-                            // case 2 wake net is not triggered
-                            // printf("command miss by wn\n");
-                            tester->file_mn_miss_by_wn_times[file_id]++;
-                        } else {
-                            // case 3, normal time out, this is the last command in region
-                            // printf("command miss, mn inactive\n");
-                            tester->file_mn_miss_times[file_id]++;
-                        }
-                    }
-                }
-            }
             break;
         }
     }
@@ -753,8 +729,6 @@ void offline_mn_tester(const char *csv_file,
     tester->gt_file_list = malloc(sizeof(char *) * tester->max_file_num);
     tester->file_gt_num_wake = malloc(sizeof(int) * tester->max_file_num);
     tester->file_gt_num_cmd = malloc(sizeof(int) * tester->max_file_num);
-    tester->file_required_num_wake = malloc(sizeof(int) * tester->max_file_num);
-    tester->file_required_num_cmd = malloc(sizeof(int) * tester->max_file_num);
 
     tester->file_wn_det_times = calloc(tester->max_file_num, sizeof(int));
     tester->file_wn_miss_times = calloc(tester->max_file_num, sizeof(int));
@@ -804,7 +778,7 @@ void offline_mn_tester(const char *csv_file,
     // mn init
     tester->mn_name = mn_coeff;
     tester->multinet = multinet;
-    tester->mn_data = multinet->create(mn_coeff, 6000);
+    tester->mn_data = multinet->create(mn_coeff, 12000);
     esp_mn_commands_update_from_sdkconfig(tester->multinet, tester->mn_data);
 
     // add commands for testing

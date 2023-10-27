@@ -16,6 +16,7 @@
 #include "esp_mn_models.h"
 #include "esp_board_init.h"
 #include "model_path.h"
+#include "string.h"
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
@@ -61,6 +62,7 @@ void detect_Task(void *arg)
 
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("wakeword detected\n");
+	        printf("model index:%d, word index:%d\n", res->wakenet_model_index, res->wake_word_index);
             printf("-----------LISTENING-----------\n");
         }
     }
@@ -73,22 +75,36 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(AUDIO_HAL_16K_SAMPLES, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
     srmodel_list_t *models = esp_srmodel_init("model");
+    char *wn_name = NULL;
+    char *wn_name_2 = NULL;
+
     if (models!=NULL) {
         for (int i=0; i<models->num; i++) {
-            printf("Load: %s\n", models->model_name[i]);
+            if (strstr(models->model_name[i], ESP_WN_PREFIX) != NULL) {
+                if (wn_name == NULL) {
+                    wn_name = models->model_name[i];
+                    printf("The first wakenet model: %s\n", wn_name);
+                } else if (wn_name_2 == NULL) {
+                    wn_name_2 = models->model_name[i];
+                    printf("The second wakenet model: %s\n", wn_name_2);
+                }
+            }
         }
+    } else {
+        printf("Please enable wakenet model and select wake word by menuconfig!\n");
+        return ;
     }
-    char *wn_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);
 
     afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_SR_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     afe_config.memory_alloc_mode = AFE_MEMORY_ALLOC_MORE_PSRAM;
     afe_config.wakenet_init = true;
     afe_config.wakenet_model_name = wn_name;
+    afe_config.wakenet_model_name_2 = wn_name_2;
     afe_config.voice_communication_init = false;
 
 #if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_EYE_BOARD
