@@ -27,7 +27,7 @@ def get_required_stats():
     required_stats = {
         "psram_en": 5000,
         "psram_cn": 5000,
-        "sram_en": 36,
+        "sram_en": 42,
         "sram_cn": 50,  # TODO
     }
 
