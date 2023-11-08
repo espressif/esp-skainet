@@ -782,7 +782,7 @@ void offline_mn_tester(const char *csv_file,
     esp_mn_commands_update_from_sdkconfig(tester->multinet, tester->mn_data);
 
     // add commands for testing
-    add_test_commands(tester);
+    // add_test_commands(tester);
 
     // the memory after AFE init
     m2 = heap_caps_get_free_size(MALLOC_CAP_8BIT);
