@@ -3,7 +3,6 @@ set(srcs
    )
 
 set(requires
-    esp-sr
     perf_tester
     )
 

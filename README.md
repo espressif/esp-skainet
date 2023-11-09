@@ -56,7 +56,7 @@ On how to configure your applications, please refer to the README.md of each exa
 ## Software Preparation
 
 ### ESP-Skainet
-Cloned this project as follows:
+Clone this project as follows:
 
 ```
 git clone https://github.com/espressif/esp-skainet.git 

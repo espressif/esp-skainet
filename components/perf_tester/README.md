@@ -1,4 +1,4 @@
-Perf tester is used to test esp-skianet performance. Currently, it support wakenet and multinet test.
+Perf tester is used to test esp-skainet performance. Currently, it support wakenet and multinet test.
 Perf tester use [console](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/console.html) component to develop an interactive console over serial port. The commands list are as follows:
 ```
 help 

@@ -28,6 +28,7 @@ idf.py app-flash monitor
 ```
 
 ### 修改voice data
+//@todo this section should be updated
 所有可用voice data放置在 `esp-skainet/components/esp-sr/esp-tts/esp_tts_chinese/`
 - 方法1. 修改CmakeLists.txt   
 修改CmakeLists.txt中 `voice_data_image` 的路径

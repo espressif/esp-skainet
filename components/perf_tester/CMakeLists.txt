@@ -6,7 +6,6 @@ set(srcs
 
 set(requires
     hardware_driver
-    esp-sr
     player
     console
     )
