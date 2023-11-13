@@ -25,16 +25,16 @@ def get_required_stats():
     # store required stats here, it's not ideal but it makes our lives easier
 
     required_stats = {
-        "psram_en": 5000,
+        "psram_en": 2920,
         "psram_cn": 5000,
-        "sram_en": 42,
+        "sram_en": 12,
         "sram_cn": 50,  # TODO
     }
 
     stats = [
         'hiesp_clean_norm_0dB_silence_-5dB,mn7_en,194,579',
         'hiesp_clean_norm_0dB_pink_-10dB,mn7_en,194,500',
-        'hiesp_clean_norm_0dB_pink_-5dB,mn7_en,194,436',
+        'hiesp_clean_norm_0dB_pink_-5dB,mn7_en,194,432',
         'hiesp_clean_norm_0dB_pub_-10dB,mn7_en,196,554',
         'hiesp_clean_norm_0dB_pub_-5dB,mn7_en,193,521',
         'hilexin_CN-TEST-S_0dB_silence_-5dB,mn7_cn,179,512',  # TODO
