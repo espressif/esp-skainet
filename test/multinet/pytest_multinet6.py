@@ -25,28 +25,28 @@ def get_required_stats():
     # store required stats here, it's not ideal but it makes our lives easier
 
     required_stats = {
-        "psram_en": 5000,
-        "psram_cn": 5000,
-        "sram_en": 28,
-        "sram_cn": 32,
+        "psram_en": 4076,
+        "psram_cn": 3942,
+        "sram_en": 21,
+        "sram_cn": 20,
     }
 
     stats = [
         'hiesp_clean_norm_0dB_silence_-5dB,mn6_en,194,510',
-        'hiesp_clean_norm_0dB_pink_-10dB,mn6_en,194,421',
+        'hiesp_clean_norm_0dB_pink_-10dB,mn6_en,194,418',
         'hiesp_clean_norm_0dB_pink_-5dB,mn6_en,194,301',
         'hiesp_clean_norm_0dB_pub_-10dB,mn6_en,196,495',
         'hiesp_clean_norm_0dB_pub_-5dB,mn6_en,193,417',
-        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn,179,512',
-        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn,178,492',
-        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn,181,454',
-        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn,188,537',
-        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn,184,507',
-        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn_ac,179,524',
-        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn_ac,178,520',
-        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn_ac,181,510',
-        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn_ac,188,556',
-        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn_ac,184,537',
+        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn,179,522',
+        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn,178,504',
+        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn,181,482',
+        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn,188,546',
+        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn,184,515',
+        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn_ac,179,528',
+        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn_ac,178,524',
+        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn_ac,181,514',
+        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn_ac,188,560',
+        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn_ac,184,542',
     ]
 
     stats = [line.split(',') for line in stats]
