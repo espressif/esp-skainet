@@ -53,12 +53,11 @@ The following examples are currently available:
 
 ### ESP-Skainet
 
-确保您已经使用  `--recursive` 克隆了整个工程，命令如下：
+您可以使用以下命令克隆整个工程：
 
 ```
-git clone --recursive https://github.com/espressif/esp-skainet.git 
+git clone https://github.com/espressif/esp-skainet.git 
 ```
-如果您克隆的项目没有使用 `--recursive` 选项，请先转到 `esp-skainet` 目录并运行 `git submodule update --init` 命令。
 
 ### ESP-IDF
 
@@ -67,7 +66,7 @@ git clone --recursive https://github.com/espressif/esp-skainet.git
 
   *注意:* 如果使用ESP-IDFv3.2及之前版本，建议参考esp-skainet v0.2.0
 
-获取更多关于搭建 ESP-IDF 环境的细节，请参考 [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html)
+获取更多关于搭建 ESP-IDF 环境的细节，请参考 [Getting Started Guide for ESP-IDF release/v4.4 branch](https://docs.espressif.com/projects/esp-idf/en/release-v4.4/esp32/get-started/index.html)
 
 # 示例
 
