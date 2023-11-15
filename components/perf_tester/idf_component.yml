@@ -1,0 +1,5 @@
+## IDF Component Manager Manifest File
+dependencies:
+  esp-sr:
+    version: ">=1.1.0,<2.0.0"
+    public: true

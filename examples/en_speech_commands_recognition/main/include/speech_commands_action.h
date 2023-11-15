@@ -8,16 +8,6 @@
 #ifndef _SPEECH_COMMANDS_ACTION_H_
 #define _SPEECH_COMMANDS_ACTION_H_
 
-#ifdef CONFIG_ESP_LYRAT_MINI_V1_1_BOARD
-#define LED_GPIO 22
-#endif
-
-void led_init(void);
-
-void led_on(int gpio);
-
-void led_off(int gpio);
-
 void led_Task(void *arg);
 
 void speech_commands_action(int command_id);
