@@ -4,8 +4,6 @@ set(srcs
     )
 
 set(requires
-    esp-sr
-    led_strip
     hardware_driver
     )
 

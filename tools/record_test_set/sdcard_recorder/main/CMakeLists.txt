@@ -1,5 +1,4 @@
 set(requires
-    esp-sr
     hardware_driver
     sr_ringbuf
     player

@@ -56,19 +56,17 @@ On how to configure your applications, please refer to the README.md of each exa
 ## Software Preparation
 
 ### ESP-Skainet
-Make sure you have cloned this project with the `--recursive` option, shown as follows:
+Clone this project as follows:
 
 ```
-git clone --recursive https://github.com/espressif/esp-skainet.git 
+git clone https://github.com/espressif/esp-skainet.git 
 ```
-
-If you have cloned this project without the `--recursive` option, please go to the `esp-skainet` directory and run the `git submodule update --init`  command before anything else.
 
 ### ESP-IDF
 
  [ESP-IDF v4.4](https://github.com/espressif/esp-idf/tree/release/v4.4) and [ESP-IDF v5.0](https://github.com/espressif/esp-idf/tree/release/v5.0) are supported. If you had already configured ESP-IDF before, and do not want to change your existing one, you can configure the `IDF_PATH` environment variable to the path to ESP-IDF. 
 
-For details on how to set up the ESP-IDF, please refer to [Getting Started Guide for the stable ESP-IDF version](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
+For details on how to set up the ESP-IDF, please refer to [Getting Started Guide for ESP-IDF release/v4.4 branch](https://docs.espressif.com/projects/esp-idf/en/release-v4.4/esp32/get-started/index.html)
 
 # Examples
 The folder of [examples](examples) contains some applications demonstrating the API features of ESP-Skainet.

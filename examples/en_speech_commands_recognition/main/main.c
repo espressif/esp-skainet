@@ -141,9 +141,6 @@ void app_main()
     models = esp_srmodel_init("model"); // partition label defined in partitions.csv
     ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
-#if defined CONFIG_ESP32_KORVO_V1_1_BOARD
-    led_init();
-#endif
 
 #if CONFIG_IDF_TARGET_ESP32
     printf("This demo only support ESP32S3\n");
@@ -168,7 +165,7 @@ void app_main()
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD
-    xTaskCreatePinnedToCore(&led_Task, "led", 2 * 1024, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(&led_Task, "led", 3 * 1024, NULL, 5, NULL, 0);
 #endif
 #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD  || CONFIG_ESP32_S3_BOX_BOARD
     xTaskCreatePinnedToCore(&play_music, "play", 4 * 1024, NULL, 5, NULL, 1);
