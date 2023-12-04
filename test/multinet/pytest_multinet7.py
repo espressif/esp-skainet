@@ -25,28 +25,28 @@ def get_required_stats():
     # store required stats here, it's not ideal but it makes our lives easier
 
     required_stats = {
-        "psram_en": 4076,
-        "psram_cn": 3942,
-        "sram_en": 21,
-        "sram_cn": 20,
+        "psram_en": 2920,
+        "psram_cn": 5000,
+        "sram_en": 12,
+        "sram_cn": 50,  # TODO
     }
 
     stats = [
-        'hiesp_clean_norm_0dB_silence_-5dB,mn6_en,194,510',
-        'hiesp_clean_norm_0dB_pink_-10dB,mn6_en,194,418',
-        'hiesp_clean_norm_0dB_pink_-5dB,mn6_en,194,301',
-        'hiesp_clean_norm_0dB_pub_-10dB,mn6_en,196,495',
-        'hiesp_clean_norm_0dB_pub_-5dB,mn6_en,193,417',
-        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn,179,522',
-        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn,178,504',
-        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn,181,482',
-        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn,188,546',
-        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn,184,515',
-        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn6_cn_ac,179,528',
-        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn6_cn_ac,178,524',
-        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn6_cn_ac,181,514',
-        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn6_cn_ac,188,560',
-        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn6_cn_ac,184,542',
+        'hiesp_clean_norm_0dB_silence_-5dB,mn7_en,194,579',
+        'hiesp_clean_norm_0dB_pink_-10dB,mn7_en,194,500',
+        'hiesp_clean_norm_0dB_pink_-5dB,mn7_en,194,432',
+        'hiesp_clean_norm_0dB_pub_-10dB,mn7_en,196,554',
+        'hiesp_clean_norm_0dB_pub_-5dB,mn7_en,193,521',
+        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn7_cn,179,512',  # TODO
+        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn7_cn,178,492',  # TODO
+        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn7_cn,181,454',  # TODO
+        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn7_cn,188,537',  # TODO
+        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn7_cn,184,507',  # TODO
+        'hilexin_CN-TEST-S_0dB_silence_-5dB,mn7_cn_ac,179,524',  # TODO
+        'hilexin_CN-TEST-S_0dB_pink_-10dB,mn7_cn_ac,178,520',  # TODO
+        'hilexin_CN-TEST-S_0dB_pink_-5dB,mn7_cn_ac,181,510',  # TODO
+        'hilexin_CN-TEST-S_0dB_pub_-10dB,mn7_cn_ac,188,556',  # TODO
+        'hilexin_CN-TEST-S_0dB_pub_-5dB,mn7_cn_ac,184,537',  # TODO
     ]
 
     stats = [line.split(',') for line in stats]
@@ -63,11 +63,9 @@ def get_required_stats():
 @pytest.mark.target('esp32s3')
 @pytest.mark.env('korvo-2')
 @pytest.mark.timeout(360000)
-@pytest.mark.config('hiesp_mn6_en')
-@pytest.mark.config('hilexin_mn6_cn')
-@pytest.mark.config('hilexin_mn6_cn_ac')
+@pytest.mark.config('hiesp_mn7_en')
 
-def test_multinet6(config, noise, snr, dut: Dut)-> None:
+def test_multinet7(config, noise, snr, dut: Dut)-> None:
 
     def match_log(pattern, timeout=18000):
         str = dut.expect(pattern, timeout=timeout).group(1).decode()
@@ -96,7 +94,7 @@ def test_multinet6(config, noise, snr, dut: Dut)-> None:
     # Get the number of test file
     file_num_pattern = re.compile(rb'Number of files: (\d+)')
     file_num = match_log_int(file_num_pattern, 20)
-    mn_name_pattern = re.compile(rb'Quantized MultiNet6:rnnt_ctc_1.0, name:([^,]*)')
+    mn_name_pattern = re.compile(rb'Quantized MultiNet7:rnnt_ctc_2.0, name:([^,]*)')
     # Get model name
     mn_name = match_log(mn_name_pattern, timeout=50)
     results["file_num"] = file_num
