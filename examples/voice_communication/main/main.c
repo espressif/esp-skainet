@@ -154,7 +154,8 @@ void app_main()
     // config for nsnet
     afe_config.aec_init = false;
     afe_config.afe_ns_mode = NS_MODE_NET;
-    afe_config.afe_ns_model_name = "nsnet1";
+    char *nsnet_name = esp_srmodel_get_name(models, ESP_NSNET_PREFIX, NULL);
+    afe_config.afe_ns_model_name = nsnet_name;
 
     afe_data = afe_handle->create_from_config(&afe_config);
     if (afe_data == NULL) {
