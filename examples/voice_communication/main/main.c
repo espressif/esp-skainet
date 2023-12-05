@@ -21,6 +21,8 @@
 #include "esp_board_init.h"
 #include "model_path.h"
 #include "ringbuf.h"
+#include "esp_nsn_models.h"
+#include "model_path.h"
 
 #define DEBUG_SAVE_PCM      0
 
@@ -154,7 +156,7 @@ void app_main()
     // config for nsnet
     afe_config.aec_init = false;
     afe_config.afe_ns_mode = NS_MODE_NET;
-    char *nsnet_name = esp_srmodel_get_name(models, ESP_NSNET_PREFIX, NULL);
+    char *nsnet_name = esp_srmodel_filter(models, ESP_NSNET_PREFIX, NULL);
     afe_config.afe_ns_model_name = nsnet_name;
 
     afe_data = afe_handle->create_from_config(&afe_config);
