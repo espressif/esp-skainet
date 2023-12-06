@@ -21,6 +21,8 @@
 #include "esp_board_init.h"
 #include "model_path.h"
 #include "ringbuf.h"
+#include "esp_nsn_models.h"
+#include "model_path.h"
 
 #define DEBUG_SAVE_PCM      0
 
@@ -129,6 +131,13 @@ void app_main()
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #endif
 
+    srmodel_list_t *models = esp_srmodel_init("model");
+    if (models!=NULL) {
+        for (int i=0; i<models->num; i++) {
+            printf("Load: %s\n", models->model_name[i]);
+        }
+    }
+
     afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_VC_HANDLE;
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
     afe_config.vad_init = false;
@@ -143,6 +152,13 @@ void app_main()
         afe_config.pcm_config.ref_num = 1;
     #endif
 #endif
+
+    // config for nsnet
+    afe_config.aec_init = false;
+    afe_config.afe_ns_mode = NS_MODE_NET;
+    char *nsnet_name = esp_srmodel_filter(models, ESP_NSNET_PREFIX, NULL);
+    afe_config.afe_ns_model_name = nsnet_name;
+
     afe_data = afe_handle->create_from_config(&afe_config);
     if (afe_data == NULL) {
         printf("create_from_config fail!\n");
@@ -164,6 +180,8 @@ void app_main()
     task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
+
+    esp_srmodel_deinit(models);
 
     // // You can call afe_handle->destroy to destroy AFE.
     // task_flag = 0;
