@@ -12,6 +12,9 @@ config ESP32_KORVO_V1_1_BOARD
 config ESP32_S3_BOX_BOARD
     bool "ESP32-S3-Box"
     depends on IDF_TARGET_ESP32S3
+config ESP32_S3_BOX_3_BOARD
+    bool "ESP32-S3-Box-3"
+    depends on IDF_TARGET_ESP32S3
 config ESP32_S3_KORVO_1_V4_0_BOARD
     bool "ESP32-S3-Korvo-1"
     depends on IDF_TARGET_ESP32S3
