@@ -1,0 +1,29 @@
+menu "Audio Media HAL"
+
+    choice AUDIO_BOARD
+        prompt "Audio hardware board"
+        default ESP32_S3_KORVO_1_V4_0_BOARD
+        help
+            Select an audio board to use
+
+        config ESP32_KORVO_V1_1_BOARD
+            bool "ESP32-Korvo"
+            depends on IDF_TARGET_ESP32
+        config ESP32_S3_BOX_BOARD
+            bool "ESP32-S3-Box"
+            depends on IDF_TARGET_ESP32S3
+        config ESP32_S3_BOX_3_BOARD
+            bool "ESP32-S3-Box-3"
+            depends on IDF_TARGET_ESP32S3
+        config ESP32_S3_KORVO_1_V4_0_BOARD
+            bool "ESP32-S3-Korvo-1"
+            depends on IDF_TARGET_ESP32S3
+        config ESP32_S3_KORVO_2_V3_0_BOARD
+            bool "ESP32-S3-Korvo-2"
+            depends on IDF_TARGET_ESP32S3
+        config ESP32_S3_EYE_BOARD
+            bool "ESP32-S3-EYE"
+            depends on IDF_TARGET_ESP32S3
+    endchoice
+
+endmenu
