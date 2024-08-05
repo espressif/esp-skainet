@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <sys/dirent.h>
+#include <dirent.h>
 #include "assert.h"
 #include "wav_decoder.h"
 #include "esp_skainet_player.h"
@@ -277,13 +277,13 @@ void fetch_task(void *arg)
     int chunk_num = 1;
 
     while (1) {
-        RSR(CCOUNT, c0);
+        c0 = esp_cpu_get_cycle_count();
         afe_fetch_result_t *res = afe_handle->fetch(afe_data);
         if (!res || res->ret_value == ESP_FAIL) {
             break;
         }
         // int res = 0;
-        RSR(CCOUNT, c1);
+        c1 = esp_cpu_get_cycle_count();
         tester->running_time += c1 - c0;
         chunk_num += 1;
         if (res->wakeup_state == WAKENET_DETECTED) {

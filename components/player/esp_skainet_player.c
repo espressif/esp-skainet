@@ -7,8 +7,8 @@
 #include "wav_decoder.h"
 #include "freertos/queue.h"
 #include <sys/stat.h>
-#include <sys/dirent.h>
 #include "esp_board_init.h"
+#include <dirent.h>
 
 #define CODEC_CHANNEL 2
 #define CODEC_SAMPLE_RATE 16000

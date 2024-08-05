@@ -18,7 +18,7 @@
 #include "esp_partition.h"
 #include "esp_idf_version.h"
 
-//#define SDCARD_OUTPUT_ENABLE
+// #define SDCARD_OUTPUT_ENABLE
 
 ringbuf_handle_t urat_rb=NULL;
 

@@ -100,7 +100,7 @@ void detect_Task(void *arg)
             afe_handle->disable_wakenet(afe_data);
             printf("-----------listening-----------\n");
         }
-#elif CONFIG_IDF_TARGET_ESP32S3
+#else
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("WAKEWORD DETECTED\n");
 	    multinet->clean(model_data);  // clean all status of multinet
@@ -148,8 +148,8 @@ void detect_Task(void *arg)
 void app_main()
 {
     models = esp_srmodel_init("model");
-    ESP_ERROR_CHECK(esp_board_init(8000, 1, 16));
-    // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
+    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
+    ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
 
     afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_SR_HANDLE;
