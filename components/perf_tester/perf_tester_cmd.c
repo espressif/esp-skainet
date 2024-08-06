@@ -68,8 +68,8 @@ perf_tester_config_t* get_perf_tester_config(void)
 {
     if (config == NULL) {
         config = (perf_tester_config_t*) malloc(sizeof(perf_tester_config_t));
-        strcpy(config->noise, "all");
-        strcpy(config->snr, "all");
+        strcpy(config->noise, "pink");
+        strcpy(config->snr, "5");
         strcpy(config->mode, "fast");
     }
     return config;
