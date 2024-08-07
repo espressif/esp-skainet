@@ -43,30 +43,27 @@
 #define GPIO_MUTE_NUM   GPIO_NUM_1
 #define GPIO_MUTE_LEVEL 1
 #define ACK_CHECK_EN   0x1     /*!< I2C master will check ack from slave*/
-#define ADC_I2S_CHANNEL 4
+#define ADC_I2S_CHANNEL 2
 static sdmmc_card_t *card;
 static const char *TAG = "board";
 static int s_play_sample_rate = 16000;
-static int s_play_channel_format = 1;
+static int s_play_channel_format = 2;
 static int s_bits_per_chan = 16;
 
 static sd_pwr_ctrl_handle_t             pwr_ctrl_handle = NULL;
 static esp_ldo_channel_handle_t         ldo_audio_board = NULL;
+static bool esp_ldo_enabled = false;
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
 static i2s_chan_handle_t                tx_handle = NULL;        // I2S tx channel handler
 static i2s_chan_handle_t                rx_handle = NULL;        // I2S rx channel handler
 #endif
-static audio_codec_data_if_t *record_data_if = NULL;
-static audio_codec_ctrl_if_t *record_ctrl_if = NULL;
-static audio_codec_if_t *record_codec_if = NULL;
-static esp_codec_dev_handle_t record_dev = NULL;
 
-static audio_codec_data_if_t *play_data_if = NULL;
-static audio_codec_ctrl_if_t *play_ctrl_if = NULL;
-static audio_codec_gpio_if_t *play_gpio_if = NULL;
-static audio_codec_if_t *play_codec_if = NULL;
-static esp_codec_dev_handle_t play_dev = NULL;
+static audio_codec_data_if_t *codec_data_if = NULL;
+static audio_codec_ctrl_if_t *codec_ctrl_if = NULL;
+static audio_codec_gpio_if_t *codec_gpio_if = NULL;
+static audio_codec_if_t *codec_if = NULL;
+static esp_codec_dev_handle_t codec_dev = NULL;
 
 
 esp_err_t bsp_i2c_init(i2c_port_t i2c_num, uint32_t clk_speed)
@@ -86,180 +83,23 @@ esp_err_t bsp_i2c_init(i2c_port_t i2c_num, uint32_t clk_speed)
     return i2c_driver_install(i2c_num, i2c_cfg.mode, 0, 0, 0);
 }
 
-esp_err_t bsp_codec_adc_init(int sample_rate)
-{
-    esp_err_t ret_val = ESP_OK;
-
-    // Do initialize of related interface: data_if, ctrl_if and gpio_if
-    audio_codec_i2s_cfg_t i2s_cfg = {
-        .port = I2S_NUM_1,
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-        .rx_handle = rx_handle,
-        .tx_handle = NULL,
-#endif
-    };
-    record_data_if = audio_codec_new_i2s_data(&i2s_cfg);
-
-    audio_codec_i2c_cfg_t i2c_cfg = {.addr = ES7210_CODEC_DEFAULT_ADDR};
-    record_ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
-    // New input codec interface
-    es7210_codec_cfg_t es7210_cfg = {
-        .ctrl_if = record_ctrl_if,
-        .mic_selected = ES7120_SEL_MIC1 | ES7120_SEL_MIC2 | ES7120_SEL_MIC3 | ES7120_SEL_MIC4,
-    };
-    record_codec_if = es7210_codec_new(&es7210_cfg);
-    // New input codec device
-    esp_codec_dev_cfg_t dev_cfg = {
-        .codec_if = record_codec_if,
-        .data_if = record_data_if,
-        .dev_type = ESP_CODEC_DEV_TYPE_IN,
-    };
-    record_dev = esp_codec_dev_new(&dev_cfg);
-
-    esp_codec_dev_sample_info_t fs = {
-        .sample_rate = 16000,
-        .channel = 2,
-        .bits_per_sample = 32,
-    };
-    esp_codec_dev_open(record_dev, &fs);
-    // esp_codec_dev_set_in_gain(record_dev, RECORD_VOLUME);
-    esp_codec_dev_set_in_channel_gain(record_dev, ESP_CODEC_DEV_MAKE_CHANNEL_MASK(0), RECORD_VOLUME);
-    esp_codec_dev_set_in_channel_gain(record_dev, ESP_CODEC_DEV_MAKE_CHANNEL_MASK(1), RECORD_VOLUME);
-    esp_codec_dev_set_in_channel_gain(record_dev, ESP_CODEC_DEV_MAKE_CHANNEL_MASK(2), 0.0);
-    esp_codec_dev_set_in_channel_gain(record_dev, ESP_CODEC_DEV_MAKE_CHANNEL_MASK(3), RECORD_VOLUME);
-
-    return ret_val;
-}
-
-esp_err_t bsp_codec_dac_init(int sample_rate, int channel_format, int bits_per_chan)
-{
-    esp_err_t ret_val = ESP_OK;
-
-    // Do initialize of related interface: data_if, ctrl_if and gpio_if
-    audio_codec_i2s_cfg_t i2s_cfg = {
-        .port = I2S_NUM_1,
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-        .rx_handle = NULL,
-        .tx_handle = tx_handle,
-#endif
-    };
-    play_data_if = audio_codec_new_i2s_data(&i2s_cfg);
-
-    audio_codec_i2c_cfg_t i2c_cfg = {.addr = ES8311_CODEC_DEFAULT_ADDR};
-    play_ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
-    play_gpio_if = audio_codec_new_gpio();
-    // New output codec interface
-    es8311_codec_cfg_t es8311_cfg = {
-        .codec_mode = ESP_CODEC_DEV_WORK_MODE_DAC,
-        .ctrl_if = play_ctrl_if,
-        .gpio_if = play_gpio_if,
-        .pa_pin = GPIO_PWR_CTRL,
-        .use_mclk = false,
-    };
-    play_codec_if = es8311_codec_new(&es8311_cfg);
-    // New output codec device
-    esp_codec_dev_cfg_t dev_cfg = {
-        .codec_if = play_codec_if,
-        .data_if = play_data_if,
-        .dev_type = ESP_CODEC_DEV_TYPE_OUT,
-    };
-    play_dev = esp_codec_dev_new(&dev_cfg);
-
-    esp_codec_dev_sample_info_t fs = {
-        .bits_per_sample = bits_per_chan,
-        .sample_rate = sample_rate,
-        .channel = channel_format,
-    };
-    esp_codec_dev_set_out_vol(play_dev, PLAYER_VOLUME);
-    esp_codec_dev_open(play_dev, &fs);
-
-    return ret_val;
-}
-
-static esp_err_t bsp_codec_adc_deinit()
-{
-    esp_err_t ret_val = ESP_OK;
-
-    if (record_dev) {
-        esp_codec_dev_close(record_dev);
-        esp_codec_dev_delete(record_dev);
-        record_dev = NULL;
-    }
-
-    // Delete codec interface
-    if (record_codec_if) {
-        audio_codec_delete_codec_if(record_codec_if);
-        record_codec_if = NULL;
-    }
-    
-    // Delete codec control interface
-    if (record_ctrl_if) {
-        audio_codec_delete_ctrl_if(record_ctrl_if);
-        record_ctrl_if = NULL;
-    }
-    
-    // Delete codec data interface
-    if (record_data_if) {
-        audio_codec_delete_data_if(record_data_if);
-        record_data_if = NULL;
-    }
-
-    return ret_val;
-}
-
-static esp_err_t bsp_codec_dac_deinit()
-{
-    esp_err_t ret_val = ESP_OK;
-
-    if (play_dev) {
-        esp_codec_dev_close(play_dev);
-        esp_codec_dev_delete(play_dev);
-        play_dev = NULL;
-    }
-
-    // Delete codec interface
-    if (play_codec_if) {
-        audio_codec_delete_codec_if(play_codec_if);
-        play_codec_if = NULL;
-    }
-    
-    // Delete codec control interface
-    if (play_ctrl_if) {
-        audio_codec_delete_ctrl_if(play_ctrl_if);
-        play_ctrl_if = NULL;
-    }
-    
-    if (play_gpio_if) {
-        audio_codec_delete_gpio_if(play_gpio_if);
-        play_gpio_if = NULL;
-    }
-    
-    // Delete codec data interface
-    if (play_data_if) {
-        audio_codec_delete_data_if(play_data_if);
-        play_data_if = NULL;
-    }
-
-    return ret_val;
-}
-
 esp_err_t bsp_audio_set_play_vol(int volume)
 {
-    if (!play_dev) {
+    if (!codec_dev) {
         ESP_LOGE(TAG, "DAC codec init fail");
         return ESP_FAIL;
     }
-    esp_codec_dev_set_out_vol(play_dev, volume);
+    esp_codec_dev_set_out_vol(codec_dev, volume);
     return ESP_OK;
 }
 
 esp_err_t bsp_audio_get_play_vol(int *volume)
 {
-    if (!play_dev) {
+    if (!codec_dev) {
         ESP_LOGE(TAG, "DAC codec init fail");
         return ESP_FAIL;
     }
-    esp_codec_dev_get_out_vol(play_dev, volume);
+    esp_codec_dev_get_out_vol(codec_dev, volume);
     return ESP_OK;
 }
 
@@ -268,21 +108,17 @@ static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int chan
 {
     esp_err_t ret_val = ESP_OK;
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     i2s_slot_mode_t channel_fmt = I2S_SLOT_MODE_STEREO;
-    if (channel_format == 1) {
-        channel_fmt = I2S_SLOT_MODE_MONO;
-    } else if (channel_format == 2) {
-        channel_fmt = I2S_SLOT_MODE_STEREO;
-    } else {
+    if (channel_format != 2) {
         ESP_LOGE(TAG, "Unable to configure channel_format %d", channel_format);
-        channel_format = 1;
-        channel_fmt = I2S_SLOT_MODE_MONO;
+        channel_format = 2;
+        channel_fmt = I2S_SLOT_MODE_STEREO;
     }
 
-    if (bits_per_chan != 16 && bits_per_chan != 32) {
+    if (bits_per_chan != 16) {
         ESP_LOGE(TAG, "Unable to configure bits_per_chan %d", bits_per_chan);
-        bits_per_chan = 32;
+        bits_per_chan = 16;
     }
 
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(i2s_num, I2S_ROLE_MASTER);
@@ -294,34 +130,7 @@ static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int chan
     ret_val |= i2s_channel_enable(tx_handle);
     ret_val |= i2s_channel_enable(rx_handle);
 #else
-    i2s_channel_fmt_t channel_fmt = I2S_CHANNEL_FMT_RIGHT_LEFT;
-    if (channel_format == 1) {
-        channel_fmt = I2S_CHANNEL_FMT_ONLY_LEFT;
-    } else if (channel_format == 2) {
-        channel_fmt = I2S_CHANNEL_FMT_RIGHT_LEFT;
-    } else {
-        ESP_LOGE(TAG, "Unable to configure channel_format %d", channel_format);
-        channel_format = 1;
-        channel_fmt = I2S_CHANNEL_FMT_ONLY_LEFT;
-    }
-
-    if (bits_per_chan != 16 && bits_per_chan != 32) {
-        ESP_LOGE(TAG, "Unable to configure bits_per_chan %d", bits_per_chan);
-        bits_per_chan = 16;
-    }
-
-    i2s_config_t i2s_config = I2S_CONFIG_DEFAULT(sample_rate, channel_fmt, bits_per_chan);
-
-    i2s_pin_config_t pin_config = {
-        .bck_io_num = GPIO_I2S_SCLK,
-        .ws_io_num = GPIO_I2S_LRCK,
-        .data_out_num = GPIO_I2S_DOUT,
-        .data_in_num = GPIO_I2S_SDIN,
-        .mck_io_num = GPIO_I2S_MCLK,
-    };
-
-    ret_val |= i2s_driver_install(i2s_num, &i2s_config, 0, NULL);
-    ret_val |= i2s_set_pin(i2s_num, &pin_config);
+    ESP_LOGE(TAG, "P4 don't support IDF version < V5.3");
 #endif
 
     return ret_val;
@@ -331,7 +140,7 @@ static esp_err_t bsp_i2s_deinit(i2s_port_t i2s_num)
 {
     esp_err_t ret_val = ESP_OK;
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     if (rx_handle) {
         ret_val |= i2s_channel_disable(rx_handle);
         ret_val |= i2s_del_channel(rx_handle);
@@ -343,8 +152,7 @@ static esp_err_t bsp_i2s_deinit(i2s_port_t i2s_num)
         tx_handle = NULL;
     }
 #else
-    ret_val |= i2s_stop(i2s_num);
-    ret_val |= i2s_driver_uninstall(i2s_num);
+    ESP_LOGE(TAG, "P4 don't support IDF version < V5.3");
 #endif
 
     return ret_val;
@@ -354,8 +162,47 @@ static esp_err_t bsp_codec_init(int adc_sample_rate, int dac_sample_rate, int da
 {
     esp_err_t ret_val = ESP_OK;
 
-    ret_val |= bsp_codec_adc_init(adc_sample_rate);
-    ret_val |= bsp_codec_dac_init(dac_sample_rate, dac_channel_format, dac_bits_per_chan);
+    // ret_val |= bsp_codec_adc_init(adc_sample_rate);
+    // ret_val |= bsp_codec_dac_init(dac_sample_rate, dac_channel_format, dac_bits_per_chan);
+
+    // Do initialize of related interface: data_if, ctrl_if and gpio_if
+    audio_codec_i2s_cfg_t i2s_cfg = {
+        .port = I2S_NUM_1,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        .rx_handle = rx_handle,
+        .tx_handle = tx_handle,
+#endif
+    };
+    codec_data_if = audio_codec_new_i2s_data(&i2s_cfg);
+
+    audio_codec_i2c_cfg_t i2c_cfg = {.addr = ES8311_CODEC_DEFAULT_ADDR};
+    codec_ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
+    codec_gpio_if = audio_codec_new_gpio();
+    // New output codec interface
+    es8311_codec_cfg_t es8311_cfg = {
+        .codec_mode = ESP_CODEC_DEV_WORK_MODE_BOTH,
+        .ctrl_if = codec_ctrl_if,
+        .gpio_if = codec_gpio_if,
+        .pa_pin = GPIO_PWR_CTRL,
+        .use_mclk = true,
+    };
+    codec_if = es8311_codec_new(&es8311_cfg);
+    // New output codec device
+    esp_codec_dev_cfg_t dev_cfg = {
+        .codec_if = codec_if,
+        .data_if = codec_data_if,
+        .dev_type = ESP_CODEC_DEV_TYPE_IN_OUT,
+    };
+    codec_dev = esp_codec_dev_new(&dev_cfg);
+
+    esp_codec_dev_sample_info_t fs = {
+        .bits_per_sample = dac_bits_per_chan,
+        .sample_rate = dac_sample_rate,
+        .channel = dac_channel_format,
+    };
+    esp_codec_dev_set_in_gain(codec_dev, RECORD_VOLUME);
+    esp_codec_dev_set_out_vol(codec_dev, PLAYER_VOLUME);
+    esp_codec_dev_open(codec_dev, &fs);
 
     return ret_val;
 }
@@ -364,65 +211,45 @@ static esp_err_t bsp_codec_deinit()
 {
     esp_err_t ret_val = ESP_OK;
 
-    ret_val |= bsp_codec_adc_deinit();
-    ret_val |= bsp_codec_dac_deinit();
+    if (codec_dev) {
+        esp_codec_dev_close(codec_dev);
+        esp_codec_dev_delete(codec_dev);
+        codec_dev = NULL;
+    }
+
+    // Delete codec interface
+    if (codec_if) {
+        audio_codec_delete_codec_if(codec_if);
+        codec_if = NULL;
+    }
+    
+    // Delete codec control interface
+    if (codec_ctrl_if) {
+        audio_codec_delete_ctrl_if(codec_ctrl_if);
+        codec_ctrl_if = NULL;
+    }
+    
+    if (codec_gpio_if) {
+        audio_codec_delete_gpio_if(codec_gpio_if);
+        codec_gpio_if = NULL;
+    }
+    
+    // Delete codec data interface
+    if (codec_data_if) {
+        audio_codec_delete_data_if(codec_data_if);
+        codec_data_if = NULL;
+    }
+
     return ret_val;
 }
 
 esp_err_t bsp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wait)
 {
-    size_t bytes_write = 0;
     esp_err_t ret = ESP_OK;
-    if (!play_dev) {
+    if (!codec_dev) {
         return ESP_FAIL;
     }
-
-    int out_length= length;
-    int audio_time = 1;
-    audio_time *= (16000 / s_play_sample_rate);
-    audio_time *= (2 / s_play_channel_format);
-
-    int *data_out = NULL;
-    if (s_bits_per_chan != 32) {
-        out_length = length * 2;
-        data_out = malloc(out_length);
-        for (int i = 0; i < length / sizeof(int16_t); i++) {
-            int ret = data[i];
-            data_out[i] = ret << 16;
-        }
-    }
-
-    int *data_out_1 = NULL;
-    if (s_play_channel_format != 2 || s_play_sample_rate != 16000) {
-        out_length *= audio_time;
-        data_out_1 = malloc(out_length);
-        int *tmp_data = NULL;
-        if (data_out != NULL) {
-            tmp_data = data_out;
-        } else {
-            tmp_data = data;
-        }
-
-        for (int i = 0; i < out_length / (audio_time * sizeof(int)); i++) {
-            for (int j = 0; j < audio_time; j++) {
-                data_out_1[audio_time * i + j] = tmp_data[i];
-            }
-        }
-        if (data_out != NULL) {
-            free(data_out);
-            data_out = NULL;
-        }
-    }
-
-    if (data_out != NULL) {
-        ret = esp_codec_dev_write(play_dev, (void *)data_out, out_length);
-        free(data_out);
-    } else if (data_out_1 != NULL) {
-        ret = esp_codec_dev_write(play_dev, (void *)data_out_1, out_length);
-        free(data_out_1);
-    } else {
-        ret = esp_codec_dev_write(play_dev, (void *)data, length);
-    }
+    ret = esp_codec_dev_write(codec_dev, (void *)data, length);
 
     return ret;
 }
@@ -430,18 +257,11 @@ esp_err_t bsp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wa
 esp_err_t bsp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer_len)
 {
     esp_err_t ret = ESP_OK;
-    size_t bytes_read;
-    int audio_chunksize = buffer_len / (sizeof(int16_t) * ADC_I2S_CHANNEL);
-
-    ret = esp_codec_dev_read(record_dev, (void *)buffer, buffer_len);
-    if (!is_get_raw_channel) {
-        for (int i = 0; i < audio_chunksize; i++) {
-            int16_t ref = buffer[4 * i + 0];
-            buffer[3 * i + 0] = buffer[4 * i + 1];
-            buffer[3 * i + 1] = buffer[4 * i + 3];
-            buffer[3 * i + 2] = ref;
-        }
+    if (!codec_dev) {
+        return ESP_FAIL;
     }
+
+    ret = esp_codec_dev_read(codec_dev, (void *)buffer, buffer_len);
 
     return ret;
 }
@@ -454,11 +274,14 @@ int bsp_get_feed_channel(void)
 static void bsp_enable_audio_board_power(void)
 {
     // Turn on the power for audio board, so it can go from "No Power" state to "Shutdown" state
-    esp_ldo_channel_config_t ldo_audio_board_config = {
-        .chan_id = LDO_CHANNEL_ID,
-        .voltage_mv = LDO_CFG_VOL_MV,
-    };
-    ESP_ERROR_CHECK(esp_ldo_acquire_channel(&ldo_audio_board_config, &ldo_audio_board));
+    if (!esp_ldo_enabled) {
+        esp_ldo_channel_config_t ldo_audio_board_config = {
+            .chan_id = LDO_CHANNEL_ID,
+            .voltage_mv = LDO_CFG_VOL_MV,
+        };
+        ESP_ERROR_CHECK(esp_ldo_acquire_channel(&ldo_audio_board_config, &ldo_audio_board));
+        esp_ldo_enabled = true;
+    }
     ESP_LOGI(TAG, "Audio board powered on");
 }
 
@@ -467,6 +290,7 @@ static void bsp_disable_audio_board_power(void)
     if (ldo_audio_board) {
         esp_ldo_release_channel(ldo_audio_board);
         ldo_audio_board = NULL;
+        esp_ldo_enabled = false;
     }
 }
 
@@ -478,33 +302,27 @@ esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_
     /*!< Initialize I2C bus, used for audio codec*/
     bsp_i2c_init(I2C_NUM, I2C_CLK);
     
+    if (sample_rate != 16000) {
+       ESP_LOGE(TAG, "Unable to configure sample_rate. It's only support 16000."); 
+       sample_rate = 16000;
+    }
     s_play_sample_rate = sample_rate;
 
-    if (channel_format != 2 && channel_format != 1) {
-        ESP_LOGE(TAG, "Unable to configure channel_format");
+    if (channel_format != 2) {
+        ESP_LOGE(TAG, "Unable to configure channel_format. It's only support 2.");
         channel_format = 2;
     }
     s_play_channel_format = channel_format;
 
-    if (bits_per_chan != 32 && bits_per_chan != 16) {
-        ESP_LOGE(TAG, "Unable to configure bits_per_chan");
-        bits_per_chan = 32;
+    if (bits_per_chan != 16) {
+        ESP_LOGE(TAG, "Unable to configure bits_per_chan. It's only support 16.");
+        bits_per_chan = 16;
     }
     s_bits_per_chan = bits_per_chan;
 
-    bsp_i2s_init(I2S_NUM_1, 16000, 2, 32);
+    bsp_i2s_init(I2S_NUM_1, 16000, 2, 16);
     // Because record and play use the same i2s.
-    bsp_codec_init(16000, 16000, 2, 32);
-    /* Initialize PA */
-    // gpio_config_t  io_conf;
-    // memset(&io_conf, 0, sizeof(io_conf));
-    // io_conf.intr_type = GPIO_INTR_DISABLE;
-    // io_conf.mode = GPIO_MODE_OUTPUT;
-    // io_conf.pin_bit_mask = ((1ULL << GPIO_PWR_CTRL));
-    // io_conf.pull_down_en = 0;
-    // io_conf.pull_up_en = 0;
-    // gpio_config(&io_conf);
-    // gpio_set_level(GPIO_PWR_CTRL, 1);
+    bsp_codec_init(16000, 16000, 2, 16);
     return ESP_OK;
 }
 
@@ -564,16 +382,19 @@ esp_err_t bsp_sdcard_init(char *mount_point, size_t max_files)
     /**
      * On these chips, the SDMMC IO power is supplied externally
      */
-    sd_pwr_ctrl_ldo_config_t ldo_config = {
-        .ldo_chan_id = LDO_CHANNEL_ID, // `LDO_VO4` is used as the SDMMC IO power
-    };
-    ret_val = sd_pwr_ctrl_new_on_chip_ldo(&ldo_config, &pwr_ctrl_handle);
-    if (ret_val != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to new an on-chip ldo power control driver");
-        return ret_val;
+    if (!esp_ldo_enabled) {
+        sd_pwr_ctrl_ldo_config_t ldo_config = {
+            .ldo_chan_id = LDO_CHANNEL_ID, // `LDO_VO4` is used as the SDMMC IO power
+        };
+        ret_val = sd_pwr_ctrl_new_on_chip_ldo(&ldo_config, &pwr_ctrl_handle);
+        if (ret_val != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to new an on-chip ldo power control driver");
+            return ret_val;
+        }
+        // pwr_ctrl_handle->set_io_voltage(pwr_ctrl_handle->ctx, LDO_CFG_VOL_MV);
+        host.pwr_ctrl_handle = pwr_ctrl_handle;
+        esp_ldo_enabled = true;
     }
-    // pwr_ctrl_handle->set_io_voltage(pwr_ctrl_handle->ctx, LDO_CFG_VOL_MV);
-    host.pwr_ctrl_handle = pwr_ctrl_handle;
 
     /**
      * @brief This initializes the slot without card detect (CD) and write protect (WP) signals.
@@ -653,11 +474,14 @@ esp_err_t bsp_sdcard_deinit(char *mount_point)
     /* Make SD/MMC card information structure pointer NULL */
     card = NULL;
 
-    ret_val = sd_pwr_ctrl_del_on_chip_ldo(pwr_ctrl_handle);
-    if (ret_val != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to delete on-chip ldo power control driver");
+    if (!pwr_ctrl_handle) {
+        ret_val = sd_pwr_ctrl_del_on_chip_ldo(pwr_ctrl_handle);
+        if (ret_val != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to delete on-chip ldo power control driver");
+        }
+        pwr_ctrl_handle = NULL;
+        esp_ldo_enabled = false;
     }
-    pwr_ctrl_handle = NULL;
 
     return ret_val;
 }
