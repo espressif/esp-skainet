@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <sys/dirent.h>
+#include <dirent.h>
 #include "assert.h"
 #include "wav_decoder.h"
 #include "esp_skainet_player.h"
@@ -517,9 +517,9 @@ void detect_task(void *arg)
         }
 
         if (tester->mn_active == 1) {
-            RSR(CCOUNT, c0);
+            c0 = esp_cpu_get_cycle_count();
             esp_mn_state_t mn_state = tester->multinet->detect(tester->mn_data, res->data);
-            RSR(CCOUNT, c1);
+            c1 = esp_cpu_get_cycle_count();
             tester->mn_running_time += c1 - c0;
             if (mn_state == ESP_MN_STATE_DETECTED) {
                 esp_mn_results_t *mn_result = tester->multinet->get_results(tester->mn_data);

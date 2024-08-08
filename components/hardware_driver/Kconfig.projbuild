@@ -24,6 +24,9 @@ config ESP32_S3_KORVO_2_V3_0_BOARD
 config ESP32_S3_EYE_BOARD
     bool "ESP32-S3-EYE"
     depends on IDF_TARGET_ESP32S3
+config ESP32_P4_FUNCTION_EV_BOARD
+    bool "ESP32-P4-Function_Ev"
+    depends on IDF_TARGET_ESP32P4
 endchoice
 
 endmenu
