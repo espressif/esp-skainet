@@ -100,7 +100,7 @@ void detect_Task(void *arg)
             afe_handle->disable_wakenet(afe_data);
             printf("-----------listening-----------\n");
         }
-#elif CONFIG_IDF_TARGET_ESP32S3
+#elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32P4
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("WAKEWORD DETECTED\n");
 	    multinet->clean(model_data);  // clean all status of multinet
@@ -148,7 +148,7 @@ void detect_Task(void *arg)
 void app_main()
 {
     models = esp_srmodel_init("model");
-    ESP_ERROR_CHECK(esp_board_init(8000, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
 
@@ -156,13 +156,11 @@ void app_main()
     afe_config_t afe_config = AFE_CONFIG_DEFAULT();
 
     afe_config.wakenet_model_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);;
-#if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_EYE_BOARD
-    afe_config.aec_init = false;
-    #if defined CONFIG_ESP32_S3_EYE_BOARD
-        afe_config.pcm_config.total_ch_num = 2;
-        afe_config.pcm_config.mic_num = 1;
-        afe_config.pcm_config.ref_num = 1;
-    #endif
+#if CONFIG_ESP32_S3_EYE_BOARD || CONFIG_ESP32_P4_FUNCTION_EV_BOARD
+    afe_config.pcm_config.total_ch_num = 2;
+    afe_config.pcm_config.mic_num = 1;
+    afe_config.pcm_config.ref_num = 1;
+    afe_config.wakenet_mode = DET_MODE_90;
 #endif
     afe_data = afe_handle->create_from_config(&afe_config);
 
@@ -170,12 +168,12 @@ void app_main()
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 
-#if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || defined CONFIG_ESP32_KORVO_V1_1_BOARD
-    xTaskCreatePinnedToCore(&led_Task, "led", 3 * 1024, NULL, 5, NULL, 0);
-#endif
-#if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD
-    xTaskCreatePinnedToCore(&play_music, "play", 2 * 1024, NULL, 5, NULL, 1);
-#endif
+// #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || defined CONFIG_ESP32_KORVO_V1_1_BOARD
+//     xTaskCreatePinnedToCore(&led_Task, "led", 3 * 1024, NULL, 5, NULL, 0);
+// #endif
+// #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD
+//     xTaskCreatePinnedToCore(&play_music, "play", 2 * 1024, NULL, 5, NULL, 1);
+// #endif
 
     // You can call afe_handle->destroy to destroy AFE.
 //    vTaskDelay(2000 / portTICK_PERIOD_MS);

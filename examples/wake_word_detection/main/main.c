@@ -107,25 +107,16 @@ void app_main()
     afe_config.wakenet_model_name_2 = wn_name_2;
     afe_config.voice_communication_init = false;
 
-#if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_EYE_BOARD
-    afe_config.aec_init = false;
-    #if defined CONFIG_ESP32_S3_EYE_BOARD
-        afe_config.pcm_config.total_ch_num = 2;
-        afe_config.pcm_config.mic_num = 1;
-        afe_config.pcm_config.ref_num = 1;
-    #endif
+#if CONFIG_ESP32_S3_EYE_BOARD || CONFIG_ESP32_P4_FUNCTION_EV_BOARD
+    afe_config.pcm_config.total_ch_num = 2;
+    afe_config.pcm_config.mic_num = 1;
+    afe_config.pcm_config.ref_num = 1;
+    afe_config.wakenet_mode = DET_MODE_90;
+    afe_config.se_init = false;
 #endif
     afe_data = afe_handle->create_from_config(&afe_config);
     
     task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 4 * 1024, (void*)afe_data, 5, NULL, 1);
-
-    // // You can call afe_handle->destroy to destroy AFE.
-    // task_flag = 0;
-
-    // printf("destroy\n");
-    // afe_handle->destroy(afe_data);
-    // afe_data = NULL;
-    // printf("successful\n");
 }
