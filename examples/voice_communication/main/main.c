@@ -127,6 +127,7 @@ void debug_pcm_save_Task(void *arg)
 void app_main()
 {
     ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
+    //esp_board_init(16000, 1, 16);
 #if DEBUG_SAVE_PCM
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #endif
@@ -153,8 +154,10 @@ void app_main()
     #endif
 #endif
 
+
     // config for nsnet
     afe_config.aec_init = false;
+
     afe_config.afe_ns_mode = NS_MODE_NET;
     char *nsnet_name = esp_srmodel_filter(models, ESP_NSNET_PREFIX, NULL);
     afe_config.afe_ns_model_name = nsnet_name;
@@ -179,7 +182,7 @@ void app_main()
 
     task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
-    xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
+    xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 
     esp_srmodel_deinit(models);
 

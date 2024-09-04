@@ -22,6 +22,8 @@ This example is used to test performance of voice communication.
 
 - For example, using ESP32-S3, run `cp sdkconfig.defaults.esp32s3 sdkconfig`
 
+- For example, using ESP32-P4, run `cp sdkconfig.defaults.esp32p4 sdkconfig`
+
 * Run  `idf.py menuconfig`
 
 * Set serial port information through `Serial Flasher Options`
