@@ -19,6 +19,8 @@
 
   - 比如， 使用 ESP32-S3， 运行 `cp sdkconfig.defaults.esp32s3 sdkconfig`
 
+  - 比如， 使用 ESP32-P4， 运行 `cp sdkconfig.defaults.esp32p4 sdkconfig`
+  
 * 进入 `idf.py menuconfig`
 
 * 通过 `Serial Flasher Options`设置串口信息
