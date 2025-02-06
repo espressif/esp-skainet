@@ -111,13 +111,13 @@ static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int chan
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     i2s_slot_mode_t channel_fmt = I2S_SLOT_MODE_STEREO;
     if (channel_format != 2) {
-        ESP_LOGE(TAG, "Unable to configure channel_format %d", channel_format);
+        ESP_LOGW(TAG, "Unable to configure channel_format %d, reset to 2", channel_format);
         channel_format = 2;
         channel_fmt = I2S_SLOT_MODE_STEREO;
     }
 
     if (bits_per_chan != 16) {
-        ESP_LOGE(TAG, "Unable to configure bits_per_chan %d", bits_per_chan);
+        ESP_LOGW(TAG, "Unable to configure bits_per_chan %d, reset to 16 ", bits_per_chan);
         bits_per_chan = 16;
     }
 
@@ -269,6 +269,11 @@ esp_err_t bsp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
 int bsp_get_feed_channel(void)
 {
     return ADC_I2S_CHANNEL;
+}
+
+char* bsp_get_input_format(void)
+{
+    return "MR";
 }
 
 static void bsp_enable_audio_board_power(void)

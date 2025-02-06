@@ -50,6 +50,11 @@ int esp_get_feed_channel(void)
     return bsp_get_feed_channel();
 }
 
+char* esp_get_input_format(void)
+{
+    return bsp_get_input_format();
+}
+
 esp_err_t esp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wait)
 {
     return bsp_audio_play(data, length, ticks_to_wait);

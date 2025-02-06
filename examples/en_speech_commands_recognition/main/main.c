@@ -51,14 +51,14 @@ void feed_Task(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
     int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
-    int nch = afe_handle->get_channel_num(afe_data);
+    int nch = afe_handle->get_feed_channel_num(afe_data);
     int feed_channel = esp_get_feed_channel();
-    assert(nch <= feed_channel);
+    assert(nch == feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
 
     while (task_flag) {
-        esp_get_feed_data(false, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
+        esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
     }
@@ -146,19 +146,11 @@ void app_main()
     printf("This demo only support ESP32S3\n");
     return;
 #else 
-    afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_SR_HANDLE;
+    afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
+    afe_handle = esp_afe_handle_from_config(afe_config);
+    afe_data = afe_handle->create_from_config(afe_config);
+    afe_config_free(afe_config);
 #endif
-
-    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
-    afe_config.wakenet_model_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);;
-#if CONFIG_ESP32_S3_EYE_BOARD || CONFIG_ESP32_P4_FUNCTION_EV_BOARD
-    afe_config.pcm_config.total_ch_num = 2;
-    afe_config.pcm_config.mic_num = 1;
-    afe_config.pcm_config.ref_num = 1;
-    afe_config.wakenet_mode = DET_MODE_90;
-    afe_config.se_init = false;
-#endif
-    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(&afe_config);
 
     task_flag = 1;
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
@@ -169,12 +161,4 @@ void app_main()
 #if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD  || CONFIG_ESP32_S3_BOX_BOARD
     xTaskCreatePinnedToCore(&play_music, "play", 4 * 1024, NULL, 5, NULL, 1);
 #endif
-
-    // // You can call afe_handle->destroy to destroy AFE.
-    // task_flag = 0;
-
-    // printf("destroy\n");
-    // afe_handle->destroy(afe_data);
-    // afe_data = NULL;
-    // printf("successful\n");
 }

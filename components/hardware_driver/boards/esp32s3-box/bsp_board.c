@@ -442,6 +442,11 @@ int bsp_get_feed_channel(void)
     return ADC_I2S_CHANNEL;
 }
 
+char* bsp_get_input_format(void)
+{
+    return "RMNM";
+}
+
 esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     /*!< Initialize I2C bus, used for audio codec*/
