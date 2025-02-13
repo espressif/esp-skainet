@@ -201,12 +201,13 @@ void wav_feed_task(void *arg)
     // printf("create speech enhancement task\n");
     int sample_rate = tester->sample_rate;
     int frame_size = tester->frame_size;
+    int frame_delay_ms = frame_size * 1000 / sample_rate;
     int nch = tester->nch;
     int file_nch = 0;
 
-    int i2s_buffer_size = frame_size * (nch + 1) * sizeof(int16_t);
+    int i2s_buffer_size = frame_size * nch * sizeof(int16_t);
 
-    int16_t *i2s_buffer = calloc(frame_size * (nch + 1), sizeof(int16_t)); // nch channel MIC data and one channel reference data
+    int16_t *i2s_buffer = calloc(frame_size * nch, sizeof(int16_t)); // nch channel MIC data and one channel reference data
     tester->wave_time = 0;
 
     for (int i = 0; i < tester->file_num; i++) {
@@ -221,7 +222,7 @@ void wav_feed_task(void *arg)
                    tester->file_list[i], sample_rate);
             wav_decoder_close(wav_decoder);
             continue;
-        } else if (file_nch != nch + 1) {
+        } else if (file_nch != nch) {
 
             printf("The channel of %s does not meet the requirements(n=%d), please input %d channel MIC data and one channel reference data\n",
                    tester->file_list[i], file_nch, nch);
@@ -244,13 +245,13 @@ void wav_feed_task(void *arg)
             // size=i2s_buffer_size;
             if (size == i2s_buffer_size) {
                 afe_handle->feed(afe_data, i2s_buffer);
-                vTaskDelay(20 / portTICK_PERIOD_MS);
+                vTaskDelay(frame_delay_ms / portTICK_PERIOD_MS);
             } else {
                 // wav decoder free
-                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                vTaskDelay(100 / portTICK_PERIOD_MS);
                 wav_decoder_close(wav_decoder);
                 wav_decoder = NULL;
-                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                vTaskDelay(200 / portTICK_PERIOD_MS);
                 break;
             }
         }
@@ -280,7 +281,11 @@ void fetch_task(void *arg)
         c0 = esp_cpu_get_cycle_count();
         afe_fetch_result_t *res = afe_handle->fetch(afe_data);
         if (!res || res->ret_value == ESP_FAIL) {
-            break;
+            if (tester->test_done) {
+                break;
+            } else {
+                continue;
+            }
         }
         // int res = 0;
         c1 = esp_cpu_get_cycle_count();
@@ -288,8 +293,10 @@ void fetch_task(void *arg)
         chunk_num += 1;
         if (res->wakeup_state == WAKENET_DETECTED) {
             tester->file_det_times[file_id]++;
+            printf("DETECT\n");
         }
         if (file_id != tester->file_id) {
+            printf("File%d, trigger times: %d\n", file_id, tester->file_det_times[file_id]);
             file_id = tester->file_id;
             chunk_num = 0;
         } else if (tester->test_done) {
@@ -342,7 +349,8 @@ void offline_wn_tester(const char *csv_file,
     sm1 = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
 
     // init AFE
-    tester->afe_handle = (esp_afe_sr_iface_t *)afe_handle;
+    afe_handle = esp_afe_handle_from_config(afe_config);
+    tester->afe_handle = afe_handle;
     tester->afe_data = afe_handle->create_from_config(afe_config);
     tester->frame_size = afe_handle->get_feed_chunksize(tester->afe_data);
     tester->sample_rate = afe_handle->get_samp_rate(tester->afe_data);
@@ -362,9 +370,9 @@ void offline_wn_tester(const char *csv_file,
         return ;
     }
 
-    // printf("The memory info after init:\n");
+    printf("The memory info after init:\n");
     if (audio_type == TESTER_WAV_3CH) {
-        xTaskCreatePinnedToCore(&wav_feed_task, "wav_feed_task", 4 * 1024, (void *)tester, 8, NULL, 1);
+        xTaskCreatePinnedToCore(&wav_feed_task, "wav_feed_task", 8 * 1024, (void *)tester, 8, NULL, 1);
     }
 
     if (audio_type == TESTER_WAV_3CH) {
