@@ -148,7 +148,7 @@ void app_main()
 #else 
     afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
     afe_handle = esp_afe_handle_from_config(afe_config);
-    afe_data = afe_handle->create_from_config(afe_config);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(afe_config);
     afe_config_free(afe_config);
 #endif
 

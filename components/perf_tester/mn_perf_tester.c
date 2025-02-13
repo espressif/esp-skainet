@@ -30,7 +30,7 @@ typedef struct {
     int tester_sram_size;       // internal SRAM size for tester
 
     // wakenet
-    esp_afe_sr_iface_t *afe_handle;
+    const esp_afe_sr_iface_t *afe_handle;
     esp_afe_sr_data_t *afe_data;
     afe_config_t *afe_config;
 
@@ -329,7 +329,7 @@ void wav_feed_task(void *arg)
 {
     printf("Create wav feed task ...\n");
     skainet_perf_tester *tester = arg;
-    esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
+    const esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
     esp_afe_sr_data_t *afe_data = tester->afe_data;
     void *wav_decoder = NULL;
     int sample_rate = tester->sample_rate;
@@ -775,7 +775,7 @@ void offline_mn_tester(const char *csv_file,
     // init AFE
     // afe_config->afe_mode = SR_MODE_HIGH_PERF;
     tester->afe_config = afe_config;
-    tester->afe_handle = (esp_afe_sr_iface_t *)afe_handle;
+    tester->afe_handle = afe_handle;
     tester->afe_data = afe_handle->create_from_config(afe_config);
     tester->frame_size = afe_handle->get_feed_chunksize(tester->afe_data);
     tester->sample_rate = afe_handle->get_samp_rate(tester->afe_data);
@@ -830,7 +830,7 @@ void print_vad_report(skainet_perf_tester *tester)
     tester->tester_mem_size -= heap_caps_get_free_size(MALLOC_CAP_8BIT);
     tester->tester_sram_size -= heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
 
-    float wave_time = tester->wave_time / tester->sample_rate;
+    // float wave_time = tester->wave_time / tester->sample_rate;
     printf("Tester PSRAM: %d KB\n", (tester->tester_mem_size - tester->tester_sram_size) / 1024);
     printf("Tester SRAM: %d KB\n", tester->tester_sram_size / 1024);
 
@@ -855,7 +855,7 @@ void vad_feed_task(void *arg)
 {
     printf("Create vad feed task ...\n");
     skainet_perf_tester *tester = arg;
-    esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
+    const esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
     esp_afe_sr_data_t *afe_data = tester->afe_data;
     void *wav_decoder = NULL;
     int sample_rate = tester->sample_rate;
@@ -880,7 +880,7 @@ void vad_feed_task(void *arg)
                    tester->file_list[i], sample_rate);
             wav_decoder_close(wav_decoder);
             continue;
-        } else if (file_nch != nch + 1) {
+        } else if (file_nch != nch) {
 
             printf("The channel of %s does not meet the requirements(n=%d), please input %d channel MIC data and one channel reference data\n",
                    tester->file_list[i], file_nch, nch);
@@ -938,6 +938,21 @@ void vad_feed_task(void *arg)
     vTaskDelete(NULL);
 }
 
+void save_vad_states(int8_t* states, int size, char* file_name) 
+{
+    char* state_file = (char*)calloc(FATFS_PATH_LENGTH_MAX, sizeof(char));
+    sprintf(state_file, "%s_states.bin", file_name);
+    FILE *fp = fopen(state_file, "wb");
+    if (fp == NULL) {
+        printf("Failed to open file %s for writing\n", state_file);
+        return;
+    } else {
+        printf("prepare to write vad states");
+    }
+    fwrite(states, sizeof(int8_t), size, fp);
+    fclose(fp);
+}
+
 void vad_detect_task(void *arg)
 {
     printf("Create detect task ...\n");
@@ -948,7 +963,6 @@ void vad_detect_task(void *arg)
     read_gt_csv_file(tester, file_id);
     tester->processed_sample_num = 0;
     tester->mn_running_time = 0;
-    uint32_t c0, c1;
 
     int gt_idx = 0;
     float curr_time_s;
@@ -960,10 +974,21 @@ void vad_detect_task(void *arg)
     int speech_seg_flag = 0;
     int noise_seg_flag = 0;
     vad_state_t last_state = VAD_SILENCE;
+    int8_t *file_vad_states = (int8_t *) malloc(60*60*60*sizeof(int8_t));
+    int file_chunk = 0;
 
     while (1) {
         afe_fetch_result_t* res = tester->afe_handle->fetch(tester->afe_data);
+        if (res->ret_value == ESP_FAIL) {
+            continue;;
+        }
         vad_state_t state = res->vad_state;
+        if (state == VAD_SPEECH) {
+            file_vad_states[file_chunk] = 1;
+        } else {
+            file_vad_states[file_chunk] = 0;
+        }
+        file_chunk++;
 
         tester->processed_sample_num += afe_chunksize;
         if (!res || res->ret_value == ESP_FAIL) {
@@ -977,10 +1002,10 @@ void vad_detect_task(void *arg)
                 tester->file_speech_count[file_id] += 1;
                 if (state == VAD_SPEECH) {
                     tester->file_vad_speech_count[file_id] += 1;
-                    // printf("speech->speech\n");
+                    printf("speech->speech\n");
                     speech_seg_flag = 1;
                 } else {
-                    // printf("speech->noise\n");
+                    printf("speech->noise\n");
                 }
                 if (state != last_state && state == VAD_SILENCE) {
                     tester->file_vad_speech_change[file_id] += 1;
@@ -1020,6 +1045,8 @@ void vad_detect_task(void *arg)
         // make sure the last region boundary in csv is at least number of total length of current audio
         assert(curr_time_s <= tester->gt_region_boundary[gt_idx]);
         if (file_id != tester->file_id) {
+            save_vad_states(file_vad_states, file_chunk, tester->file_list[file_id]);
+            file_chunk = 0;
             // new file
             file_id = tester->file_id;
             // reset ground truth
@@ -1047,9 +1074,6 @@ void offline_vad_tester(const char *csv_file,
     // ringbuffer init
     tester->tester_mem_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
     tester->tester_sram_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
-
-    int m1 = 0, m2 = 0;
-    int sm1 = 0, sm2 = 0;
     tester->rb_buffer_size = 4096 * 2;
 
     // file list init
@@ -1090,7 +1114,7 @@ void offline_vad_tester(const char *csv_file,
     // init AFE
     // afe_config->afe_mode = SR_MODE_HIGH_PERF;
     tester->afe_config = afe_config;
-    tester->afe_handle = (esp_afe_sr_iface_t *)afe_handle;
+    tester->afe_handle = afe_handle;
     tester->afe_data = afe_handle->create_from_config(afe_config);
     tester->frame_size = afe_handle->get_feed_chunksize(tester->afe_data);
     tester->sample_rate = afe_handle->get_samp_rate(tester->afe_data);

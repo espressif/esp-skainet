@@ -34,7 +34,6 @@ FILE * file_save[FILES_MAX] = {NULL};
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
-static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 
 void feed_Task(void *arg)
@@ -135,7 +134,7 @@ void app_main()
     srmodel_list_t *models = esp_srmodel_init("model");
     afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_VC, AFE_MODE_LOW_COST);
     afe_handle = esp_afe_handle_from_config(afe_config);
-    afe_data = afe_handle->create_from_config(afe_config);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(afe_config);
     afe_config_free(afe_config);
 
 #if DEBUG_SAVE_PCM
@@ -154,13 +153,4 @@ void app_main()
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 
-    esp_srmodel_deinit(models);
-
-    // // You can call afe_handle->destroy to destroy AFE.
-    // task_flag = 0;
-
-    // printf("destroy\n");
-    // afe_handle->destroy(afe_data);
-    // afe_data = NULL;
-    // printf("successful\n");
 }

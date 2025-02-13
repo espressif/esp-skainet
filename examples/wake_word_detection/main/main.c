@@ -20,7 +20,6 @@
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
-static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 
 void feed_Task(void *arg)
@@ -82,7 +81,7 @@ void app_main()
     srmodel_list_t *models = esp_srmodel_init("model");
     afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
     afe_handle = esp_afe_handle_from_config(afe_config);
-    afe_data = afe_handle->create_from_config(afe_config);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(afe_config);
     afe_config_free(afe_config);
     
     task_flag = 1;

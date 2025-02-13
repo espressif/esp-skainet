@@ -20,7 +20,6 @@
 #include "string.h"
 
 static esp_afe_sr_iface_t *afe_handle = NULL;
-static esp_afe_sr_data_t *afe_data = NULL;
 static bool sdcard_enable = true;
 
 void feed_Task(void *arg)
@@ -67,7 +66,7 @@ void detect_Task(void *arg)
             printf("fetch error!\n");
             break;
         }
-        printf("vad state: %s\n", res->vad_state==AFE_VAD_SILENCE ? "noise" : "speech");
+        printf("vad state: %s\n", res->vad_state == VAD_SILENCE ? "noise" : "speech");
 
         /*
         
@@ -85,7 +84,7 @@ void detect_Task(void *arg)
                 printf("Save vad cache: %d\n", res->vad_cache_size);
                 FatfsComboWrite(res->vad_cache, 1, res->vad_cache_size, fp);
             }
-            if (res->vad_state == AFE_VAD_SPEECH) {
+            if (res->vad_state == VAD_SPEECH) {
                 FatfsComboWrite(res->data, 1, res->data_size, fp);
             }
         }
@@ -113,7 +112,7 @@ void app_main()
 
 
     afe_handle = esp_afe_handle_from_config(afe_config);
-    afe_data = afe_handle->create_from_config(afe_config);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(afe_config);
     afe_config_free(afe_config);
     
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);

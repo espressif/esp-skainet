@@ -30,6 +30,12 @@ examples/voice_communication:
       temporary: false
       reason: the other targets are not tested yet
 
+examples/voice_activity_detection:
+  enable:
+    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+      temporary: false
+      reason: the other targets are not tested yet
+
 examples/wake_word_detection:
   enable:
     - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]

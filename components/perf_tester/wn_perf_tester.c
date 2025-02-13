@@ -30,7 +30,7 @@ typedef struct {
     int tester_mem_size;        //total memory for tester, include PSRAM and SRAM
     int tester_sram_size;       //internal SRAM size for tester
 
-    esp_afe_sr_iface_t *afe_handle;
+    const esp_afe_sr_iface_t *afe_handle;
     esp_afe_sr_data_t *afe_data;
     int64_t running_time;
     int afe_mem_size;            //total memory for afe, include PSRAM and SRAM
@@ -195,7 +195,7 @@ void wav_feed_task(void *arg)
 {
     printf("Create wav feed task ...\n");
     skainet_perf_tester *tester = arg;
-    esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
+    const esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
     esp_afe_sr_data_t *afe_data = tester->afe_data;
     void *wav_decoder = NULL;
     // printf("create speech enhancement task\n");
@@ -269,7 +269,7 @@ void fetch_task(void *arg)
 {
     printf("Create fetch task ...\n");
     skainet_perf_tester *tester = arg;
-    esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
+    const esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
     esp_afe_sr_data_t *afe_data = tester->afe_data;
     uint32_t c0, c1;
     tester->running_time = 0;
