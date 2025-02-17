@@ -114,9 +114,9 @@ build_idf_v5.3:
   extends: .build_examples_template
   image: espressif/idf:release-v5.3
 
-build_idf_v5.4:
-  extends: .build_examples_template
-  image: espressif/idf:release-v5.4
+# build_idf_v5.4:
+#   extends: .build_examples_template
+#   image: espressif/idf:release-v5.4
 
 # Rules to trigger wakenet test
 .rules:test:test_wakenet:

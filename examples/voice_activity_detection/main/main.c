@@ -107,7 +107,6 @@ void app_main()
     afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
     afe_config->vad_min_noise_ms = 1000;  // The minimum duration of noise or silence in ms.
     afe_config->vad_min_speech_ms = 128;  // The minimum duration of speech in ms.
-    afe_config->vad_delay_ms = 128;       // The delay between the first frame trigger of VAD and the first frame of speech data.
     afe_config->vad_mode = VAD_MODE_1;    // The larger the mode, the higher the speech trigger probability.
 
 
