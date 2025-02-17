@@ -451,6 +451,11 @@ int bsp_get_feed_channel(void)
     return ADC_I2S_CHANNEL;
 }
 
+char* bsp_get_input_format(void)
+{
+    return "RMNM";
+}
+
 static void bsp_enable_audio_board_power(void)
 {
     // Turn on the power for audio board, so it can go from "No Power" state to "Shutdown" state

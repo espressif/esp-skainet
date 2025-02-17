@@ -391,7 +391,7 @@ esp_err_t bsp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wa
         if (data_out != NULL) {
             tmp_data = data_out;
         } else {
-            tmp_data = data;
+            tmp_data = (int *)data;
         }
 
         for (int i = 0; i < out_length / (audio_time * sizeof(int)); i++) {
@@ -440,6 +440,11 @@ esp_err_t bsp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
 int bsp_get_feed_channel(void)
 {
     return ADC_I2S_CHANNEL;
+}
+
+char* bsp_get_input_format(void)
+{
+    return "RMNM";
 }
 
 esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)

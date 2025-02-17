@@ -19,23 +19,22 @@ static ringbuf_handle_t rb_debug = NULL;
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
-static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 
 void feed_Task(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
     int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
-    int nch = afe_handle->get_total_channel_num(afe_data);
+    int nch = afe_handle->get_feed_channel_num(afe_data);
     int feed_channel = esp_get_feed_channel();
-    assert(nch <= feed_channel);
+    assert(nch == feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     char *destry_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
     assert(destry_buff);
 
     while (task_flag) {
-        esp_get_feed_data(false, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
+        esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
 
@@ -78,18 +77,10 @@ void app_main()
 {
     ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
 
-    afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_VC_HANDLE;
-    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
-    afe_config.vad_init = false;
-    afe_config.wakenet_init = false;
-    afe_config.voice_communication_init = true;
-
-    afe_data = afe_handle->create_from_config(&afe_config);
-    if (afe_data == NULL) {
-        printf("create_from_config fail!\n");
-        return;
-    }
-
+    afe_config_t *afe_config = afe_config_init(esp_get_input_format(), NULL, AFE_TYPE_VC, AFE_MODE_LOW_COST);
+    afe_handle = esp_afe_handle_from_config(afe_config);
+    esp_afe_sr_data_t * afe_data = afe_handle->create_from_config(afe_config);
+    afe_config_free(afe_config);
     rb_debug = mic_recorder_init();
 
     task_flag = 1;

@@ -39,3 +39,20 @@ void offline_mn_tester(const char *csv_file,
                        char *mn_coeff,
                        int audio_type,
                        perf_tester_config_t *config);
+
+/**
+ * @brief Test multinet, wakenet and AFE pipeline performance,include CPU loading, memory size and trigger times
+ *
+ * @param csv_file       CSV file path
+ * @param log_file       File name to save test report
+ * @param afe_handle     Handle of speech front end
+ * @param afe_config     Config of afe handle
+ * @param audio_type     Input audio type, 0: 3channel-PCM; 1: 3channel-WAV
+ * @param tester_config  Perf tester config
+ */
+void offline_vad_tester(const char *csv_file,
+                       const char *log_file,
+                       const esp_afe_sr_iface_t *afe_handle,
+                       afe_config_t *afe_config,
+                       int audio_type,
+                       perf_tester_config_t *config);

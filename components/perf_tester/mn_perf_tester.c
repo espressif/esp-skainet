@@ -30,7 +30,7 @@ typedef struct {
     int tester_sram_size;       // internal SRAM size for tester
 
     // wakenet
-    esp_afe_sr_iface_t *afe_handle;
+    const esp_afe_sr_iface_t *afe_handle;
     esp_afe_sr_data_t *afe_data;
     afe_config_t *afe_config;
 
@@ -78,6 +78,15 @@ typedef struct {
     int current_region_mn_detected;  // whether a mn detection is made in this region
     int early_timeout;  // whether there is a early timeout in current section
     int mn_reseted;  // whether mn is reset in this region
+    size_t * file_speech_count;
+    size_t * file_vad_speech_count;
+    size_t * file_noise_count;
+    size_t * file_vad_noise_count;
+    size_t * file_vad_speech_change;
+    size_t * file_vad_noise_change;
+    size_t * file_vad_speech_trigger;
+    size_t * file_vad_noise_trigger;
+
 
     perf_tester_config_t *config;
 
@@ -222,6 +231,7 @@ void print_mn_report(skainet_perf_tester *tester)
 int read_csv_file(skainet_perf_tester *tester)
 {
     FILE *fp = fopen(tester->csv_file, "r");
+    printf("csv:%s\n", tester->csv_file);
     tester->file_num = 0;
     if (fp == NULL) {
         return tester->file_num;
@@ -319,7 +329,7 @@ void wav_feed_task(void *arg)
 {
     printf("Create wav feed task ...\n");
     skainet_perf_tester *tester = arg;
-    esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
+    const esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
     esp_afe_sr_data_t *afe_data = tester->afe_data;
     void *wav_decoder = NULL;
     int sample_rate = tester->sample_rate;
@@ -765,7 +775,7 @@ void offline_mn_tester(const char *csv_file,
     // init AFE
     // afe_config->afe_mode = SR_MODE_HIGH_PERF;
     tester->afe_config = afe_config;
-    tester->afe_handle = (esp_afe_sr_iface_t *)afe_handle;
+    tester->afe_handle = afe_handle;
     tester->afe_data = afe_handle->create_from_config(afe_config);
     tester->frame_size = afe_handle->get_feed_chunksize(tester->afe_data);
     tester->sample_rate = afe_handle->get_samp_rate(tester->afe_data);
@@ -809,6 +819,324 @@ void offline_mn_tester(const char *csv_file,
 
     if (audio_type == TESTER_WAV_3CH) {
         xTaskCreatePinnedToCore(&detect_task, "detect_task", 4 * 1024, (void *)tester, 8, NULL, 0);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
+}
+
+
+void print_vad_report(skainet_perf_tester *tester)
+{
+    assert(tester != NULL);
+    tester->tester_mem_size -= heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    tester->tester_sram_size -= heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+
+    // float wave_time = tester->wave_time / tester->sample_rate;
+    printf("Tester PSRAM: %d KB\n", (tester->tester_mem_size - tester->tester_sram_size) / 1024);
+    printf("Tester SRAM: %d KB\n", tester->tester_sram_size / 1024);
+
+    if (tester->file_num > 0) {
+        for (int i = 0; i < tester->file_num; i++) {
+            printf("File%d: %s\n", i, tester->file_list[i]);
+            printf("File%d, speech count: %d\n", i, tester->file_speech_count[i]);
+            printf("File%d, noise count: %d\n", i, tester->file_noise_count[i]);
+            printf("File%d, speech state change: %d\n", i, tester->file_vad_speech_change[i]);
+            printf("File%d, speech trigger: %d\n", i, tester->file_vad_speech_trigger[i]);
+            printf("File%d, noise state change: %d\n", i, tester->file_vad_noise_change[i]);
+            printf("File%d, noise trigger: %d\n", i, tester->file_vad_noise_trigger[i]);
+            printf("File%d, vad speech count: %d, accuracy:%f\n", i, tester->file_vad_speech_count[i], tester->file_vad_speech_count[i]*1.0/tester->file_speech_count[i]);
+            printf("File%d, vad noise count: %d, accuracy:%f\n", i, tester->file_vad_noise_count[i], tester->file_vad_noise_count[i]*1.0/tester->file_noise_count[i]);
+        
+        }
+    }
+
+    printf("TEST DONE\n");
+}
+void vad_feed_task(void *arg)
+{
+    printf("Create vad feed task ...\n");
+    skainet_perf_tester *tester = arg;
+    const esp_afe_sr_iface_t *afe_handle = tester->afe_handle;
+    esp_afe_sr_data_t *afe_data = tester->afe_data;
+    void *wav_decoder = NULL;
+    int sample_rate = tester->sample_rate;
+    int frame_size = tester->frame_size;
+    int nch = tester->nch;
+    int file_nch = 0;
+
+    int i2s_buffer_size = frame_size * (nch + 1) * sizeof(int16_t);
+
+    int16_t *i2s_buffer = calloc(frame_size * (nch + 1), sizeof(int16_t)); // nch channel MIC data and one channel reference data
+    tester->wave_time = 0;
+
+    for (int i = 0; i < tester->file_num; i++) {
+        wav_decoder = wav_decoder_open(tester->file_list[i]);
+        file_nch = wav_decoder_get_channel(wav_decoder);
+
+        if (wav_decoder == NULL) {
+            printf("can not find %s, play next song\n", tester->file_list[i]);
+            continue;
+        } else if (wav_decoder_get_sample_rate(wav_decoder) != sample_rate) {
+            printf("The sample rate of %s does not meet the requirements, please resample to %d\n",
+                   tester->file_list[i], sample_rate);
+            wav_decoder_close(wav_decoder);
+            continue;
+        } else if (file_nch != nch) {
+
+            printf("The channel of %s does not meet the requirements(n=%d), please input %d channel MIC data and one channel reference data\n",
+                   tester->file_list[i], file_nch, nch);
+            wav_decoder_close(wav_decoder);
+            continue;
+        } else {
+            printf("start to process %s\n", tester->file_list[i]);
+        }
+
+        tester->file_id = i;
+        tester->file_speech_count[i] = 0;
+        tester->file_noise_count[i] = 0;
+        tester->file_vad_noise_count[i] = 0.0;
+        tester->file_vad_speech_count[i] = 0.0;
+        tester->file_vad_noise_change[i] = 0.0;
+        tester->file_vad_speech_change[i] = 0.0;
+        tester->file_vad_speech_trigger[i] = 0.0;
+        tester->file_vad_noise_trigger[i] = 0.0;
+
+        int out_samples = 0;
+        int size = i2s_buffer_size;
+
+        while (1) {
+            size = wav_decoder_run(wav_decoder, (unsigned char *)i2s_buffer, i2s_buffer_size);
+            out_samples += frame_size;
+
+            if (size == i2s_buffer_size) {
+                afe_handle->feed(afe_data, i2s_buffer);
+                vTaskDelay(32 / portTICK_PERIOD_MS);
+            } else {
+                // wav decoder free
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                wav_decoder_close(wav_decoder);
+                wav_decoder = NULL;
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                break;
+            }
+        }
+
+        printf("File%d: %s\n", i, tester->file_list[i]);
+        printf("File%d, speech count: %d\n", i, tester->file_speech_count[i]);
+        printf("File%d, noise count: %d\n", i, tester->file_noise_count[i]);
+        printf("File%d, speech state change: %d\n", i, tester->file_vad_speech_change[i]);
+        printf("File%d, speech trigger: %d\n", i, tester->file_vad_speech_trigger[i]);
+        printf("File%d, noise state change: %d\n", i, tester->file_vad_noise_change[i]);
+        printf("File%d, noise trigger: %d\n", i, tester->file_vad_noise_trigger[i]);
+        printf("File%d, vad speech count: %d, accuracy:%f\n", i, tester->file_vad_speech_count[i], tester->file_vad_speech_count[i]*1.0/tester->file_speech_count[i]);
+        printf("File%d, vad noise count: %d, accuracy:%f\n", i, tester->file_vad_noise_count[i], tester->file_vad_noise_count[i]*1.0/tester->file_noise_count[i]);
+    
+        tester->wave_time += out_samples;
+    }
+
+    tester->test_done = 1;
+    print_vad_report(tester);
+    vTaskDelete(NULL);
+}
+
+void save_vad_states(int8_t* states, int size, char* file_name) 
+{
+    char* state_file = (char*)calloc(FATFS_PATH_LENGTH_MAX, sizeof(char));
+    sprintf(state_file, "%s_states.bin", file_name);
+    FILE *fp = fopen(state_file, "wb");
+    if (fp == NULL) {
+        printf("Failed to open file %s for writing\n", state_file);
+        return;
+    } else {
+        printf("prepare to write vad states");
+    }
+    fwrite(states, sizeof(int8_t), size, fp);
+    fclose(fp);
+}
+
+void vad_detect_task(void *arg)
+{
+    printf("Create detect task ...\n");
+    skainet_perf_tester *tester = arg;
+    int afe_chunksize = tester->afe_handle->get_fetch_chunksize(tester->afe_data);
+
+    int file_id = 0;
+    read_gt_csv_file(tester, file_id);
+    tester->processed_sample_num = 0;
+    tester->mn_running_time = 0;
+
+    int gt_idx = 0;
+    float curr_time_s;
+    tester->woke_up = 0;
+    tester->current_region_mn_detected = 0;
+    tester->current_region_wn_detected = 0;
+    tester->early_timeout = 0;
+    tester->mn_reseted = 0;
+    int speech_seg_flag = 0;
+    int noise_seg_flag = 0;
+    vad_state_t last_state = VAD_SILENCE;
+    int8_t *file_vad_states = (int8_t *) malloc(60*60*60*sizeof(int8_t));
+    int file_chunk = 0;
+
+    while (1) {
+        afe_fetch_result_t* res = tester->afe_handle->fetch(tester->afe_data);
+        if (res->ret_value == ESP_FAIL) {
+            continue;;
+        }
+        vad_state_t state = res->vad_state;
+        if (state == VAD_SPEECH) {
+            file_vad_states[file_chunk] = 1;
+        } else {
+            file_vad_states[file_chunk] = 0;
+        }
+        file_chunk++;
+
+        tester->processed_sample_num += afe_chunksize;
+        if (!res || res->ret_value == ESP_FAIL) {
+            break;
+        }
+
+        curr_time_s = (float) tester->processed_sample_num / 16000.0;
+        if (curr_time_s <= tester->gt_region_end[gt_idx]) {
+            // speech
+            if (gt_idx > 0) {
+                tester->file_speech_count[file_id] += 1;
+                if (state == VAD_SPEECH) {
+                    tester->file_vad_speech_count[file_id] += 1;
+                    printf("speech->speech\n");
+                    speech_seg_flag = 1;
+                } else {
+                    printf("speech->noise\n");
+                }
+                if (state != last_state && state == VAD_SILENCE) {
+                    tester->file_vad_speech_change[file_id] += 1;
+                    // printf("------state change1-----, noise->speech\n");
+                }
+            }
+        } else if (curr_time_s < tester->gt_region_boundary[gt_idx]) {
+            // noise
+            tester->file_noise_count[file_id] += 1;
+
+            if (state == VAD_SILENCE) {
+                tester->file_vad_noise_count[file_id] += 1;
+                // printf("noise->noise\n");
+                noise_seg_flag = 1;
+            } else {
+                // printf("noise->speech\n");
+            }
+
+            if (state != last_state && state == VAD_SPEECH) {
+                tester->file_vad_noise_change[file_id] += 1;
+                // printf("------state change2-----, speech->noise\n");
+            }
+        } else {
+            gt_idx += 1;
+            if (speech_seg_flag) {
+                tester->file_vad_speech_trigger[file_id]  += 1;
+            }
+            if (noise_seg_flag) {
+                tester->file_vad_noise_trigger[file_id]  += 1;
+            }
+            speech_seg_flag = 0;
+            noise_seg_flag = 1;
+        }
+        last_state = state;
+
+        // the curr_time_s should never exceed the last region boundary
+        // make sure the last region boundary in csv is at least number of total length of current audio
+        assert(curr_time_s <= tester->gt_region_boundary[gt_idx]);
+        if (file_id != tester->file_id) {
+            save_vad_states(file_vad_states, file_chunk, tester->file_list[file_id]);
+            file_chunk = 0;
+            // new file
+            file_id = tester->file_id;
+            // reset ground truth
+            gt_idx = 0;
+            tester->processed_sample_num = 0;
+            read_gt_csv_file(tester, file_id);
+        } else if (tester->test_done) {
+            // finish up last region of current file first
+            break;
+        }
+    }
+    vTaskDelete(NULL);
+}
+
+
+void offline_vad_tester(const char *csv_file,
+                       const char *log_file,
+                       const esp_afe_sr_iface_t *afe_handle,
+                       afe_config_t *afe_config,
+                       int audio_type,
+                       perf_tester_config_t *config)
+{
+    skainet_perf_tester *tester = malloc(sizeof(skainet_perf_tester));
+    tester->config = config;
+    // ringbuffer init
+    tester->tester_mem_size = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    tester->tester_sram_size = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+    tester->rb_buffer_size = 4096 * 2;
+
+    // file list init
+    tester->max_file_num = 50;
+    tester->file_id = 0;
+    tester->file_num = 0;
+    tester->file_list = malloc(sizeof(char *) * tester->max_file_num);
+    tester->gt_file_list = malloc(sizeof(char *) * tester->max_file_num);
+    tester->file_gt_num_wake = malloc(sizeof(int) * tester->max_file_num);
+    tester->file_gt_num_cmd = malloc(sizeof(int) * tester->max_file_num);
+
+    tester->file_speech_count = calloc(tester->max_file_num, sizeof(int));
+    tester->file_noise_count = calloc(tester->max_file_num, sizeof(int));
+    tester->file_vad_speech_count = calloc(tester->max_file_num, sizeof(float));
+    tester->file_vad_noise_count = calloc(tester->max_file_num, sizeof(float));
+    tester->file_vad_speech_change = calloc(tester->max_file_num, sizeof(float));
+    tester->file_vad_noise_change = calloc(tester->max_file_num, sizeof(float));
+    tester->file_vad_speech_trigger = calloc(tester->max_file_num, sizeof(float));
+    tester->file_vad_noise_trigger = calloc(tester->max_file_num, sizeof(float));
+
+    tester->audio_type = audio_type;
+    for (int i = 0; i < tester->max_file_num; i++) {
+        tester->file_list[i] = calloc(FATFS_PATH_LENGTH_MAX, sizeof(char));
+        tester->gt_file_list[i] = calloc(FATFS_PATH_LENGTH_MAX, sizeof(char));
+    }
+
+    tester->gt_region_type = NULL;
+    tester->gt_region_end = NULL;
+    tester->gt_region_boundary = NULL;
+
+    tester->csv_file = (char *)csv_file;
+    read_csv_file(tester);
+    tester->log_file = (char *) log_file;
+
+    tester->force_reset = 0;
+    tester->test_done = 0;
+
+    // init AFE
+    // afe_config->afe_mode = SR_MODE_HIGH_PERF;
+    tester->afe_config = afe_config;
+    tester->afe_handle = afe_handle;
+    tester->afe_data = afe_handle->create_from_config(afe_config);
+    tester->frame_size = afe_handle->get_feed_chunksize(tester->afe_data);
+    tester->sample_rate = afe_handle->get_samp_rate(tester->afe_data);
+    tester->nch = afe_handle->get_channel_num(tester->afe_data);
+
+
+    // running time init
+    tester->wave_time = 0;
+    tester->mn_running_time = 0;
+
+    if (tester->file_num == 0) {
+        print_mn_report(tester);
+        return ;
+    }
+
+    // printf("The memory info after init:\n");
+    if (audio_type == TESTER_WAV_3CH) {
+        xTaskCreatePinnedToCore(&vad_feed_task, "vad_feed_task", 4 * 1024, (void *)tester, 8, NULL, 1);
+    }
+
+    if (audio_type == TESTER_WAV_3CH) {
+        xTaskCreatePinnedToCore(&vad_detect_task, "vad_detect_task", 4 * 1024, (void *)tester, 8, NULL, 0);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }

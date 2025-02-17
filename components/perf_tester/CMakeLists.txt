@@ -8,6 +8,7 @@ set(requires
     hardware_driver
     player
     console
+    esp-sr
     )
 
 idf_component_register(

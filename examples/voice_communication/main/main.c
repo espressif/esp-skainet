@@ -34,21 +34,20 @@ FILE * file_save[FILES_MAX] = {NULL};
 
 int detect_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
-static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 
 void feed_Task(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
     int audio_chunksize = afe_handle->get_feed_chunksize(afe_data);
-    int nch = afe_handle->get_total_channel_num(afe_data);
+    int nch = afe_handle->get_feed_channel_num(afe_data);
     int feed_channel = esp_get_feed_channel();
-    assert(nch <= feed_channel);
+    assert(nch == feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
 
     while (task_flag) {
-        esp_get_feed_data(false, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
+        esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
 
         afe_handle->feed(afe_data, i2s_buff);
 
@@ -133,43 +132,13 @@ void app_main()
 #endif
 
     srmodel_list_t *models = esp_srmodel_init("model");
-    if (models!=NULL) {
-        for (int i=0; i<models->num; i++) {
-            printf("Load: %s\n", models->model_name[i]);
-        }
-    }
-
-    afe_handle = (esp_afe_sr_iface_t *)&ESP_AFE_VC_HANDLE;
-    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
-    afe_config.vad_init = false;
-    afe_config.wakenet_init = false;
-    afe_config.voice_communication_init = true;
-
-#if defined CONFIG_ESP32_S3_BOX_BOARD || defined CONFIG_ESP32_S3_EYE_BOARD
-    afe_config.aec_init = false;
-    #if defined CONFIG_ESP32_S3_EYE_BOARD
-        afe_config.pcm_config.total_ch_num = 2;
-        afe_config.pcm_config.mic_num = 1;
-        afe_config.pcm_config.ref_num = 1;
-    #endif
-#endif
-
-
-    // config for nsnet
-    afe_config.aec_init = false;
-
-    afe_config.afe_ns_mode = NS_MODE_NET;
-    char *nsnet_name = esp_srmodel_filter(models, ESP_NSNET_PREFIX, NULL);
-    afe_config.afe_ns_model_name = nsnet_name;
-
-    afe_data = afe_handle->create_from_config(&afe_config);
-    if (afe_data == NULL) {
-        printf("create_from_config fail!\n");
-        return;
-    }
+    afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_VC, AFE_MODE_LOW_COST);
+    afe_handle = esp_afe_handle_from_config(afe_config);
+    esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(afe_config);
+    afe_config_free(afe_config);
 
 #if DEBUG_SAVE_PCM
-    rb_debug[0] = rb_create(afe_handle->get_total_channel_num(afe_data) * 4 * 16000 * 2, 1);   // 4s ringbuf
+    rb_debug[0] = rb_create(afe_handle->get_feed_channel_num(afe_data) * 4 * 16000 * 2, 1);   // 4s ringbuf
     file_save[0] = fopen("/sdcard/feed.pcm", "w");
     if (file_save[0] == NULL) printf("can not open file\n");
 
@@ -184,13 +153,4 @@ void app_main()
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 
-    esp_srmodel_deinit(models);
-
-    // // You can call afe_handle->destroy to destroy AFE.
-    // task_flag = 0;
-
-    // printf("destroy\n");
-    // afe_handle->destroy(afe_data);
-    // afe_data = NULL;
-    // printf("successful\n");
 }

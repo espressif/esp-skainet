@@ -1,6 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
   idf: ">=4.4"
-  leeebo/tinyusb_src: ">=0.0.4"
-  espressif/esp-sr: ">=1.1.0,<1.5.0"
+  leeebo/tinyusb_src: "0.0.4"
+  espressif/esp-sr: "^2.0.0"
 

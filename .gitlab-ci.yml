@@ -8,7 +8,7 @@ variables:
   BATCH_BUILD: "1"
   V: "0"
   IDF_CI_BUILD: "1"
-  DOCKER_TARGET_TEST_v5_0_ENV_IMAGE: "$CI_DOCKER_REGISTRY/target-test-env-v5.0:3"
+  DOCKER_TARGET_TEST_v5_3_ENV_IMAGE: "espressif/idf:release-v5.3"
 
 before_script:
   # add gitlab ssh key
@@ -67,7 +67,7 @@ before_script:
     - *build_test_script
 
 .test_template: &test_template
-  image: DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
+  image: DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
   stage: target_test
   timeout: 10 hour
   variables:
@@ -114,9 +114,9 @@ build_idf_v5.3:
   extends: .build_examples_template
   image: espressif/idf:release-v5.3
 
-build_idf_v5.0:
-  extends: .build_examples_template
-  image: espressif/idf:release-v5.0
+# build_idf_v5.4:
+#   extends: .build_examples_template
+#   image: espressif/idf:release-v5.4
 
 # Rules to trigger wakenet test
 .rules:test:test_wakenet:
@@ -129,7 +129,7 @@ build_wakenet_test:
   extends:
     - .build_test_template
     - .rules:test:test_wakenet
-  image: espressif/idf:release-v5.0
+  image: espressif/idf:release-v5.3
   variables:
     EXAMPLES_PATH: "test/wakenet"
 
@@ -143,12 +143,12 @@ test_wakenet:
       optional: true
   tags:
     - 'korvo-2'
-  image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
+  image: $DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
   variables:
     TEST_TARGET: 'esp32s3'
     TEST_FOLDER: './test/wakenet'
     TEST_ENV: 'korvo-2'
-    IDF_VERSION: "5.0"
+    IDF_VERSION: "5.3"
   parallel:
     matrix:
       - MODEL: ["hilexin", "hiesp"]
@@ -211,7 +211,7 @@ build_multinet_test:
       optional: true
   tags:
     - 'korvo-2'
-  image: $DOCKER_TARGET_TEST_v5_0_ENV_IMAGE
+  image: $DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
   variables:
     TEST_TARGET: 'esp32s3'
     TEST_ENV: 'korvo-2'

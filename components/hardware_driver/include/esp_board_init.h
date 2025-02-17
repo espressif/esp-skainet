@@ -80,6 +80,8 @@ esp_err_t esp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
 
 int esp_get_feed_channel(void);
 
+char* esp_get_input_format(void);
+
 /**
  * @brief Set play volume
  * 
