@@ -21,31 +21,10 @@
 #include "model_path.h"
 #include "esp_process_sdkconfig.h"
 
-int detect_flag = 0;
+int wakeup_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
 static volatile int task_flag = 0;
 srmodel_list_t *models = NULL;
-static int play_voice = -2;
-
-void play_music(void *arg)
-{
-    while (task_flag) {
-        switch (play_voice) {
-        case -2:
-            vTaskDelay(10);
-            break;
-        case -1:
-            wake_up_action();
-            play_voice = -2;
-            break;
-        default:
-            speech_commands_action(play_voice);
-            play_voice = -2;
-            break;
-        }
-    }
-    vTaskDelete(NULL);
-}
 
 void feed_Task(void *arg)
 {
@@ -93,16 +72,18 @@ void detect_Task(void *arg)
 
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("WAKEWORD DETECTED\n");
-	    multinet->clean(model_data);
-        } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
-            play_voice = -1;
-            detect_flag = 1;
-            printf("AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
-            // afe_handle->disable_wakenet(afe_data);
-            // afe_handle->disable_aec(afe_data);
+	        multinet->clean(model_data);
         }
 
-        if (detect_flag == 1) {
+        if (res->raw_data_channels == 1 && res->wakeup_state == WAKENET_DETECTED) {
+            wakeup_flag = 1;
+        } else if (res->raw_data_channels > 1 && res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
+            // For a multi-channel AFE, it is necessary to wait for the channel to be verified.
+            printf("AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+            wakeup_flag = 1;
+        }
+
+        if (wakeup_flag == 1) {
             esp_mn_state_t mn_state = multinet->detect(model_data, res->data);
 
             if (mn_state == ESP_MN_STATE_DETECTING) {
@@ -122,7 +103,7 @@ void detect_Task(void *arg)
                 esp_mn_results_t *mn_result = multinet->get_results(model_data);
                 printf("timeout, string:%s\n", mn_result->string);
                 afe_handle->enable_wakenet(afe_data);
-                detect_flag = 0;
+                wakeup_flag = 0;
                 printf("\n-----------awaits to be waken up-----------\n");
                 continue;
             }
@@ -155,10 +136,4 @@ void app_main()
     task_flag = 1;
     xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 1);
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
-#if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD
-    xTaskCreatePinnedToCore(&led_Task, "led", 3 * 1024, NULL, 5, NULL, 0);
-#endif
-#if defined  CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD || CONFIG_ESP32_S3_KORVO_2_V3_0_BOARD || CONFIG_ESP32_KORVO_V1_1_BOARD  || CONFIG_ESP32_S3_BOX_BOARD
-    xTaskCreatePinnedToCore(&play_music, "play", 4 * 1024, NULL, 5, NULL, 1);
-#endif
 }

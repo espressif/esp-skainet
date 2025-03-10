@@ -79,9 +79,29 @@ void app_main()
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
     srmodel_list_t *models = esp_srmodel_init("model");
+    if (models) {
+        for (int i=0; i<models->num; i++) {
+            if (strstr(models->model_name[i], ESP_WN_PREFIX) != NULL) {
+                printf("wakenet model in flash: %s\n", models->model_name[i]);
+            }
+        }
+    }
+
     afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
+    
+    // print/modify wake word model. 
+    if (afe_config->wakenet_model_name) {
+        printf("wakeword model in AFE config: %s\n", afe_config->wakenet_model_name);
+    }
+    if (afe_config->wakenet_model_name_2) {
+        printf("wakeword model in AFE config: %s\n", afe_config->wakenet_model_name_2);
+    }
+
     afe_handle = esp_afe_handle_from_config(afe_config);
     esp_afe_sr_data_t *afe_data = afe_handle->create_from_config(afe_config);
+    
+
+    // 
     afe_config_free(afe_config);
     
     task_flag = 1;
