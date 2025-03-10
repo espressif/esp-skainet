@@ -20,32 +20,12 @@
 #include "speech_commands_action.h"
 #include "model_path.h"
 
-int detect_flag = 0;
+int wakeup_flag = 0;
 static esp_afe_sr_iface_t *afe_handle = NULL;
 static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 srmodel_list_t *models = NULL;
-static int play_voice = -2;
 
-void play_music(void *arg)
-{
-    while (task_flag) {
-        switch (play_voice) {
-        case -2:
-            vTaskDelay(10);
-            break;
-        case -1:
-            wake_up_action();
-            play_voice = -2;
-            break;
-        default:
-            speech_commands_action(play_voice);
-            play_voice = -2;
-            break;
-        }
-    }
-    vTaskDelete(NULL);
-}
 
 void feed_Task(void *arg)
 {
@@ -84,34 +64,27 @@ void detect_Task(void *arg)
     //print active speech commands
     multinet->print_active_speech_commands(model_data);
     printf("------------detect start------------\n");
-    // FILE *fp = fopen("/sdcard/out1", "w");
-    // if (fp == NULL) printf("can not open file\n");
     while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (!res || res->ret_value == ESP_FAIL) {
             printf("fetch error!\n");
             break;
         }
-#if CONFIG_IDF_TARGET_ESP32
-        if (res->wakeup_state == WAKENET_DETECTED) {
-            printf("wakeword detected\n");
-            play_voice = -1;
-            detect_flag = 1;
-            afe_handle->disable_wakenet(afe_data);
-            printf("-----------listening-----------\n");
-        }
-#elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32P4
+
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("WAKEWORD DETECTED\n");
-	    multinet->clean(model_data);  // clean all status of multinet
-        } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
-            play_voice = -1;
-            detect_flag = 1;
-            printf("AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+	        multinet->clean(model_data);
         }
-#endif
 
-        if (detect_flag == 1) {
+        if (res->raw_data_channels == 1 && res->wakeup_state == WAKENET_DETECTED) {
+            wakeup_flag = 1;
+        } else if (res->raw_data_channels > 1 && res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {
+            // For a multi-channel AFE, it is necessary to wait for the channel to be verified.
+            printf("AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+            wakeup_flag = 1;
+        }
+
+        if (wakeup_flag == 1) {
             esp_mn_state_t mn_state = multinet->detect(model_data, res->data);
 
             if (mn_state == ESP_MN_STATE_DETECTING) {
@@ -131,7 +104,7 @@ void detect_Task(void *arg)
                 esp_mn_results_t *mn_result = multinet->get_results(model_data);
                 printf("timeout, string:%s\n", mn_result->string);
                 afe_handle->enable_wakenet(afe_data);
-                detect_flag = 0;
+                wakeup_flag = 0;
                 printf("\n-----------awaits to be waken up-----------\n");
                 continue;
             }
