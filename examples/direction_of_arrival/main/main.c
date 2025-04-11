@@ -31,10 +31,10 @@
 #include "model_path.h"
 #include "esp_doa.h"
 
-#define DEBUG_SAVE_PCM      1
+#define DEBUG_SAVE_PCM      0
 
 #if DEBUG_SAVE_PCM
-#define FILES_MAX           3
+#define FILES_MAX           1
 ringbuf_handle_t rb_debug[FILES_MAX] = {NULL};
 FILE * file_save[FILES_MAX] = {NULL};
 #endif
@@ -87,7 +87,7 @@ void feed_Task(void *arg)
         fdoa = esp_doa_process(doa_handle, ileft, iright);    
         printf("fdoa: %f\n", fdoa);
 
-        afe_handle->feed(afe_data, i2s_buff);
+        //afe_handle->feed(afe_data, i2s_buff);
 
     #if DEBUG_SAVE_PCM
         if (rb_bytes_available(rb_debug[0]) < audio_chunksize * nch * sizeof(int16_t)) {
@@ -113,39 +113,39 @@ void feed_Task(void *arg)
     vTaskDelete(NULL);
 }
 
-void detect_Task(void *arg)
-{
-    //doa_handle_t *doa_handle = esp_doa_create(16000, 20, 0.05, 1024); 
-    //float fdoa = 0.0f;
-    esp_afe_sr_data_t *afe_data = arg;
-    int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
-    int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
-    assert(buff);
-    printf("------------detect start------------\n");
+// void detect_Task(void *arg)
+// {
+//     //doa_handle_t *doa_handle = esp_doa_create(16000, 20, 0.05, 1024); 
+//     //float fdoa = 0.0f;
+//     esp_afe_sr_data_t *afe_data = arg;
+//     int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
+//     int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
+//     assert(buff);
+//     printf("------------detect start------------\n");
 
-    while (task_flag) {
-        afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
-        if (res && res->ret_value != ESP_FAIL) {
-            memcpy(buff, res->data, afe_chunksize * sizeof(int16_t));
-        //fdoa = esp_doa_process(doa_handle, &(res->data[0]), &(res->data[1]));    
-        //printf("fdoa: %f\n", fdoa);
+//     while (task_flag) {
+//         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
+//         if (res && res->ret_value != ESP_FAIL) {
+//             memcpy(buff, res->data, afe_chunksize * sizeof(int16_t));
+//         //fdoa = esp_doa_process(doa_handle, &(res->data[0]), &(res->data[1]));    
+//         //printf("fdoa: %f\n", fdoa);
 
-        #if DEBUG_SAVE_PCM
-            if (rb_bytes_available(rb_debug[1]) < afe_chunksize * 1 * sizeof(int16_t)) {
-                printf("ERROR! rb_debug[1] slow!!!\n");
-            }
+//         #if DEBUG_SAVE_PCM
+//             if (rb_bytes_available(rb_debug[1]) < afe_chunksize * 1 * sizeof(int16_t)) {
+//                 printf("ERROR! rb_debug[1] slow!!!\n");
+//             }
 
-            rb_write(rb_debug[1], buff, afe_chunksize * 1 * sizeof(int16_t), 0);
-        #endif
-        }
-    }
-    if (buff) {
-        free(buff);
-        buff = NULL;
-    }
-    //esp_doa_destroy(doa_handle);
-    vTaskDelete(NULL);
-}
+//             rb_write(rb_debug[1], buff, afe_chunksize * 1 * sizeof(int16_t), 0);
+//         #endif
+//         }
+//     }
+//     if (buff) {
+//         free(buff);
+//         buff = NULL;
+//     }
+//     //esp_doa_destroy(doa_handle);
+//     vTaskDelete(NULL);
+// }
 
 #if DEBUG_SAVE_PCM
 void debug_pcm_save_Task(void *arg)
@@ -197,15 +197,15 @@ void app_main()
     file_save[0] = fopen("/sdcard/feed.pcm", "w");
     if (file_save[0] == NULL) printf("can not open file\n");
 
-    rb_debug[1] = rb_create(1 * 4 * 16000 * 2, 1);   // 4s ringbuf
-    file_save[1] = fopen("/sdcard/fetch.pcm", "w");
-    if (file_save[1] == NULL) printf("can not open file\n");
+    // rb_debug[1] = rb_create(1 * 4 * 16000 * 2, 1);   // 4s ringbuf
+    // file_save[1] = fopen("/sdcard/fetch.pcm", "w");
+    // if (file_save[1] == NULL) printf("can not open file\n");
 
     xTaskCreatePinnedToCore(&debug_pcm_save_Task, "debug_pcm_save", 2 * 1024, NULL, 5, NULL, 1);
 #endif
 
     task_flag = 1;
     xTaskCreatePinnedToCore(&feed_Task, "feed", 8 * 1024, (void*)afe_data, 5, NULL, 0);
-    xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 0);
+    //xTaskCreatePinnedToCore(&detect_Task, "detect", 8 * 1024, (void*)afe_data, 5, NULL, 0);
 
 }
