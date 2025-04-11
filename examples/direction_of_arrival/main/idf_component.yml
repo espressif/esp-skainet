@@ -1,0 +1,2 @@
+dependencies:
+  espressif/esp-sr: "^2.0.0"
