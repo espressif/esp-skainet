@@ -41,3 +41,9 @@ examples/wake_word_detection:
     - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
       temporary: false
       reason: the other targets are not tested yet
+
+examples/direction_of_arrival:
+  enable:
+    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+      temporary: false
+      reason: the other targets are not tested yet
