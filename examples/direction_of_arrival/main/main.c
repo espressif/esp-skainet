@@ -31,7 +31,7 @@
 #include "model_path.h"
 #include "esp_doa.h"
 
-#define DEBUG_SAVE_PCM      0
+#define DEBUG_SAVE_PCM      1
 
 #if DEBUG_SAVE_PCM
 #define FILES_MAX           1
@@ -46,7 +46,7 @@ static volatile int task_flag = 0;
 void feed_Task(void *arg)
 {
     int fs = 16000;
-    float resolution = 10.f;
+    float resolution = 20.f;
     float d_mics = 0.065f;
     float fdoa = 0.0f;    
     esp_afe_sr_data_t *afe_data = arg;
