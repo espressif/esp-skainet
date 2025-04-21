@@ -1,3 +1,4 @@
+if((${IDF_TARGET} STREQUAL "esp32s3") OR (${IDF_TARGET} STREQUAL "esp32p4") OR (${IDF_TARGET} STREQUAL "esp32"))
 set(srcs
     wn_perf_tester.c
     mn_perf_tester.c
@@ -16,3 +17,4 @@ idf_component_register(
     INCLUDE_DIRS "."
     REQUIRES ${requires})
 
+endif()

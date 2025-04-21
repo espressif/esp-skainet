@@ -337,9 +337,9 @@ void wav_feed_task(void *arg)
     int nch = tester->nch;
     int file_nch = 0;
 
-    int i2s_buffer_size = frame_size * (nch + 1) * sizeof(int16_t);
+    int i2s_buffer_size = frame_size * (nch) * sizeof(int16_t);
 
-    int16_t *i2s_buffer = calloc(frame_size * (nch + 1), sizeof(int16_t)); // nch channel MIC data and one channel reference data
+    int16_t *i2s_buffer = calloc(frame_size * (nch), sizeof(int16_t)); // nch channel MIC data and one channel reference data
     tester->wave_time = 0;
 
     for (int i = 0; i < tester->file_num; i++) {
@@ -354,7 +354,7 @@ void wav_feed_task(void *arg)
                    tester->file_list[i], sample_rate);
             wav_decoder_close(wav_decoder);
             continue;
-        } else if (file_nch != nch + 1) {
+        } else if (file_nch != nch) {
 
             printf("The channel of %s does not meet the requirements(n=%d), please input %d channel MIC data and one channel reference data\n",
                    tester->file_list[i], file_nch, nch);
@@ -863,9 +863,9 @@ void vad_feed_task(void *arg)
     int nch = tester->nch;
     int file_nch = 0;
 
-    int i2s_buffer_size = frame_size * (nch + 1) * sizeof(int16_t);
+    int i2s_buffer_size = frame_size * (nch) * sizeof(int16_t);
 
-    int16_t *i2s_buffer = calloc(frame_size * (nch + 1), sizeof(int16_t)); // nch channel MIC data and one channel reference data
+    int16_t *i2s_buffer = calloc(frame_size * (nch), sizeof(int16_t)); // nch channel MIC data and one channel reference data
     tester->wave_time = 0;
 
     for (int i = 0; i < tester->file_num; i++) {
@@ -976,11 +976,15 @@ void vad_detect_task(void *arg)
     vad_state_t last_state = VAD_SILENCE;
     int8_t *file_vad_states = (int8_t *) malloc(60*60*60*sizeof(int8_t));
     int file_chunk = 0;
+    FILE *fp=fopen("/sdcard/tt2.pcm", "wb");
+    if(fp == NULL) {
+        printf("---------fail to open file.-----------");
+    }
 
     while (1) {
         afe_fetch_result_t* res = tester->afe_handle->fetch(tester->afe_data);
         if (res->ret_value == ESP_FAIL) {
-            continue;;
+            continue;
         }
         vad_state_t state = res->vad_state;
         if (state == VAD_SPEECH) {
@@ -989,7 +993,9 @@ void vad_detect_task(void *arg)
             file_vad_states[file_chunk] = 0;
         }
         file_chunk++;
-
+        FatfsComboWrite(res->data, res->data_size, 1, fp);
+        printf("size:%d\n", res->data_size);
+     
         tester->processed_sample_num += afe_chunksize;
         if (!res || res->ret_value == ESP_FAIL) {
             break;
