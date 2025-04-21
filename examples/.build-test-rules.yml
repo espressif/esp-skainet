@@ -47,3 +47,10 @@ examples/direction_of_arrival:
     - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
       temporary: false
       reason: the other targets are not tested yet
+
+
+examples/deep_noise_suppression:
+  enable:
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
+      temporary: false
+      reason: the other targets are not tested yet      
