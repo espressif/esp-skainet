@@ -1,4 +1,5 @@
 #include "wn_perf_tester.h"
+#include "esp_afe_config.h"
 #include "model_path.h"
 #include "esp_board_init.h"
 #include "esp_mn_speech_commands.h"
@@ -17,12 +18,13 @@ static int start_wakenet_test(int argc, char **argv)
     printf("test:%s, log:%s\n", csv_file, log_file);
 
     // Select speech enhancement pipeline
-    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
-    afe_config.wakenet_model_name = wn_name;
-    afe_config.wakenet_mode = DET_MODE_3CH_90;
-
+    afe_config_t *afe_config = afe_config_init("MNR", models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
+    afe_config->ns_init = true;
+    afe_config->ns_model_name = NULL;
     perf_tester_config_t *tester_config = get_perf_tester_config();
-    offline_wn_tester(csv_file, log_file, &ESP_AFE_SR_HANDLE, &afe_config, TESTER_WAV_3CH, tester_config);
+    afe_config_print(afe_config);
+    offline_wn_tester(csv_file, log_file, NULL, afe_config, TESTER_WAV_3CH, tester_config);
+    afe_config_free(afe_config);
     return 0;
 }
 

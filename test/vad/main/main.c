@@ -21,21 +21,16 @@ static int start_vad_test(int argc, char **argv)
     printf("test:%s, log:%s\n", csv_file, log_file);
 
     // Select speech enhancement pipeline
-    afe_config_t afe_config = AFE_CONFIG_DEFAULT();
-    afe_config.aec_init = false;
-    afe_config.se_init = false;
-    afe_config.pcm_config.mic_num = 2;
-    afe_config.pcm_config.ref_num = 1;
-    afe_config.pcm_config.total_ch_num = 3;
-    afe_config.vad_model_name = model_name;
-    afe_config.vad_mode = VAD_MODE_3;
-    afe_config.vad_min_speech_ms = 32;
-    afe_config.vad_min_noise_ms = 128;
-
-    afe_config.wakenet_model_name = esp_srmodel_filter(models, ESP_WN_PREFIX, NULL);;
-    afe_config.wakenet_mode = DET_MODE_3CH_90;
+    afe_config_t* afe_config = afe_config_init("MNN", models, AFE_TYPE_SR, AFE_MODE_HIGH_PERF);
+    afe_config->vad_min_speech_ms = 32;
+    afe_config->vad_min_noise_ms = 96;
+    // afe_config->aec_init = false;
+    // afe_config->se_init = false;
+    // afe_config->ns_init = false;
+    afe_config->vad_mode = VAD_MODE_1;
+    // afe_config->vad_model_name = NULL;
     perf_tester_config_t *tester_config = get_perf_tester_config();
-    offline_vad_tester(csv_file, log_file, &ESP_AFE_SR_HANDLE, &afe_config,
+    offline_vad_tester(csv_file, log_file, esp_afe_handle_from_config(afe_config), afe_config,
                        TESTER_WAV_3CH, tester_config);
     return 0;
 }
