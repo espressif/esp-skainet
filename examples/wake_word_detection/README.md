@@ -1,40 +1,16 @@
 # Wake Word Detection
 
+## `wake_word_detection/wakenet`
+
+| Supported Targets | ESP32    | ESP32-S2 | ESP32-S3 | ESP32-P4 | ESP32-C3 | ESP32-C5 | ESP32-C6 | 
+| ----------------- | -------- | -------- | -------- | -------- | -------- | -------- | -------- |
+
+This example shows how to use the Wakenet interface directly. If you are using a single microphone and only need to use WakeNet, and you want to reduce memory and CPU resource consumption, this example is recommended.
 
 
-(See the [README.md](../README.md) file in the upper level 'examples' directory for more information about examples.)
+## `wake_word_detection/afe`
 
-This example is used to test performance of wakenet.(the word word engine of Espressif).
-This example can load multiple models, but can only run two models at the same time
+| Supported Targets | ESP32    | ESP32-S3 | ESP32-P4 | 
+| ----------------- | -------- | -------- | -------- |
 
-
-### Configure
-
-Select board and wake words
-```
-idf.py set-target esp32s3
-idf.py menuconfig
-
-# Select audio board
-Audio Media HAL -> Audio hardware board -> ESP32-S3-Korvo-1
-
-# Load one wakenet model
-ESP Speech Recognition -> Select wake words -> Hi,Lexin (wn9_hilexin)
-
-# Load multiple wakenet models
-ESP Speech Recognition -> Select wake words -> Hi,Lexin (wn9_hilexin) -> Load Multiple Wake Words
-ESP Speech Recognition -> Load Multiple Wake Words -> Hi,Lexin (wn9_hilexin)
-                                                   -> Hi,ESP (wn9_hiesp)
-```
-
-### build&flash
-
-Build the project and flash it to the board, then run the monitor tool to view the output via serial port:
-
-```
-idf.py flash monitor 
-```
-
-(To exit the serial monitor, type ``Ctrl-]``.)
-
-
+This example shows how to use WakeNet through the AFE interface. If you are using a dual-microphone or require more speech enhancement algorithms, this example is recommended.
