@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from idf_build_apps import LOGGER, App, build_apps, find_apps, setup_logging
+from idf_build_apps import  App, build_apps, find_apps, setup_logging
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 APPS_BUILD_PER_JOB = 30
@@ -71,11 +71,6 @@ def main(args):  # type: (argparse.Namespace) -> None
     else:
         apps_to_build = apps[:]
 
-    LOGGER.info('Found %d apps after filtering', len(apps_to_build))
-    LOGGER.info(
-        'Suggest setting the parallel count to %d for this build job',
-        len(apps_to_build) // APPS_BUILD_PER_JOB + 1,
-    )
 
     ret_code = build_apps(
         apps_to_build,
