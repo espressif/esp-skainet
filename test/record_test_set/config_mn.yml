@@ -1,0 +1,29 @@
+clean_set:
+  wake_words_paths:
+      # - "/home/projects/pipeline-test/hiesp"
+    - "/home/projects/pipeline-test/hilexin"
+  commands_paths:
+      # - "/home/projects/pipeline-test/clean_norm"
+    - "/home/projects/pipeline-test/CN-TEST-S"
+  filelists_paths:
+      # - "/home/projects/pipeline-test/en_test.json"
+    - "/home/projects/pipeline-test/cn_test.json"
+  normalization: True
+  target_dB: -36
+noise_set:
+  paths:
+    - "/home/datasets/_noise_korvo"
+  normalization: True
+  target_dB: -36
+output_set:
+  path: "/home/datasets/pipeline-test/test"
+  remove_old_files: true
+  snr:
+    - snr_dB: 10
+      clean_gain_dB: 0
+    - snr_dB: 5
+      clean_gain_dB: 0
+    - snr_dB: 0
+      clean_gain_dB: 5
+player:
+  play_output: true

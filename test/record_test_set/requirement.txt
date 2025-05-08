@@ -1,0 +1,5 @@
+numpy<2.0.0
+pydub
+pyyaml
+pyserial
+playsound
