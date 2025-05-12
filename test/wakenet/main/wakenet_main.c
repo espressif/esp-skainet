@@ -18,7 +18,7 @@ static int start_wakenet_test(int argc, char **argv)
     printf("test:%s, log:%s\n", csv_file, log_file);
 
     // Select speech enhancement pipeline
-    afe_config_t *afe_config = afe_config_init("MNR", models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
+    afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
     afe_config->ns_init = true;
     afe_config->ns_model_name = NULL;
     perf_tester_config_t *tester_config = get_perf_tester_config();
