@@ -2,7 +2,17 @@
 
 This part is used to test the performance of esp-skainet, include wakenet, multinet and AFE modules.
 
-## How to use it
+## Get Started
+
+## 1. record test set
+Please refer to [test/record_test_set](./record_test_set/README.md) to record your test case.
+
+## 2. build test app and run all test set
+Please refer to [test/wakenet](./wakenet/README.md) to run test cases.
+
+
+
+## How to use it in CI
 ### 1. build all test app
 ```
 pip install -r tools/ci/requirement.txt

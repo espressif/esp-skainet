@@ -9,11 +9,13 @@ Steps to run these cases:
   - pytest test/wakenet --target esp32s2
 '''
 
-import pytest
-import re
-import os
 import json
+import os
+import re
+
+import pytest
 from pytest_embedded import Dut
+
 
 def save_report(results):
     with open(results["report_file"], "w") as f:
@@ -39,7 +41,7 @@ def test_wakenet(config, noise, snr, dut: Dut)-> None:
     mode = 'norm'
     dut.write('config {} {} {}'.format(mode, noise, snr))
     dut.expect('mode:{}, noise:{}, snr:{}'.format(mode, noise, snr), timeout=20)
-    dut.write('start')
+    dut.write('rar')
     timeout = 36000
     results = {}
     basedir = os.path.dirname(dut.logfile)

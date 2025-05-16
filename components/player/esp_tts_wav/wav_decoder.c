@@ -36,6 +36,18 @@ struct wav_decoder {
 	int block_align;
 };
 
+void print_wav_info(struct wav_decoder* wr)
+{
+	printf("WAV info:\n");
+	printf( "format: %d\n", wr->format);
+	printf( "sample rate: %d\n", wr->sample_rate);
+	printf( "bits per sample: %d\n", wr->bits_per_sample);
+	printf( "channels: %d\n", wr->channels);
+	printf( "byte rate: %d\n", wr->byte_rate);
+	printf( "block align: %d\n", wr->block_align);
+	printf( "data length: %ld\n", wr->data_length);
+}
+
 static uint32_t read_tag(struct wav_decoder* wr) {
 	uint32_t tag = 0;
 	tag = (tag << 8) | fgetc(wr->wav);
@@ -124,6 +136,7 @@ void* wav_decoder_open(const char *filename) {
 		}
 	}
 	fseek(wr->wav, data_pos, SEEK_SET);
+	// print_wav_info(wr);
 	return wr;
 }
 

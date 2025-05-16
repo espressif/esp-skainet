@@ -15,6 +15,7 @@ typedef enum {
     TESTER_WAV_1CH = 3,        // input 1 channel WAV
 } tester_audio_t;
 
+// typedef void* skainet_perf_tester;
 
 /**
  * @brief Test wakenet and AFE pipeline performance,include CPU loading, memory size and trigger times
@@ -26,9 +27,16 @@ typedef enum {
  * @param audio_type     Input audio type, 0: 3channel-PCM; 1: 3channel-WAV
  * @param tester_config  Perf tester config
  */
-void offline_wn_tester(const char *csv_file,
+void* offline_wn_tester_start(const char *csv_file,
                        const char *log_file,
                        const esp_afe_sr_iface_t *afe_handle,
                        afe_config_t *afe_config,
                        int audio_type,
                        perf_tester_config_t *config);
+
+/**
+ * @brief Stop test
+ *
+ * @param tester       tester handle
+ */
+void offline_wn_tester_stop(void * tester);
