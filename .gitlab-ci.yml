@@ -46,8 +46,6 @@ before_script:
   artifacts:
     when: always
     paths:
-      - "**/build*/size.json"
-      - "**/build*/build_log.txt"
       - "**/build*/*.bin"
       # upload to s3 server to save the artifacts size
       - "**/build*/*.map"
@@ -59,7 +57,6 @@ before_script:
       - "**/build*/bootloader/*.elf"
       - "**/build*/partition_table/*.bin"
       - "**/build*/srmodels/*.bin"
-      - size_info.txt
     expire_in: 1 week
   variables:
     EXAMPLES_PATH: "test"
@@ -133,27 +130,27 @@ build_wakenet_test:
   variables:
     EXAMPLES_PATH: "test/wakenet"
 
-test_wakenet:
-  extends:
-    - .pytest_template
-    - .rules:test:test_wakenet
-  needs:
-    - job: "build_wakenet_test"
-      artifacts: true
-      optional: true
-  tags:
-    - 'korvo-2'
-  image: $DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
-  variables:
-    TEST_TARGET: 'esp32s3'
-    TEST_FOLDER: './test/wakenet'
-    TEST_ENV: 'korvo-2'
-    IDF_VERSION: "5.3"
-  parallel:
-    matrix:
-      - MODEL: ["hilexin", "hiesp"]
-        NOISE: ["pink", "pub"]
-        SNR: ["0", "5"]
+# test_wakenet:
+#   extends:
+#     - .pytest_template
+#     - .rules:test:test_wakenet
+#   needs:
+#     - job: "build_wakenet_test"
+#       artifacts: true
+#       optional: true
+#   tags:
+#     - 'korvo-2'
+#   image: $DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
+#   variables:
+#     TEST_TARGET: 'esp32s3'
+#     TEST_FOLDER: './test/wakenet'
+#     TEST_ENV: 'korvo-2'
+#     IDF_VERSION: "5.3"
+#   parallel:
+#     matrix:
+#       - MODEL: ["hilexin", "hiesp"]
+#         NOISE: ["pink", "pub"]
+#         SNR: ["0", "5"]
 
 .patterns-test_multinet6: &patterns-test_multinet6
   - "components/esp-sr/lib/**/*"

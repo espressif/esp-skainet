@@ -1,0 +1,38 @@
+clean_set:
+  paths:
+    - "./data/wake_words/hey_lepro"
+  normalization: true
+  target_dB: -36
+music_set:
+  paths:
+    - "./data/music_set"
+  normalization: true
+  target_dB: -20
+noise_set:
+  paths:
+    - "./data/noise_set/silence"
+    - "./data/noise_set/pink"
+    - "./data/noise_set/pub"
+    - "./data/noise_set/news"
+    - "./data/noise_set/cooking"
+    - "./data/noise_set/washing"
+  normalization: true
+  target_dB: -36
+output_set:
+  path: "./data/output_set"
+  overwrite: false
+  noise_snr:
+    - snr_dB: 10
+      clean_gain_dB: 0
+    - snr_dB: 5
+      clean_gain_dB: 0
+    - snr_dB: 0
+      clean_gain_dB: 5
+  playback_snr:
+    - snr_dB: -10
+      clean_gain_dB: 0
+    - snr_dB: 0
+      clean_gain_dB: 10
+
+player:
+  play_output: true

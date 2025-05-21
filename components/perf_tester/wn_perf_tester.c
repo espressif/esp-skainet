@@ -11,7 +11,8 @@
 #include "esp_board_init.h"
 #include "esp_process_sdkconfig.h"
 
-
+static int delay_flag = 0; // control feed delay
+static int start_flag = 1;
 typedef struct {
     int rb_buffer_size;
     int frame_size;
@@ -203,7 +204,6 @@ void wav_feed_task(void *arg)
     int frame_size = tester->frame_size;
     int frame_delay_ms = frame_size * 1000 / sample_rate;
     int nch = tester->nch;
-    int file_nch = 0;
 
     int i2s_buffer_size = frame_size * nch * sizeof(int16_t);
 
@@ -212,20 +212,19 @@ void wav_feed_task(void *arg)
 
     for (int i = 0; i < tester->file_num; i++) {
         wav_decoder = wav_decoder_open(tester->file_list[i]);
-        file_nch = wav_decoder_get_channel(wav_decoder);
 
         if (wav_decoder == NULL) {
-            printf("can not find %s, play next song\n", tester->file_list[i]);
+            printf("can not find %s, play next file\n", tester->file_list[i]);
             continue;
         } else if (wav_decoder_get_sample_rate(wav_decoder) != sample_rate) {
             printf("The sample rate of %s does not meet the requirements, please resample to %d\n",
                    tester->file_list[i], sample_rate);
             wav_decoder_close(wav_decoder);
             continue;
-        } else if (file_nch != nch) {
+        } else if (wav_decoder_get_channel(wav_decoder) != nch) {
 
             printf("The channel of %s does not meet the requirements(n=%d), please input %d channel MIC data and one channel reference data\n",
-                   tester->file_list[i], file_nch, nch);
+                   tester->file_list[i], wav_decoder_get_channel(wav_decoder), nch);
             wav_decoder_close(wav_decoder);
             continue;
         } else {
@@ -238,20 +237,24 @@ void wav_feed_task(void *arg)
         int out_samples = 0;
         int size = i2s_buffer_size;
 
-        while (1) {
+        while (start_flag) {
             size = wav_decoder_run(wav_decoder, (unsigned char *)i2s_buffer, i2s_buffer_size);
             out_samples += frame_size;
 
             // size=i2s_buffer_size;
             if (size == i2s_buffer_size) {
                 afe_handle->feed(afe_data, i2s_buffer);
-                vTaskDelay(frame_delay_ms / portTICK_PERIOD_MS);
+                if (delay_flag == 0) {
+                    vTaskDelay(frame_delay_ms * 0.3 / portTICK_PERIOD_MS);
+                } else {
+                    vTaskDelay(frame_delay_ms / portTICK_PERIOD_MS);
+                }
             } else {
                 // wav decoder free
                 vTaskDelay(100 / portTICK_PERIOD_MS);
                 wav_decoder_close(wav_decoder);
                 wav_decoder = NULL;
-                vTaskDelay(200 / portTICK_PERIOD_MS);
+                vTaskDelay(2000 / portTICK_PERIOD_MS);
                 break;
             }
         }
@@ -260,7 +263,9 @@ void wav_feed_task(void *arg)
     }
 
     tester->test_done = 1;
-    print_wn_report(tester);
+    if (start_flag) {
+        print_wn_report(tester);
+    }
     vTaskDelete(NULL);
 }
 
@@ -277,7 +282,9 @@ void fetch_task(void *arg)
     int file_id = 0;
     int chunk_num = 1;
 
-    while (1) {
+    int seq = 0;
+
+    while (start_flag) {
         c0 = esp_cpu_get_cycle_count();
         afe_fetch_result_t *res = afe_handle->fetch(afe_data);
         if (!res || res->ret_value == ESP_FAIL) {
@@ -287,13 +294,24 @@ void fetch_task(void *arg)
                 continue;
             }
         }
+        if (res->ringbuff_free_pct < 0.5) {
+            delay_flag = 1;
+            printf("warning: ringbuffer free space is less than 50%%\n");
+        } else {
+            delay_flag = 0;
+        }
         // int res = 0;
+        seq += 1;
         c1 = esp_cpu_get_cycle_count();
         tester->running_time += c1 - c0;
         chunk_num += 1;
         if (res->wakeup_state == WAKENET_DETECTED) {
             tester->file_det_times[file_id]++;
-            printf("DETECT\n");
+            printf("DETECT:%d\n", tester->file_det_times[file_id]);
+            if (seq < 50) {
+                printf("-----------------------------warning: repeated trigger, please check: %d(%d)\n", tester->file_det_times[file_id], seq);
+            }
+            seq = 0;
         }
         if (file_id != tester->file_id) {
             printf("File%d, trigger times: %d\n", file_id, tester->file_det_times[file_id]);
@@ -307,13 +325,14 @@ void fetch_task(void *arg)
 }
 
 
-void offline_wn_tester(const char *csv_file,
+void* offline_wn_tester_start(const char *csv_file,
                        const char *log_file,
                        const esp_afe_sr_iface_t *afe_handle,
                        afe_config_t *afe_config,
                        int audio_type,
                        perf_tester_config_t *config)
 {
+    start_flag = 1;
     skainet_perf_tester *tester = malloc(sizeof(skainet_perf_tester));
     tester->config = config;
     // ringbuffer init
@@ -367,7 +386,7 @@ void offline_wn_tester(const char *csv_file,
     tester->running_time = 0;
     if (tester->file_num == 0) {
         print_wn_report(tester);
-        return ;
+        return tester;
     }
 
     printf("The memory info after init:\n");
@@ -379,4 +398,26 @@ void offline_wn_tester(const char *csv_file,
         xTaskCreatePinnedToCore(&fetch_task, "fetch_task", 4 * 1024, (void *)tester, 8, NULL, 0);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
+    return  tester;
+}
+
+
+void offline_wn_tester_stop(void * handle) 
+{
+
+    skainet_perf_tester* tester = (skainet_perf_tester*) handle;
+    start_flag = 0;
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    free(tester->file_det_times);
+    free(tester->file_list);
+    free(tester->csv_col2);
+    free(tester->csv_col3);
+
+    for (int i = 0; i < tester->max_file_num; i++) {
+        free(tester->file_list[i]);
+    }
+
+    tester->afe_handle->destroy(tester->afe_data);
+    free(tester);
 }

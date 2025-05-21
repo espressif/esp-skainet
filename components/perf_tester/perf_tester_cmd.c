@@ -12,6 +12,10 @@ static struct {
     struct arg_end *end;
 } teser_config_args;
 
+static struct {
+    struct arg_str *type;
+} teser_type_args;
+
 static perf_tester_config_t *config = NULL;
 
 
@@ -46,6 +50,19 @@ void register_perf_tester_config_cmd(void)
     const esp_console_cmd_t tester_cmd = {
         .command = "config",
         .help = "Perf Tester Config",
+        .hint = NULL,
+        .func = &run_tester_config,
+        .argtable = &teser_config_args
+    };
+    ESP_ERROR_CHECK(esp_console_cmd_register(&tester_cmd));
+}
+
+void register_perf_tester_type_cmd(void)
+{
+    teser_type_args.type = arg_str1(NULL, NULL, "<rar/far>", "Tester type, rar: response accuracy rate, far: false alarm rate.");
+    const esp_console_cmd_t tester_cmd = {
+        .command = "config",
+        .help = "Perf Tester Type",
         .hint = NULL,
         .func = &run_tester_config,
         .argtable = &teser_config_args
