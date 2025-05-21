@@ -1,10 +1,18 @@
-This program is used to test recorded set and generate a test report.
+# WakeNet Test Report Generation Guide
 
-## How to start
+This program automates the testing of recorded audio sets and generates comprehensive test reports for wake word detection performance.
 
-###  1. Create RAR test set
-The test set is a csv file, which contains the file path and the number of wake words, formatted as follows:
-```
+## Test Preparation
+
+### 1. Create RAR Test Set (Wake Word Detection Test)
+
+**File Format Requirements**:
+- CSV file containing test cases and pass criteria
+- Must be named `{wn_name}.csv` (where `wn_name` matches your wake word model name in `menuconfig`)
+- Store in the root directory of the SD card
+
+**File Structure Example**:
+```csv
 filename,required,total
 /sdcard/hilexin_0dB_silence.wav,285,300
 /sdcard/hilexin_0dB_pub_-10dB.wav,270,300
@@ -15,32 +23,81 @@ filename,required,total
 /sdcard/hilexin_5dB_pink_5dB.wav,260,300
 ```
 
-The filename of this csv file should be "{wn_name}.csv". `wn_name` is the name of the wake word model you loaded in `menuconfig`. If you want to use other filename, please modify the [wakenet_main.c](./main/wakenet_main.c). 
+**Field Definitions**:
+| Field    | Description |
+|----------|-------------|
+| filename | Full path to test audio file on SD card |
+| required | Minimum number of successful detections needed to pass (typically 85%-95% of total) |
+| total    | Total number of wake word instances in the audio file |
 
-`required` means the number of wake words required to pass the test.   
-`total` means the total number of wake words in the test set.   
+**Customization Note**:  
+To use a different filename, modify the source file:  
+[wakenet_main.c](./main/wakenet_main.c)
 
-### 2. Download FAR test set
+---
 
-FAR test set is general for all wake word models. Please download it from the following link
-download [far_48h.csv](https://github.com/espressif/esp-adf/blob/master/examples/speech_recognition/wake_word_detection/far_48h.csv)
+### 2. Prepare FAR Test Set (False Alarm Test)
 
-This FAR test set consists of 48 hours of three-channel audio data, including:  
-- 22 hours of Chinese speech  
-- 20 hours of English speech  
-- 6 hours of music  
+**General Requirements**:
+- Standardized test set for all wake word models
+- 48 hours of continuous audio data
+- Must be named `far_48h.csv`
+- Store in the root directory of the SD card
 
-Please copy the data to the SD card before you start the test.
+**Audio Content Composition**:
+| Content Type | Duration | Description |
+|--------------|----------|-------------|
+| Chinese Speech | 22 hours | Various accents and speaking styles |
+| English Speech | 22 hours | Multiple dialects and pronunciations |
+| Music         | 4 hours  | Different genres and recording qualities |
 
-### 2. build and flash 
-Insert the SD card and flash the program.
+**File Preparation**:
+1. Download the FAR test package
+2. Extract contents to SD card root directory
+3. Verify all files are properly transferred
 
-```
+---
+
+## Setup and Execution
+
+### 1. Hardware Preparation
+1. Insert prepared SD card into the device
+2. Ensure proper connection to host computer via USB
+
+### 2. Build and Flash Firmware
+```bash
+# Build and flash the program
 idf.py flash monitor
+
+# For first-time setup:
+idf.py set-target esp32s3  # Specify your target chip if different
 ```
 
-### 3. test
+### 3. Run Tests
 
-Type `rar` in the terminal to load `{wn_name}.csv` and start the RAR test.
-Type `far` in the terminal to load `far_48h.csv` and start the FAR test.
+**FAR Test Execution**:
+1. In serial monitor, type command:  
+   ```
+   far
+   ``` 
+2. Program will:
+   - Process the 48-hour test set
+   - Monitor for false wake word detections
+   - Calculate false alarm rate
+   - Generate comprehensive report
 
+**NOTE**: The FAR test automatically enables **debug mode** by default. In debug mode, the system will output **detection threshold**. Please adjust the threshold based on the test results before conducting the RAR test.
+
+
+**RAR Test Execution**:
+1. Open serial monitor after flashing
+2. Type command:  
+   ```
+   rar
+   ```
+3. Program will:
+   - Load `{wn_name}.csv`
+   - Process each test file
+   - Generate detection statistics
+   - Output pass/fail results
+---

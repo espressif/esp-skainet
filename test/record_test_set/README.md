@@ -1,34 +1,57 @@
-# How to record WakeNet test set
-`create_test_set.py` is used to synthesize audio with different SNR, play the audio, and use the serial port to record audio data by the board.
 
-`sdcard_recorder` app records and saves data into SD card by receiving the serial port signal from `create_test_set.py`. This project supports [ESP32-Korvo](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32/user-guide-esp32-korvo-v1.1.md), [ESP32-S3-Korvo-1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32s3/user-guide-korvo-1.md),[ESP-S3-Korvo-2](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/user-guide-esp32-s3-korvo-2.html).
+# WakeNet Test Set Recording Guide
 
-## 1. Calibration
+## Overview
+This document describes how to:
+1. Synthesize test audio with varying SNR levels  
+2. Play the audio through speakers  
+3. Record audio using the ESP32 audio board  
 
-### 1. Calibrate Noise Speaker
-One speaker plays noise, and the other plays wake words. Please place both speakers according to the test scenario requirements. Once placed, begin calibrating their volume levels.
+The process involves two main components:  
+- `create_test_set.py`: Synthesizes test audio and controls the test process  
+- `sdcard_recorder`: ESP32 application that records audio to SD card based on serial commands  
 
-Calibration method:
+**Supported hardware**:  
+- [ESP32-S3-Korvo-1](https://github.com/espressif/esp-skainet/blob/master/docs/en/hw-reference/esp32s3/user-guide-korvo-1.md)  
+- [ESP32-S3-Korvo-2](https://docs.espressif.com/projects/esp-adf/en/latest/get-started/user-guide-esp32-s3-korvo-2.html)  
 
-Speaker plays the [data/pink](./data/noise_set/pink/Pink.wav) noise. Adjust the speakers so that the sound level measured by the decibel meter at the DUT (Device Under Test) position is **60dB**.
+---
 
-### 1.2 Calibrate DUT Speaker
+## 1. Calibration Procedure
 
-To test the performance under playback conditions, it is necessary to calibrate the device's playback volume.
+### 1.1 Noise Speaker Calibration
+**Setup**:  
+- Position two speakers according to your test scenario requirements  
+- One speaker will play background noise  
+- The other will play wake words  
 
-Calibration method:
+**Calibration Steps**:  
+1. Play the [pink noise sample](./data/noise_set/pink/Pink.wav) through the noise speaker  
+2. Using a decibel meter at the DUT (Device Under Test) position:  
+   - Adjust the speaker volume until the meter reads **55 dBA**  
+   - Maintain this volume level for all subsequent tests  
 
-DUT play [music](./data/music). Adjust the device's playback volume to ensure that the volume measured at the device's microphone is **70dB**.
+### 1.2 DUT Playback Volume Calibration
+**Setup**:  
+Connect your ESP32 board to the test computer via USB and make sure the speaker is connected to the DUT's speaker output.
 
-## 2. Performance Test
+**Calibration Steps**:  
+1. Play the [music sample](./data/music) through the DUT  
+2. Using a decibel meter at the device's microphone position:  
+   - Adjust the DUT's playback volume until the meter reads **70 dBA**  
+   - Maintain this volume level for all playback tests  
 
-### 2.1. Configuration
-The template of `config.yml` is as follows, please modify it according to your own test data.
+---
 
-```yml
+## 2. Performance Testing
+
+### 2.1 Configuration Setup
+Modify `config.yml` according to your test requirements:
+
+```yaml
 clean_set:
   paths:
-    - "./data/wake_words/hey_lepro"
+    - "./data/wake_words/hilexin"
   normalization: true
   target_dB: -36
 music_set:
@@ -50,44 +73,66 @@ output_set:
   path: "./data/output_set"
   overwrite: false
   noise_snr:
-    - snr_dB: 10
-      clean_gain_dB: 0
     - snr_dB: 5
       clean_gain_dB: 0
     - snr_dB: 0
       clean_gain_dB: 5
   playback_snr:
     - snr_dB: -10
+      clean_gain_dB: 5
+    - snr_dB: -15
       clean_gain_dB: 0
-    - snr_dB: 0
-      clean_gain_dB: 10
 
 player:
   play_output: true
 
-```
-The above configuration will generate 2(the number of clean set)*6(the number of noise set)*3(the number of SNR)=36 test files.
-Do not modify target_db unless understand its purpose.
-
-If you want to test playback condition, you need to copy music_set audio data into `/sdcard/music` path. `sdcard_recorder` app will play those music automatically to test AEC performance.
-
-Note only support to play 16KHz single channel audio data.
-
-### 2.2. Build and Flash sdcard_recorder app
 
 ```
+
+**Notes**:  
+- The example configuration will generate 14 test cases (1 wake words × 6 noise types × 2 SNR levels + 2  playback SNR levels)  
+- Only modify `target_dB` if you understand its impact on audio normalization  
+- For playback tests, copy music files to `/sdcard/music` on your ESP32 device  
+- **Supported audio format**: 16kHz, mono channel  
+
+---
+
+### 2.2 Flash the Recorder Application
+
+```bash
+# Navigate to the recorder directory
 cd sdcard_recorder
-idf.py menuconfig   // select board and change the target
-idf.py flash monitor   // build and flash
+
+# Configure the target board
+idf.py menuconfig
+
+#Build and flash
+idf.py flash monitor
 ```
 
-### 2.3. synthesize, play and record
-Plug the board into the playback computer and ensure the serial port can detect your board.
-```
-pip install -r requirement.txt
+---
 
-python create_test_set.py config.yml
-```
+### 2.3 Run the Test
+
+1. Connect your ESP32 board to the test computer via USB  
+2. Verify the system detects the board's serial port  
+3. Install required Python packages:  
+   ```bash
+   pip install -r requirement.txt
+   ```
+4. Execute the test script:  
+   ```bash
+   python create_test_set.py config.yml
+   ```
+
+**Test Process**:  
+The script will automatically:  
+1. Generate all test audio combinations  
+2. Play each audio scenario  
+3. Trigger the board to record responses  
+4. Save recordings to the SD card  
+
+
 
 
 # How to record MultiNet test set
