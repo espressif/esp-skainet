@@ -52,6 +52,12 @@ void detect_Task(void *arg)
     assert(buff);
     printf("------------detect start------------\n");
 
+    // modify wakenet detection threshold
+    afe_handle->set_wakenet_threshold(afe_data, 1, 0.6); // set model1's threshold to 0.6
+    afe_handle->set_wakenet_threshold(afe_data, 2, 0.6); // set model2's threshold to 0.6
+    afe_handle->reset_wakenet_threshold(afe_data, 1);    // reset model1's threshold to default
+    afe_handle->reset_wakenet_threshold(afe_data, 2);    // reset model2's threshold to default
+
     while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (!res || res->ret_value == ESP_FAIL) {

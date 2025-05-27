@@ -37,3 +37,21 @@ idf.py flash monitor
 (退出窗口，请键入 ``Ctrl-]``.)
 
 参考 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started-cmake/index.html) 来获取更多使用 ESP-IDF 编译项目的细节.
+
+
+### 修改检测阈值
+
+默认的检测阈值定义在 `_MODEL_INFO_` 文件中，创建模型时将打印该阈值。
+
+比如，[`wakenet9_v1h24_嗨，乐鑫_3_0.608_0.615`](https://github.com/espressif/esp-sr/blob/master/model/wakenet_model/wn9_hilexin/_MODEL_INFO_) 的检测阈值范围是 0.608 到 0.615。
+有两种修改方式：
+
+- 修改 `_MODEL_INFO_` 文件
+
+- 在代码中修改
+```
+afe_handle->set_wakenet_threshold(afe_handle, model_index, threshold); // currently AFE support to load two model. model_index is 1 or 2
+afe_handle->reset_wakenet_threshold(afe_handle, model_index);          // reset threshold to default
+```
+
+**注意**：以下API在esp-sr v2.1.3及以后才支持
