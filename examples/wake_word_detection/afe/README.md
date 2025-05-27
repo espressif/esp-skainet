@@ -41,3 +41,20 @@ idf.py flash monitor
 (To exit the serial monitor, type ``Ctrl-]``.)
 
 
+### modify detection threshold
+
+The default detection threshold is defined in `_MODEL_INFO_` file, and it will be printed when model is created. 
+
+For example, [`wakenet9_v1h24_嗨，乐鑫_3_0.608_0.615`](https://github.com/espressif/esp-sr/blob/master/model/wakenet_model/wn9_hilexin/_MODEL_INFO_) has a detection threshold range from 0.608 to 0.615. 
+You can modify threshold in the following ways:
+
+- modify the threshold in `_MODEL_INFO_` file
+
+- modify the threshold in code
+
+```
+afe_handle->set_wakenet_threshold(afe_handle, model_index, threshold); // currently AFE support to load two model. model_index is 1 or 2
+afe_handle->reset_wakenet_threshold(afe_handle, model_index);          // reset threshold to default
+```
+
+**Note**: This API is supported from esp-sr v2.1.3
