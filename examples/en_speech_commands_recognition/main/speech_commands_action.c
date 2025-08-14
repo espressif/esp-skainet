@@ -58,7 +58,7 @@ typedef struct {
 #if defined CONFIG_ESP32_S3_KORVO_1_V4_0_BOARD
 #include "led_strip.h"
 #define EXAMPLE_CHASE_SPEED_MS (10)
-led_strip_handle_t *strip = NULL;
+led_strip_handle_t strip = NULL;
 void led_Task(void *arg)
 {
     const led_strip_config_t led_config = {
