@@ -122,7 +122,7 @@ int bsp_get_feed_channel(void)
 
 char* bsp_get_input_format(void)
 {
-    return "NM";
+    return "MN";
 }
 
 
