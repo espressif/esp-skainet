@@ -1,8 +1,8 @@
 # ESP-Skainet [[中文]](./README_cn.md)
 
-ESP-Skainet is Espressif's intelligent voice assistant, currently supporting wake word detection and speech command recognition.
+ESP-Skainet is Espressif's intelligent voice assistant, which currently supports the Wake Word Engine and Speech Commands Recognition.
 
-### It is recommended to use ESP32-S3 for speech command recognition, as it supports AI instructions and high-speed octal SPI PSRAM. The latest models will be deployed on ESP32-S3 first.
+### ESP32-S3 is recommended to run speech commands recognition, which supports AI instructions and high-speed octal SPI PSRAM. The latest models will be deployed on ESP32-S3 first.
 
 # Overview
 
