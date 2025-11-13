@@ -22,7 +22,7 @@
 #include "esp_process_sdkconfig.h"
 
 int wakeup_flag = 0;
-static esp_afe_sr_iface_t *afe_handle = NULL;
+static const esp_afe_sr_iface_t *afe_handle = NULL;
 static volatile int task_flag = 0;
 srmodel_list_t *models = NULL;
 
