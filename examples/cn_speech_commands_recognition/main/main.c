@@ -21,7 +21,7 @@
 #include "model_path.h"
 
 int wakeup_flag = 0;
-static esp_afe_sr_iface_t *afe_handle = NULL;
+static const esp_afe_sr_iface_t *afe_handle = NULL;
 static esp_afe_sr_data_t *afe_data = NULL;
 static volatile int task_flag = 0;
 srmodel_list_t *models = NULL;

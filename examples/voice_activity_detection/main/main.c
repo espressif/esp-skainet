@@ -19,7 +19,7 @@
 #include "model_path.h"
 #include "string.h"
 
-static esp_afe_sr_iface_t *afe_handle = NULL;
+static const esp_afe_sr_iface_t *afe_handle = NULL;
 static bool sdcard_enable = true;
 
 void feed_Task(void *arg)
