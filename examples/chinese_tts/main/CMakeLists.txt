@@ -11,6 +11,7 @@ set(requires
     hardware_driver
     sr_ringbuf
     player
+    esp_driver_uart
     )
 
 idf_component_register(SRCS ${srcs}

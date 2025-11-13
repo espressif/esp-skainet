@@ -52,7 +52,7 @@ int app_main()
     } else {
         printf("voice_data paration size:%d\n", part->size);
     }
-    void* voicedata;
+    const void* voicedata;
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
     esp_partition_mmap_handle_t mmap;
     esp_err_t err=esp_partition_mmap(part, 0, part->size, ESP_PARTITION_MMAP_DATA, &voicedata, &mmap);
