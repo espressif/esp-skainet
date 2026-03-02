@@ -73,7 +73,7 @@
 #define GPIO_I2S_LRCK       (GPIO_NUM_48)
 #define GPIO_I2S_MCLK       (GPIO_NUM_46)
 #define GPIO_I2S_SCLK       (GPIO_NUM_47)
-#define GPIO_I2S_SDIN       (GPIO_NUM_51)
+#define GPIO_I2S_SDIN       (GPIO_NUM_27)
 #define GPIO_I2S_DOUT       (GPIO_NUM_45)
 
 /**
