@@ -11,7 +11,6 @@
 #include "ringbuf.h"
 #include "esp_log.h"
 #include "driver/uart.h"
-#include "driver/uart_vfs.h"
 #include "soc/uart_periph.h"
 #include "esp_idf_version.h"
 
@@ -45,7 +44,7 @@ void uartTask(void *arg)
         }
 
         // We have a driver now installed so set up the read/write functions to use driver also.
-        uart_vfs_dev_use_driver(0);
+        esp_vfs_dev_uart_use_driver(0);
 
         while (1) {
             int s;
