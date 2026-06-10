@@ -25,9 +25,9 @@
 
 static const char *TAG = "hardware";
 
-esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
+esp_err_t esp_board_init(void)
 {
-    return bsp_board_init(sample_rate, channel_format, bits_per_chan);
+    return bsp_board_init();
 }
 
 esp_err_t esp_sdcard_init(char *mount_point, size_t max_files)
@@ -68,6 +68,23 @@ esp_err_t esp_audio_set_play_vol(int volume)
 esp_err_t esp_audio_get_play_vol(int *volume)
 {
     return bsp_audio_get_play_vol(volume);
+}
+
+void esp_get_player_format(esp_player_format_t *format)
+{
+    if (format != NULL) {
+        bsp_get_player_format(&format->channels, &format->sample_rate, &format->bits_per_sample);
+    }
+}
+
+esp_err_t esp_sdcard_write(const void* buffer, int size, int count, FILE* stream)
+{
+    esp_err_t res = ESP_OK;
+    res = fwrite(buffer, size, count, stream);
+    res |= fflush(stream);
+    res |= fsync(fileno(stream));
+
+    return res;
 }
 
 esp_err_t FatfsComboWrite(const void* buffer, int size, int count, FILE* stream)

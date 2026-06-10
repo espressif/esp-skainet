@@ -93,12 +93,16 @@ esp_err_t bsp_sdcard_init(char *mount_point, size_t max_files);
 
 /**
  * @brief Special config for dev board
- * 
+ *
+ * Board audio configuration (sample rate, channel format, bits per channel)
+ * is defined per board via BSP_BOARD_SAMPLE_RATE, BSP_BOARD_CHANNEL_FORMAT,
+ * BSP_BOARD_BITS_PER_CHAN constants.
+ *
  * @return
  *    - ESP_OK: Success
  *    - Others: Fail
  */
-esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan);
+esp_err_t bsp_board_init(void);
 
 
 esp_err_t bsp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wait);
@@ -141,13 +145,22 @@ esp_err_t bsp_audio_set_play_vol(int volume);
 
 /**
  * @brief Get play volume
- * 
+ *
+ * @param volume  Output volume value; must not be NULL.
  * @return
- *    - ESP_OK: Success
- *    - Others: Fail
+ *    - ESP_OK:   Success
+ *    - Others:  Fail
  */
 esp_err_t bsp_audio_get_play_vol(int *volume);
 
+/**
+ * @brief Get the codec playback format for this board.
+ *
+ * @param channels         Output number of channels (e.g. 1 or 2); must not be NULL.
+ * @param sample_rate      Output sample rate in Hz (e.g. 16000); must not be NULL.
+ * @param bits_per_sample  Output bits per sample (e.g. 16 or 32); must not be NULL.
+ */
+void bsp_get_player_format(int *channels, int *sample_rate, int *bits_per_sample);
 
 #ifdef __cplusplus
 }

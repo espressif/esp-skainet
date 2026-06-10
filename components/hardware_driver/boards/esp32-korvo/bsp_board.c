@@ -40,6 +40,12 @@
 #define GPIO_MUTE_LEVEL 1
 #define ACK_CHECK_EN   0x1     /*!< I2C master will check ack from slave*/
 #define ADC_I2S_CHANNEL 4
+
+/* Board audio configuration */
+#define BSP_BOARD_SAMPLE_RATE      16000
+#define BSP_BOARD_CHANNEL_FORMAT  2
+#define BSP_BOARD_BITS_PER_CHAN   32
+
 static sdmmc_card_t *card;
 static const char *TAG = "board";
 
@@ -419,14 +425,14 @@ char* bsp_get_input_format(void)
     return "MRNN";
 }
 
-esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
+esp_err_t bsp_board_init(void)
 {
     /*!< Initialize I2C bus, used for audio codec*/
     bsp_i2c_init(I2C_NUM, I2C_CLK);
-    bsp_i2s_init(I2S_NUM_0, sample_rate, channel_format, bits_per_chan);
+    bsp_i2s_init(I2S_NUM_0, BSP_BOARD_SAMPLE_RATE, BSP_BOARD_CHANNEL_FORMAT, BSP_BOARD_BITS_PER_CHAN);
     bsp_i2s_init(I2S_NUM_1, 16000, 2, 32);
 
-    bsp_codec_init(16000, sample_rate, channel_format, bits_per_chan);
+    bsp_codec_init(16000, BSP_BOARD_SAMPLE_RATE, BSP_BOARD_CHANNEL_FORMAT, BSP_BOARD_BITS_PER_CHAN);
     /* Initialize PA */
     // gpio_config_t  io_conf;
     // memset(&io_conf, 0, sizeof(io_conf));
@@ -438,6 +444,19 @@ esp_err_t bsp_board_init(uint32_t sample_rate, int channel_format, int bits_per_
     // gpio_config(&io_conf);
     // gpio_set_level(GPIO_PWR_CTRL, 1);
     return ESP_OK;
+}
+
+void bsp_get_player_format(int *channels, int *sample_rate, int *bits_per_sample)
+{
+    if (channels) {
+        *channels = BSP_BOARD_CHANNEL_FORMAT;
+    }
+    if (sample_rate) {
+        *sample_rate = BSP_BOARD_SAMPLE_RATE;
+    }
+    if (bits_per_sample) {
+        *bits_per_sample = BSP_BOARD_BITS_PER_CHAN;
+    }
 }
 
 esp_err_t bsp_sdcard_init(char *mount_point, size_t max_files)
