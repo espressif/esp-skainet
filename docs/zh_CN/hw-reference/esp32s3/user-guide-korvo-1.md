@@ -29,6 +29,7 @@
   - [5.2. 原理图](#52-原理图)
   - [5.3. PCB 布局图](#53-pcb-布局图)
   - [5.4. 尺寸图](#54-尺寸图)
+  - [5.5. 参考设计](#55-参考设计)
 
 本指南将帮助您快速上手 ESP32-S3-Korvo-1 v5.0，并提供该款开发板的详细信息。
 
@@ -359,5 +360,9 @@ ESP32-S3-Korvo-1 v5.0 相对于 ESP32-S3-Korvo-1 v4.0 主要有两处变更：1)
 -   [ESP32-S3-Korvo-1 v4.0 主板尺寸图源文件](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.dxf) (DXF) - 可使用 [Autodesk Viewer](https://viewer.autodesk.com/) 查看
 -   [ESP32-Korvo-Mic 子板正面尺寸图源文件](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - 可使用 [Autodesk Viewer](https://viewer.autodesk.com/) 查看
 -   [ESP32-Korvo-Mic 子板背面尺寸图源文件](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - 可使用 [Autodesk Viewer](https://viewer.autodesk.com/) 查看
+
+## 5.5 参考设计
+
+-   [ESP32-S3-Korvo-1 V5.0 参考设计](https://documentation.espressif.com/ESP32-S3-Korvo-1_Reference_Design.zip) (ZIP)
 
 有关本开发板的更多设计文档，请联系我们的商务部门 [<sales@espressif.com>](sales@espressif.com)。

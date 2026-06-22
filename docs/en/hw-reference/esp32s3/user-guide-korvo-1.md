@@ -29,6 +29,7 @@
   - [5.2 Schematic](#52-schematic)
   - [5.3 PCB Layout](#53-pcb-layout)
   - [5.4 Dimensions](#54-dimensions)
+  - [5.5 Reference Design](#55-reference-design)
 
 This user guide will help you get started with ESP32-S3-Korvo-1 v5.0 and will also provide more in-depth information.
 
@@ -359,5 +360,9 @@ Compared to ESP32-S3-Korvo-1 v4.0, ESP32-S3-Korvo-1 v5.0 has two changes in hard
 -   [ESP32-S3-Korvo-1 v4.0 Main Board Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-KORVO_V4_MB_20210719AE.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
 -   [ESP32-Korvo-Mic Sub Board Front Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
 -   [ESP32-Korvo-Mic Sub Board Back Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
+
+## 5.5 Reference Design
+
+-   [ESP32-S3-Korvo-1 V5.0 Reference Design](https://documentation.espressif.com/ESP32-S3-Korvo-1_Reference_Design.zip) (ZIP)
 
 For further design documentation for the board, please contact us at [<sales@espressif.com>](sales@espressif.com).
