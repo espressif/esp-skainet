@@ -30,6 +30,7 @@
   - [5.3 PCB Layout](#53-pcb-layout)
   - [5.4 Dimensions](#54-dimensions)
   - [5.5 Reference Design](#55-reference-design)
+- [6. Disclaimer and Copyright Notice](#6-disclaimer-and-copyright-notice)
 
 This user guide will help you get started with ESP32-S3-Korvo-1 v5.0 and will also provide more in-depth information.
 
@@ -55,6 +56,7 @@ The document consists of the following major sections:
 -   [Hardware Reference](#3-hardware-reference): More detailed information about the board's hardware.
 -   [Hardware Revision Details](#4-hardware-revision-details): Hardware revision history, known issues, and links to user guides for previous versions (if any) of the board.
 -   [Related Documents](#5-related-documents): Links to related documentation.
+-   [Disclaimer and Copyright Notice](#6-disclaimer-and-copyright-notice): Link to the disclaimer and copyright notice.
 
 
 # 1. Getting Started
@@ -366,3 +368,7 @@ Compared to ESP32-S3-Korvo-1 v4.0, ESP32-S3-Korvo-1 v5.0 has two changes in hard
 -   [ESP32-S3-Korvo-1 V5.0 Reference Design](https://documentation.espressif.com/ESP32-S3-Korvo-1_Reference_Design.zip) (ZIP)
 
 For further design documentation for the board, please contact us at [<sales@espressif.com>](sales@espressif.com).
+
+# 6. Disclaimer and Copyright Notice
+
+See [Disclaimer and Copyright Notice](../../disclaimer-and-copyright.md).
