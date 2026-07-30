@@ -14,6 +14,7 @@ ESP32-Korvo V1.1 是一个基于双核 ESP32、搭载麦克风阵列的音频开
 * [入门指南](#1-入门指南): 简要介绍了 ESP32-Korvo V1.1 和硬件、软件设置指南。
 * [硬件参考](#2-硬件参考): 详细介绍了 ESP32-Korvo V1.1 的硬件。
 * [相关文档](#3-相关文档): 列出了相关文档的链接。
+* [免责声明和版权公告](#4-免责声明和版权公告): 链接到免责声明和版权公告。
 
 # 1. 入门指南
 
@@ -142,3 +143,7 @@ ESP32-Korvo V1.1 的主要组件和连接方式如下图所示。
 * [ESP32 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_cn.pdf) (PDF)
 * [ESP32-WROVER-E & ESP32-WROVER-IE 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-e_esp32-wrover-ie_datasheet_cn.pdf) (PDF)
 * [乐鑫产品订购信息](https://www.espressif.com/sites/default/files/documentation/espressif_products_ordering_information_cn.pdf)  (PDF)
+
+# 4. 免责声明和版权公告
+
+请参阅 [免责声明和版权公告](../../disclaimer-and-copyright.md)。
