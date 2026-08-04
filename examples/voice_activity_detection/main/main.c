@@ -98,7 +98,7 @@ void detect_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init());
     if (sdcard_enable) {
         ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     }
