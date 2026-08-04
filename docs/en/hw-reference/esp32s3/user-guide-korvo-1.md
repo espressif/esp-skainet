@@ -29,6 +29,8 @@
   - [5.2 Schematic](#52-schematic)
   - [5.3 PCB Layout](#53-pcb-layout)
   - [5.4 Dimensions](#54-dimensions)
+  - [5.5 Reference Design](#55-reference-design)
+- [6. Disclaimer and Copyright Notice](#6-disclaimer-and-copyright-notice)
 
 This user guide will help you get started with ESP32-S3-Korvo-1 v5.0 and will also provide more in-depth information.
 
@@ -54,6 +56,7 @@ The document consists of the following major sections:
 -   [Hardware Reference](#3-hardware-reference): More detailed information about the board's hardware.
 -   [Hardware Revision Details](#4-hardware-revision-details): Hardware revision history, known issues, and links to user guides for previous versions (if any) of the board.
 -   [Related Documents](#5-related-documents): Links to related documentation.
+-   [Disclaimer and Copyright Notice](#6-disclaimer-and-copyright-notice): Link to the disclaimer and copyright notice.
 
 
 # 1. Getting Started
@@ -95,7 +98,7 @@ The key components of the board are described in an anti-clockwise direction sta
 | 3   | 5 V to 3.3 V LDO         | Power regulator that converts a 5 V supply into a 3.3 V output for the module.|
 | 4   | 5 V Power On LED         | The LED (red) turns on when the USB power is connected to the board and the **Power Switch** is toggled to "ON". |
 | 5   | Power Switch             | Toggling it to “ON” powers on the board; toggling it to “OFF” powers off the board. |
-| 6   | Battery Socket           | Two-pin socket to connect a Li-ion battery. The battery serves as an alternative power supply to the **USB Power Port** for charging the board. Make sure to use a Li-ion battery that has protection circuit and fuse. The recommended specifications of the battery: capacity > 1000 mAh, output voltage 3.7 V, input voltage 4.2 V – 5 V. Please verify if polarity on the battery plug matches polarity of the socket as marked on the board’s soldermask besides the socket. |
+| 6   | Battery Socket           | Two-pin socket to connect a Li-ion battery. The battery can be used as an alternative power source to the **USB Power Port** to power the board. Make sure to use a Li-ion battery that has protection circuit and fuse. The recommended specifications of the battery: capacity > 1000 mAh, output voltage 3.7 V, input voltage 4.2 V – 5 V. Please verify if polarity on the battery plug matches polarity of the socket as marked on the board’s soldermask besides the socket. |
 | 7   | Battery Charger Chip     | 1 A linear Li-ion battery charger (AP5056), used for charging a battery connected to the **Battery Socket**. The power source for charging is the **USB Power Port**.|
 | 8   | Battery Green LED        | When the USB power is connected to the board and a battery is not connected, the green LED turns on. If a battery is connected and fully charged, the green LED turns on.  |
 | 9   | Battery Red LED          | When the USB power is connected to the board and a battery is not connected, the red LED blinks. If a battery is connected, the red LED turns on, indicating that the battery is being charged. When the battery is fully charged, the red LED turns off. |
@@ -209,7 +212,7 @@ This section provides instructions on how to do hardware/software setup and flas
 
 -   1 x ESP32-S3-Korvo-1
 -   2 x USB 2.0 cables (Standard-A to Micro-B), one for USB power supply, the other for flashing firmware on to the board
--   4-ohm, 3-watt speaker or headphones with a 3.5 mm jack. If you use a speaker, it is recommended to choose one no more than 3 watts and fitted with JST PH 2.0 2-Pin plugs are needed. In case you do not have this type of plug it is also fine to use Dupont female jumper wires during development.
+-   4-ohm, 3-watt speaker or headphones with a 3.5 mm jack. If you use a speaker, it is recommended to choose one rated at 3 watts or less and fitted with JST PH 2.0 2-Pin plugs. In case you do not have this type of plug, it is also fine to use Dupont female jumper wires during development.
 -   Computer running Windows, Linux, or macOS
 
 ## 2.2 Optional Hardware
@@ -249,7 +252,7 @@ After hardware setup, you can proceed with preparation of development tools. Go 
 
 > **Note**
 >
-> Espressif provides the **Off-line Wake Word Customization** service which allows you to customize wake words. For the detailed process, please refer to [Espressif Speech Wake Word Customization Process](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/ESP_Wake_Words_Customization.md).
+> Espressif provides the **Off-line Wake Word Customization** service which allows you to customize wake words. For the detailed process, please refer to [Espressif Speech Wake Word Customization Process](https://github.com/espressif/esp-sr/blob/master/docs/en/wake_word_engine/ESP_Wake_Words_Customization.rst).
 
 
 # 3. Hardware Reference
@@ -319,7 +322,7 @@ Compared to ESP32-S3-Korvo-1 v4.0, ESP32-S3-Korvo-1 v5.0 has two changes in hard
 
 | ESP32-S3-Korvo-1 V5.0 Marking      | ESP32-S3-Korvo V4.0 Marking |
 |--------------------|----|
-|  ![ESP32-S3-Korvo-1 V5.0 Marking](../../../_static/esp32-s3-korvo-1-v5-marking.png) |![ESP32-S3-Korvo V4.0 Marking](../../../_static/esp32-s3-korvo-1-v4-marking.png) |
+|  ![ESP32-S3-Korvo-1 V5.0 Marking](../../../_static/esp32-s3-korvo-1-v5-marking.png) |![ESP32-S3-Korvo-1 V4.0 Marking](../../../_static/esp32-s3-korvo-1-v4-marking.png) |
 
 2.  The J1 component on the ESP32-S3-Korvo-1 v5.0 main board is moved a little to the right. This does not affect the performance of the board.
 
@@ -347,7 +350,7 @@ Compared to ESP32-S3-Korvo-1 v4.0, ESP32-S3-Korvo-1 v5.0 has two changes in hard
 
 -   [ESP32-S3-Korvo-1 v5.0 Main Board PCB Layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-S3-Korvo-1_V5_20211201.pdf) (PDF)
 -   [ESP32-S3-Korvo-1 v4.0 Main Board PCB Layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-S3-KORVO_V4_20210719AE.pdf) (PDF)
--   [ESP32-Korvo-Mic PCB layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-Korvo-Mic_V1_1_20200316AA.pdf) (PDF)
+-   [ESP32-Korvo-Mic Sub Board PCB Layout](https://dl.espressif.com/dl/schematics/PCB_ESP32-Korvo-Mic_V1_1_20200316AA.pdf) (PDF)
 
 ## 5.4 Dimensions
 
@@ -360,4 +363,12 @@ Compared to ESP32-S3-Korvo-1 v4.0, ESP32-S3-Korvo-1 v5.0 has two changes in hard
 -   [ESP32-Korvo-Mic Sub Board Front Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
 -   [ESP32-Korvo-Mic Sub Board Back Dimensions Source File](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - You can view it with [Autodesk Viewer](https://viewer.autodesk.com/) online
 
+## 5.5 Reference Design
+
+-   [ESP32-S3-Korvo-1 V5.0 Reference Design](https://documentation.espressif.com/ESP32-S3-Korvo-1_Reference_Design.zip) (ZIP)
+
 For further design documentation for the board, please contact us at [<sales@espressif.com>](sales@espressif.com).
+
+# 6. Disclaimer and Copyright Notice
+
+See [Disclaimer and Copyright Notice](../../disclaimer-and-copyright.md).

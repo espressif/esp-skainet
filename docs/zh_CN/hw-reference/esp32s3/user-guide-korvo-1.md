@@ -29,6 +29,8 @@
   - [5.2. 原理图](#52-原理图)
   - [5.3. PCB 布局图](#53-pcb-布局图)
   - [5.4. 尺寸图](#54-尺寸图)
+  - [5.5. 参考设计](#55-参考设计)
+- [6. 免责声明和版权公告](#6-免责声明和版权公告)
 
 本指南将帮助您快速上手 ESP32-S3-Korvo-1 v5.0，并提供该款开发板的详细信息。
 
@@ -54,6 +56,7 @@ ESP32-S3-Korvo-1 是[乐鑫](https://www.espressif.com/zh-hans/home)推出的一
 -  [硬件参考](#3-硬件参考)：详细介绍了开发板的硬件。
 -  [硬件版本](#4-硬件版本)：介绍硬件历史版本和已知问题，并提供链接至历史版本开发板的入门指南（如有）。
 -  [相关文档](#5-相关文档)：列出了相关文档的链接。
+-  [免责声明和版权公告](#6-免责声明和版权公告)：链接到免责声明和版权公告。
 
 
 # 1. 入门指南
@@ -95,7 +98,7 @@ ESP32-S3-Korvo-1 开发板包含两部分：一块主板 ESP32-S3-Korvo-1，配�
 | 3   | 5 V to 3.3 V LDO（5 V 转 3.3 V LDO）        | 模组电路的电源转换器，输入 5 V，输出 3.3 V。|
 | 4   | 5 V Power On LED（5 V 电源指示灯）         | 开发板连接 USB 电源，并且**电源开关**拨至 "ON"，5 V 电源指示灯红灯亮起。|
 | 5   | Power Switch（电源开关）             | 拨动至 "ON"，开发板上电：拨动至 "OFF"，开发板断电。 |
-| 6   | Battery Socket（电池接口）          | 外接锂电池，与 USB 供电二选一。请使用带有保护电路板和电流保险器组件的锂电池。建议电池规格：容量 >1000 mAh, 输出电压 3.7 V， 输入电压 4.2 V – 5 V。装电池时注意正负极性与接口标示的正负极性相匹配。|
+| 6   | Battery Socket（电池接口）          | 外接锂电池可作为 USB 供电的替代电源，为开发板供电。请使用带有保护电路板和电流保险器组件的锂电池。建议电池规格：容量 >1000 mAh, 输出电压 3.7 V， 输入电压 4.2 V – 5 V。装电池时注意正负极性与接口标示的正负极性相匹配。|
 | 7   | Battery Charger Chip（电池充电芯片）     | AP5056，1 A 线性锂电池充电器。充电电源来自 **USB 供电接口**。|
 | 8   | Battery Green LED（电池指示绿灯）        | 开发板连接 USB 电源，不接电池的情况下，绿灯亮。接电池状态下，在电池充电完成后，绿灯亮。|
 | 9   | Battery Red LED（电池指示红灯）         | 开发板连接 USB 电源，不接电池的情况下，红灯闪烁。接电池状态下，电池充电正在进行时，红灯亮；电池充电完成后，红灯灭。|
@@ -132,7 +135,7 @@ ESP32-S3-Korvo-1 开发板包含两部分：一块主板 ESP32-S3-Korvo-1，配�
 
 </center>
 
-下面从上到下依次介绍子上的主要组件。
+下面从上到下依次介绍子板上的主要组件。
 
 | 主要组件      | 介绍 |
 |--------------------|----|
@@ -171,7 +174,7 @@ ESP32-S3-Korvo-1 出厂即烧录[默认固件](https://github.com/espressif/esp-
 
 > **注意**
 >
-> 请注意，默认固件仅支持中文唤醒词和语音命令。您也可以参考 [esp-skainet/examples](https://github.com/espressif/esp-skainet/tree/master/examples) 配置使用英语唤醒词和语音命令。如需配置英语唤醒词和语音命令，请首先按照[第 2 节](#2-start-application-development)中的步骤进行操作。
+> 请注意，默认固件仅支持中文唤醒词和语音命令。您也可以参考 [esp-skainet/examples](https://github.com/espressif/esp-skainet/tree/master/examples) 配置使用英语唤醒词和语音命令。如需配置英语唤醒词和语音命令，请首先按照[第 2 节](#2-开始开发应用)中的步骤进行操作。
 
 使用开发板前，您需要准备以下硬件：
 
@@ -249,7 +252,7 @@ ESP32-S3-Korvo-1 出厂即烧录[默认固件](https://github.com/espressif/esp-
 
 > **说明**
 >
-> 您可以自定义离线唤醒词。具体请查看 [Espressif Speech Wake Word Customization Process（乐鑫唤醒词定制流程）](https://github.com/espressif/esp-sr/blob/master/docs/wake_word_engine/ESP_Wake_Words_Customization.md)。
+> 您可以自定义离线唤醒词。具体请查看 [Espressif Speech Wake Word Customization Process（乐鑫唤醒词定制流程）](https://github.com/espressif/esp-sr/blob/master/docs/zh_CN/wake_word_engine/ESP_Wake_Words_Customization.rst)。
 
 
 # 3. 硬件参考
@@ -360,4 +363,12 @@ ESP32-S3-Korvo-1 v5.0 相对于 ESP32-S3-Korvo-1 v4.0 主要有两处变更：1)
 -   [ESP32-Korvo-Mic 子板正面尺寸图源文件](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_top_V1_1_20211111.dxf) (DXF) - 可使用 [Autodesk Viewer](https://viewer.autodesk.com/) 查看
 -   [ESP32-Korvo-Mic 子板背面尺寸图源文件](https://dl.espressif.com/dl/schematics/DXF_ESP32-S3-Korvo-Mic_Bottom_V1_1_20211111.dxf) (DXF) - 可使用 [Autodesk Viewer](https://viewer.autodesk.com/) 查看
 
+## 5.5 参考设计
+
+-   [ESP32-S3-Korvo-1 V5.0 参考设计](https://documentation.espressif.com/ESP32-S3-Korvo-1_Reference_Design.zip) (ZIP)
+
 有关本开发板的更多设计文档，请联系我们的商务部门 [<sales@espressif.com>](sales@espressif.com)。
+
+# 6. 免责声明和版权公告
+
+请参阅 [免责声明和版权公告](../../disclaimer-and-copyright.md)。

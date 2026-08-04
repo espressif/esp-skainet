@@ -36,7 +36,7 @@
 #include "led_strip.h"
 
 extern int detect_flag;
-led_strip_handle_t *strip = NULL;
+led_strip_handle_t strip = NULL;
 
 typedef struct {
     char* name;

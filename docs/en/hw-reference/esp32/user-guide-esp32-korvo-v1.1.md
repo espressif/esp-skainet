@@ -13,7 +13,8 @@ The document consists of the following major sections:
 
 -   [Getting started](#1-getting-started): Provides an overview of ESP32-Korvo V1.1 and hardware/software setup instructions to get started.
 -   [Hardware reference](#2-hardware-reference): Provides more detailed information about the ESP32-Korvo V1.1's hardware.
--   [Related Documents](#3-related-documents): Gives links to related documentaiton.
+-   [Related Documents](#3-related-documents): Gives links to related documentation.
+-   [Disclaimer and Copyright Notice](#4-disclaimer-and-copyright-notice): Link to the disclaimer and copyright notice.
 
 # 1. Getting Started
 
@@ -23,7 +24,7 @@ This section describes how to get started with ESP32-Korvo V1.1. It begins with 
 
 ESP32-Korvo V1.1 consists of two boards connected by an FPC cable: one mainboard containing an ESP32-WROVER-E module, a USB power port, a micro SD card slot, an earphone connector and a speaker connector, and one subboard containing microphone arrays, function buttons and RGB LEDs.
 
-Unlike other Espressif's audio development boards, ESP32-Korvo V1.1 achieves far-field offline speech recoginition with a single ESP32 chip. The board can be equipped with either two or three microphone arrays. Combined with beamforming, AEC and other speech enhancement algorithms, it applies to various speech-recognition scenarios. 
+Unlike other Espressif's audio development boards, ESP32-Korvo V1.1 achieves far-field offline speech recognition with a single ESP32 chip. The board can be equipped with either two or three microphone arrays. Combined with beamforming, AEC and other speech enhancement algorithms, it applies to various speech-recognition scenarios.
 
 ## 1.2  Contents and Packaging
 
@@ -56,7 +57,7 @@ For wholesale orders, please check [Espressif Product Ordering Information](http
 ![ESP32-Korvo V1.1 - mic back](../../../_static/esp32-korvo-v1.1-annotated-photo-mic-back.png)
 <div align=center>ESP32-Korvo V1.1 Subboard Back</div>
 
-|Key Componenet|Description|
+|Key Component|Description|
 |:- |:- |
 |ESP32-WROVER-E|This ESP32 module contains the latest ESP32-D0WD-V3, a 16 MB flash and a 8 MB PSRAM for flexible data storage, featuring Wi-Fi / BT connectivity and data processing capability.|
 |Power Regulator|5V-to-3.3V regulator.|
@@ -142,3 +143,7 @@ A block diagram below shows the components of ESP32-Korvo V1.1 and their interco
 * [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) (PDF)
 * [ESP32-WROVER-E & ESP32-WROVER-IE Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-wrover-e_esp32-wrover-ie_datasheet_en.pdf) (PDF)
 * [Espressif Product Ordering Information](https://www.espressif.com/sites/default/files/documentation/espressif_products_ordering_information_en.pdf) (PDF)
+
+# 4. Disclaimer and Copyright Notice
+
+See [Disclaimer and Copyright Notice](../../disclaimer-and-copyright.md).

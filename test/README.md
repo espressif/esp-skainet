@@ -21,7 +21,7 @@ python tools/ci/build_apps.py ./test -t esp32s3 -vv
 ```
 
 This script will build all apps in the `esp-skainet/test`, and generate different bins according to different sdkconfig.ci.***.  
-For example, there are `sdkconfig.ci.hilexin` and `sdkconfig.ci.hiesp` in `esp-skainet/test/wakenet`. So after running the above script, `esp-skainet/test/wakenet/IDF_VERSION/build_esp32s3_hilexin` and `esp-skainet/test/wakenet/IDF_VERSION/build_esp32s3_hiesp` will be generated. IDF_VERSION is your idf verison.
+For example, there are `sdkconfig.ci.hilexin` and `sdkconfig.ci.hiesp` in `esp-skainet/test/wakenet`. So after running the above script, `esp-skainet/test/wakenet/IDF_VERSION/build_esp32s3_hilexin` and `esp-skainet/test/wakenet/IDF_VERSION/build_esp32s3_hiesp` will be generated. IDF_VERSION is your idf version.
 
 build rules are determined in `esp-skainet/test/.build-relus.yml`. You can modify this yaml file to set which targets should be build.
 

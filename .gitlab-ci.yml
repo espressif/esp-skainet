@@ -1,4 +1,5 @@
 stages:
+  - check
   - build
   - target_test
   - deploy
@@ -110,6 +111,14 @@ before_script:
 build_idf_v5.3:
   extends: .build_examples_template
   image: espressif/idf:release-v5.3
+
+build_idf_v5.4:
+  extends: .build_examples_template
+  image: espressif/idf:release-v5.4
+
+build_idf_v5.5:
+  extends: .build_examples_template
+  image: espressif/idf:release-v5.5
 
 # build_idf_v5.4:
 #   extends: .build_examples_template
@@ -263,3 +272,6 @@ push_to_github:
     - git remote remove github &>/dev/null || true
     - git remote add github git@github.com:espressif/esp-skainet.git
     - ${SKAINET_PATH}/tools/ci/push_to_github.sh
+
+include:
+  - '.gitlab/ci/pre_commit.yml'

@@ -13,6 +13,7 @@
 #include "driver/uart.h"
 #include "soc/uart_periph.h"
 #include "esp_idf_version.h"
+#include "driver/uart_vfs.h"
 
 #define TAG "TTS_URAT"
 extern ringbuf_handle_t urat_rb;
@@ -44,7 +45,9 @@ void uartTask(void *arg)
         }
 
         // We have a driver now installed so set up the read/write functions to use driver also.
-        esp_vfs_dev_uart_use_driver(0);
+        // esp_vfs_dev_uart_use_driver(0);
+        // esp_vfs_uart_use_driver(0);
+        uart_vfs_dev_use_driver(0);
 
         while (1) {
             int s;
