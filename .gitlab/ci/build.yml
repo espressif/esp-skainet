@@ -1,0 +1,41 @@
+.build_examples_template:
+  stage: build
+  tags:
+    - build
+  image: ${IMAGE}
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  needs:
+    - job: check_pre_commit
+      artifacts: false
+      optional: true
+  variables:
+    EXAMPLES_PATH: "examples"
+    MANIFEST_FILE: ".build-test-rules.yml"
+    IDF_CCACHE_ENABLE: "1"
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -n "$GITLAB_KEY" > ~/.ssh/id_rsa_base64
+    - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+    - git --version
+    - git submodule update --init --recursive --force
+    - pip install idf_build_apps
+  script:
+    - python -m idf_build_apps build -p "${EXAMPLES_PATH}" --recursive --manifest-file "${EXAMPLES_PATH}/${MANIFEST_FILE}" -t "${TARGET}"
+
+build_examples:
+  extends: .build_examples_template
+  parallel:
+    matrix:
+      - IMAGE:
+          - espressif/idf:release-v5.5
+          - espressif/idf:release-v6.0
+        TARGET:
+          - esp32s3
+          - esp32p4
