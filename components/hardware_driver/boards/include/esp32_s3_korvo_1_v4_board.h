@@ -77,7 +77,8 @@
 #define GPIO_I2S0_LRCK       (GPIO_NUM_41)
 #define GPIO_I2S0_MCLK       (GPIO_NUM_42)
 #define GPIO_I2S0_SCLK       (GPIO_NUM_40)
-#define GPIO_I2S0_SDIN       (GPIO_NUM_NC)
+// ES8311 ASDOUT -> ESP32-S3 IO4 (I2S0 data-in), used for DAC-loopback reference (回采)
+#define GPIO_I2S0_SDIN       (GPIO_NUM_4)
 #define GPIO_I2S0_DOUT       (GPIO_NUM_39)
 
 #define RECORD_VOLUME   (30.0)

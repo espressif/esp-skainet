@@ -16,6 +16,7 @@
  */
 
 #include "string.h"
+#include "stdlib.h"
 #include "bsp_board.h"
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "driver/i2s_std.h"
@@ -39,19 +40,23 @@
 #define GPIO_MUTE_NUM   GPIO_NUM_1
 #define GPIO_MUTE_LEVEL 1
 #define ACK_CHECK_EN   0x1     /*!< I2C master will check ack from slave*/
-#define ADC_I2S_CHANNEL 4
+
+#define ES7210_FRAME_CHANNEL 4   /*!< ES7210 frames read from I2S1 (mics + on-board slots) */
+#define ES8311_FRAME_CHANNEL 2   /*!< ES8311 frames read from I2S0: ch0 = mic, ch1 = DAC reference */
+#define FEED_CHANNEL         3   /*!< Fused output channels fed to AFE: M, M, R */
 
 /* Board audio configuration */
 #define BSP_BOARD_SAMPLE_RATE      16000
 #define BSP_BOARD_CHANNEL_FORMAT   2
-#define BSP_BOARD_BITS_PER_CHAN   32
+#define BSP_BOARD_BITS_PER_CHAN   16
 
 static sdmmc_card_t *card;
 static const char *TAG = "board";
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-static i2s_chan_handle_t                tx_handle = NULL;        // I2S tx channel handler
-static i2s_chan_handle_t                rx_handle = NULL;        // I2S rx channel handler
+static i2s_chan_handle_t                tx_handle = NULL;        // I2S0 tx channel handler (ES8311 playback)
+static i2s_chan_handle_t                rx_handle = NULL;        // I2S1 rx channel handler (ES7210 mics)
+static i2s_chan_handle_t                rx_handle_i2s0 = NULL;   // I2S0 rx channel handler (ES8311 reference)
 #endif
 static audio_codec_data_if_t *record_data_if = NULL;
 static audio_codec_ctrl_if_t *record_ctrl_if = NULL;
@@ -131,11 +136,14 @@ esp_err_t bsp_codec_dac_init(int sample_rate, int channel_format, int bits_per_c
 {
     esp_err_t ret_val = ESP_OK;
 
-    // Do initialize of related interface: data_if, ctrl_if and gpio_if
+    // Do initialize of related interface: data_if, ctrl_if and gpio_if.
+    // ES8311 works in full-duplex (BOTH) mode on I2S0: it plays audio (tx) and
+    // simultaneously captures a reference (回采) channel (rx) which is the
+    // internal DAC->ADC loopback of the playback signal, used for AEC.
     audio_codec_i2s_cfg_t i2s_cfg = {
         .port = I2S_NUM_0,
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-        .rx_handle = NULL,
+        .rx_handle = rx_handle_i2s0,
         .tx_handle = tx_handle,
 #endif
     };
@@ -144,28 +152,31 @@ esp_err_t bsp_codec_dac_init(int sample_rate, int channel_format, int bits_per_c
     audio_codec_i2c_cfg_t i2c_cfg = {.addr = ES8311_CODEC_DEFAULT_ADDR};
     play_ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
     play_gpio_if = audio_codec_new_gpio();
-    // New output codec interface
+    // New codec interface: enable both DAC (playback) and ADC (reference capture)
     es8311_codec_cfg_t es8311_cfg = {
-        .codec_mode = ESP_CODEC_DEV_WORK_MODE_DAC,
+        .codec_mode = ESP_CODEC_DEV_WORK_MODE_BOTH,
         .ctrl_if = play_ctrl_if,
         .gpio_if = play_gpio_if,
         .pa_pin = GPIO_PWR_CTRL,
         .use_mclk = false,
     };
     play_codec_if = es8311_codec_new(&es8311_cfg);
-    // New output codec device
+    // New codec device, used both as output (playback) and input (reference)
     esp_codec_dev_cfg_t dev_cfg = {
         .codec_if = play_codec_if,
         .data_if = play_data_if,
-        .dev_type = ESP_CODEC_DEV_TYPE_OUT,
+        .dev_type = ESP_CODEC_DEV_TYPE_IN_OUT,
     };
     play_dev = esp_codec_dev_new(&dev_cfg);
 
+    // 2-channel capture: ch0 = ES8311 mic, ch1 = DAC reference (回采).
+    // Playback must be 2-channel for the reference loopback to carry audio.
     esp_codec_dev_sample_info_t fs = {
         .bits_per_sample = bits_per_chan,
         .sample_rate = sample_rate,
         .channel = channel_format,
     };
+    esp_codec_dev_set_in_gain(play_dev, RECORD_VOLUME);
     esp_codec_dev_set_out_vol(play_dev, PLAYER_VOLUME);
     esp_codec_dev_open(play_dev, &fs);
 
@@ -290,11 +301,14 @@ static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int chan
         ret_val |= i2s_channel_enable(rx_handle);
     } else if (i2s_num == I2S_NUM_0) {
         chan_cfg.auto_clear = true; // Auto clear the legacy data in the DMA buffer
-        ret_val |= i2s_new_channel(&chan_cfg, &tx_handle, NULL);
+        // Full-duplex: tx for ES8311 playback, rx for ES8311 reference (回采)
+        ret_val |= i2s_new_channel(&chan_cfg, &tx_handle, &rx_handle_i2s0);
         i2s_std_config_t std_cfg = I2S0_CONFIG_DEFAULT(sample_rate, channel_fmt, bits_per_chan);
         // std_cfg.clk_cfg.mclk_multiple = EXAMPLE_MCLK_MULTIPLE;   //The default is I2S_MCLK_MULTIPLE_256. If not using 24-bit data width, 256 should be enough
         ret_val |= i2s_channel_init_std_mode(tx_handle, &std_cfg);
+        ret_val |= i2s_channel_init_std_mode(rx_handle_i2s0, &std_cfg);
         ret_val |= i2s_channel_enable(tx_handle);
+        ret_val |= i2s_channel_enable(rx_handle_i2s0);
     }
 #else
     i2s_channel_fmt_t channel_fmt = I2S_CHANNEL_FMT_RIGHT_LEFT;
@@ -354,10 +368,17 @@ static esp_err_t bsp_i2s_deinit(i2s_port_t i2s_num)
         ret_val |= i2s_channel_disable(rx_handle);
         ret_val |= i2s_del_channel(rx_handle);
         rx_handle = NULL;
-    } else if (i2s_num == I2S_NUM_0  && tx_handle) {
-        ret_val |= i2s_channel_disable(tx_handle);
-        ret_val |= i2s_del_channel(tx_handle);
-        tx_handle = NULL;
+    } else if (i2s_num == I2S_NUM_0) {
+        if (tx_handle) {
+            ret_val |= i2s_channel_disable(tx_handle);
+            ret_val |= i2s_del_channel(tx_handle);
+            tx_handle = NULL;
+        }
+        if (rx_handle_i2s0) {
+            ret_val |= i2s_channel_disable(rx_handle_i2s0);
+            ret_val |= i2s_del_channel(rx_handle_i2s0);
+            rx_handle_i2s0 = NULL;
+        }
     }
 #else
     ret_val |= i2s_stop(i2s_num);
@@ -400,17 +421,34 @@ esp_err_t bsp_audio_play(const int16_t* data, int length, TickType_t ticks_to_wa
 esp_err_t bsp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer_len)
 {
     esp_err_t ret = ESP_OK;
-    size_t bytes_read;
-    int audio_chunksize = buffer_len / (sizeof(int16_t) * ADC_I2S_CHANNEL);
+    int audio_chunksize = buffer_len / (sizeof(int16_t) * FEED_CHANNEL);
 
-    ret = esp_codec_dev_read(record_dev, (void *)buffer, buffer_len);
-    if (!is_get_raw_channel) {
-        for (int i = 0; i < audio_chunksize; i++) {
-            int16_t ref = buffer[4 * i + 0];
-            buffer[3 * i + 0] = buffer[4 * i + 1];
-            buffer[3 * i + 1] = buffer[4 * i + 3];
-            buffer[3 * i + 2] = ref;
-        }
+    // The microphones come from ES7210 (I2S1) and the reference (回采) comes from
+    // ES8311 (I2S0). They are two separate I2S peripherals, so they are read into
+    // separate scratch buffers and then interleaved into the output as M, M, R.
+    static int16_t *es7210_buf = NULL;
+    static int16_t *es8311_buf = NULL;
+    static int cached_frames = 0;
+    if (cached_frames < audio_chunksize) {
+        free(es7210_buf);
+        free(es8311_buf);
+        es7210_buf = malloc(audio_chunksize * ES7210_FRAME_CHANNEL * sizeof(int16_t));
+        es8311_buf = malloc(audio_chunksize * ES8311_FRAME_CHANNEL * sizeof(int16_t));
+        cached_frames = (es7210_buf && es8311_buf) ? audio_chunksize : 0;
+    }
+    if (!es7210_buf || !es8311_buf) {
+        return ESP_ERR_NO_MEM;
+    }
+
+    ret |= esp_codec_dev_read(record_dev, (void *)es7210_buf,
+                              audio_chunksize * ES7210_FRAME_CHANNEL * sizeof(int16_t));
+    ret |= esp_codec_dev_read(play_dev, (void *)es8311_buf,
+                              audio_chunksize * ES8311_FRAME_CHANNEL * sizeof(int16_t));
+
+    for (int i = 0; i < audio_chunksize; i++) {
+        buffer[FEED_CHANNEL * i + 0] = es7210_buf[ES7210_FRAME_CHANNEL * i + 1]; // mic 1
+        buffer[FEED_CHANNEL * i + 1] = es8311_buf[ES8311_FRAME_CHANNEL * i + 1]; // mic 2
+        buffer[FEED_CHANNEL * i + 2] = es8311_buf[ES8311_FRAME_CHANNEL * i + 0]; // ES8311 reference
     }
 
     return ret;
@@ -418,12 +456,12 @@ esp_err_t bsp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
 
 int bsp_get_feed_channel(void)
 {
-    return ADC_I2S_CHANNEL;
+    return FEED_CHANNEL;
 }
 
 char* bsp_get_input_format(void)
 {
-    return "RMNM";
+    return "MMR";
 }
 
 esp_err_t bsp_board_init(void)

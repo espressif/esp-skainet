@@ -371,8 +371,9 @@ void *esp_skainet_player_create(int ringbuf_size, unsigned int core_num,
         }
     }
 
-    xTaskCreatePinnedToCore(&esp_skainet_stream_in_task, "stream_in", 2 * 1024, (void *)player, 8, NULL, core_num);
-    xTaskCreatePinnedToCore(&esp_skainet_stream_out_task, "stream_out", 2 * 1024, (void *)player, 8, NULL, core_num);
+    /* FatFS + printf (USB Serial JTAG) need more than 2KB stack */
+    xTaskCreatePinnedToCore(&esp_skainet_stream_in_task, "stream_in", 8 * 1024, (void *)player, 8, NULL, core_num);
+    xTaskCreatePinnedToCore(&esp_skainet_stream_out_task, "stream_out", 4 * 1024, (void *)player, 8, NULL, core_num);
 
     return player;
 }
