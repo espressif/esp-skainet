@@ -27,7 +27,13 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_log.h"
+// esp_codec_dev talks to the codecs through the i2c_master driver since ESP-IDF 5.3.
+// The two I2C drivers cannot be mixed, so the bus has to be created with the same one.
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
+#include "driver/i2c_master.h"
+#else
 #include "driver/i2c.h"
+#endif
 #include "esp_rom_sys.h"
 #include "esp_check.h"
 #include "esp_vfs_fat.h"
@@ -71,8 +77,25 @@ static audio_codec_if_t *play_codec_if = NULL;
 static esp_codec_dev_handle_t play_dev = NULL;
 
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
+static i2c_master_bus_handle_t i2c_bus_handle = NULL;
+#endif
+static uint32_t i2c_bus_clk_speed = 0;
+
 esp_err_t bsp_i2c_init(i2c_port_t i2c_num, uint32_t clk_speed)
 {
+    i2c_bus_clk_speed = clk_speed;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
+    i2c_master_bus_config_t i2c_cfg = {
+        .i2c_port = i2c_num,
+        .scl_io_num = GPIO_I2C_SCL,
+        .sda_io_num = GPIO_I2C_SDA,
+        .clk_source = I2C_CLK_SRC_DEFAULT,
+        .glitch_ignore_cnt = 7,
+        .flags.enable_internal_pullup = true,
+    };
+    return i2c_new_master_bus(&i2c_cfg, &i2c_bus_handle);
+#else
     i2c_config_t i2c_cfg = {
         .mode = I2C_MODE_MASTER,
         .scl_io_num = GPIO_I2C_SCL,
@@ -86,6 +109,19 @@ esp_err_t bsp_i2c_init(i2c_port_t i2c_num, uint32_t clk_speed)
         return ESP_FAIL;
     }
     return i2c_driver_install(i2c_num, i2c_cfg.mode, 0, 0, 0);
+#endif
+}
+
+static audio_codec_i2c_cfg_t bsp_codec_i2c_cfg(uint8_t addr)
+{
+    audio_codec_i2c_cfg_t i2c_cfg = {
+        .addr = addr,
+        .clock_speed_hz = i2c_bus_clk_speed,
+    };
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
+    i2c_cfg.bus_handle = i2c_bus_handle;
+#endif
+    return i2c_cfg;
 }
 
 esp_err_t bsp_codec_adc_init(int sample_rate)
@@ -102,12 +138,12 @@ esp_err_t bsp_codec_adc_init(int sample_rate)
     };
     record_data_if = audio_codec_new_i2s_data(&i2s_cfg);
 
-    audio_codec_i2c_cfg_t i2c_cfg = {.addr = ES7210_CODEC_DEFAULT_ADDR};
+    audio_codec_i2c_cfg_t i2c_cfg = bsp_codec_i2c_cfg(ES7210_CODEC_DEFAULT_ADDR);
     record_ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
     // New input codec interface
     es7210_codec_cfg_t es7210_cfg = {
         .ctrl_if = record_ctrl_if,
-        .mic_selected = ES7120_SEL_MIC1 | ES7120_SEL_MIC2 | ES7120_SEL_MIC3 | ES7120_SEL_MIC4,
+        .mic_selected = ES7210_SEL_MIC1 | ES7210_SEL_MIC2 | ES7210_SEL_MIC3 | ES7210_SEL_MIC4,
     };
     record_codec_if = es7210_codec_new(&es7210_cfg);
     // New input codec device
@@ -147,7 +183,7 @@ esp_err_t bsp_codec_dac_init(int sample_rate, int channel_format, int bits_per_c
     };
     play_data_if = audio_codec_new_i2s_data(&i2s_cfg);
 
-    audio_codec_i2c_cfg_t i2c_cfg = {.addr = ES8311_CODEC_DEFAULT_ADDR};
+    audio_codec_i2c_cfg_t i2c_cfg = bsp_codec_i2c_cfg(ES8311_CODEC_DEFAULT_ADDR);
     play_ctrl_if = audio_codec_new_i2c_ctrl(&i2c_cfg);
     play_gpio_if = audio_codec_new_gpio();
     // New output codec interface
@@ -265,8 +301,8 @@ esp_err_t bsp_audio_get_play_vol(int *volume)
     return ESP_OK;
 }
 
-// static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, i2s_channel_fmt_t channel_format, i2s_bits_per_chan_t bits_per_chan)
-static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int channel_format, int bits_per_chan)
+// static esp_err_t bsp_i2s_init(int i2s_num, uint32_t sample_rate, i2s_channel_fmt_t channel_format, i2s_bits_per_chan_t bits_per_chan)
+static esp_err_t bsp_i2s_init(int i2s_num, uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     esp_err_t ret_val = ESP_OK;
 
@@ -329,7 +365,7 @@ static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int chan
     return ret_val;
 }
 
-static esp_err_t bsp_i2s_deinit(i2s_port_t i2s_num)
+static esp_err_t bsp_i2s_deinit(int i2s_num)
 {
     esp_err_t ret_val = ESP_OK;
 

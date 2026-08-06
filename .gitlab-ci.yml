@@ -1,6 +1,7 @@
 stages:
   - check
   - build
+  - target_test
   - deploy
 
 workflow:
@@ -28,4 +29,5 @@ variables:
 include:
   - ".gitlab/ci/pre_commit.yml"
   - ".gitlab/ci/build.yml"
+  - ".gitlab/ci/target_test.yml"
   - ".gitlab/ci/deploy.yml"

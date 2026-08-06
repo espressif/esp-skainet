@@ -24,7 +24,7 @@
 
 static void *player = NULL;
 int detect_flag = 0;
-static esp_afe_sr_iface_t *afe_handle = NULL;
+static const esp_afe_sr_iface_t *afe_handle = NULL;
 static volatile int task_flag = 1;
 /* Console command handlers */
 static int cmd_play(int argc, char **argv)
@@ -183,7 +183,9 @@ void detect_Task(void *arg)
 void app_main(void)
 {
     ESP_ERROR_CHECK(esp_board_init());
-    ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
+    if (esp_sdcard_init("/sdcard", 10) != ESP_OK) {
+        printf("SD card is not available, no WAV file can be played\n");
+    }
 
     srmodel_list_t *models = esp_srmodel_init("model");
     if (models) {

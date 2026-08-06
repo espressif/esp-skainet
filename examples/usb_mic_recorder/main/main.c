@@ -18,7 +18,7 @@
 static ringbuf_handle_t rb_debug = NULL;
 
 int detect_flag = 0;
-static esp_afe_sr_iface_t *afe_handle = NULL;
+static const esp_afe_sr_iface_t *afe_handle = NULL;
 static volatile int task_flag = 0;
 
 void feed_Task(void *arg)

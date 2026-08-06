@@ -64,7 +64,7 @@ void led_Task(void *arg)
     const led_strip_config_t led_config = {
         .strip_gpio_num = 19,
         .max_leds = 12,
-        .led_pixel_format = LED_PIXEL_FORMAT_GRB,
+        .color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_GRB,
         .led_model = LED_MODEL_WS2812,
     };
     const led_strip_rmt_config_t rmt_config = {}; // default

@@ -51,7 +51,7 @@ static const char *TAG = "board";
 static i2s_chan_handle_t                rx_handle = NULL;        // I2S rx channel handler
 #endif
 
-static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int channel_format, int bits_per_chan)
+static esp_err_t bsp_i2s_init(int i2s_num, uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     esp_err_t ret_val = ESP_OK;
 
@@ -83,7 +83,7 @@ static esp_err_t bsp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int chan
     return ret_val;
 }
 
-static esp_err_t bsp_i2s_deinit(i2s_port_t i2s_num)
+static esp_err_t bsp_i2s_deinit(int i2s_num)
 {
     esp_err_t ret_val = ESP_OK;
 
