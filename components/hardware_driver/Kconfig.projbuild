@@ -27,6 +27,9 @@ config ESP32_S3_EYE_BOARD
 config ESP32_P4_FUNCTION_EV_BOARD
     bool "ESP32-P4-Function_Ev"
     depends on IDF_TARGET_ESP32P4
+config ESP_CUSTOM_BOARD
+    bool "Custom Board (breadboard build)"
+    depends on IDF_TARGET_ESP32S3
 endchoice
 
 endmenu
