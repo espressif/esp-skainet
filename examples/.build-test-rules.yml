@@ -2,61 +2,60 @@
 
 examples/chinese_tts:
   enable:
-    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/cn_speech_commands_recognition:
   enable:
-    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/en_speech_commands_recognition:
   enable:
     - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
-examples/usb_mic_recorder:
+examples/player:
   enable:
-    - if: IDF_TARGET == "esp32s3"
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/voice_communication:
   enable:
     - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/voice_activity_detection:
   enable:
-    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/wake_word_detection/afe:
   enable:
-    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/wake_word_detection/wakenet:
   enable:
-    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4", "esp32c3", "esp32c6", "esp32s2"]
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/direction_of_arrival:
   enable:
-    - if: IDF_TARGET in ["esp32", "esp32s3", "esp32p4"]
+    - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet
-
+      reason: CI supports ESP32-S3 and ESP32-P4
 
 examples/deep_noise_suppression:
   enable:
     - if: IDF_TARGET in ["esp32s3", "esp32p4"]
       temporary: false
-      reason: the other targets are not tested yet      
+      reason: CI supports ESP32-S3 and ESP32-P4

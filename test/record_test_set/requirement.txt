@@ -1,5 +1,6 @@
-numpy<2.0.0
+numpy<2.0.0; python_version < "3.13"
+pandas
 pydub
+audioop-lts; python_version >= "3.13"
 pyyaml
 pyserial
-playsound

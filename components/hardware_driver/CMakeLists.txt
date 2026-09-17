@@ -26,6 +26,9 @@ if(CONFIG_ESP32_P4_FUNCTION_EV_BOARD)
     list(APPEND BSP_BOARD_SRC "./boards/esp32p4-function-ev")
 endif()
 
+if(CONFIG_ESP32_P4_FUNCTION_EV_BOARD_2MIC)
+    list(APPEND BSP_BOARD_SRC "./boards/esp32p4-function-ev-2mic")
+endif()
 
 idf_component_register(
     SRC_DIRS
@@ -36,6 +39,10 @@ idf_component_register(
         "boards/include"
     REQUIRES
         driver
+        esp_driver_gpio
+        esp_driver_i2s
+        esp_driver_i2c
+        esp_driver_sdmmc
         fatfs
         spiffs
         )

@@ -5,6 +5,7 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +31,7 @@
 #define FILES_MAX           3
 ringbuf_handle_t rb_debug[FILES_MAX] = {NULL};
 FILE * file_save[FILES_MAX] = {NULL};
+static bool pcm_save_enable = false;
 #endif
 
 int detect_flag = 0;
@@ -52,11 +54,13 @@ void feed_Task(void *arg)
         afe_handle->feed(afe_data, i2s_buff);
 
     #if DEBUG_SAVE_PCM
-        if (rb_bytes_available(rb_debug[0]) < audio_chunksize * nch * sizeof(int16_t)) {
-            printf("ERROR! rb_debug[0] slow!!!\n");
-        }
+        if (pcm_save_enable) {
+            if (rb_bytes_available(rb_debug[0]) < audio_chunksize * nch * sizeof(int16_t)) {
+                printf("ERROR! rb_debug[0] slow!!!\n");
+            }
 
-        rb_write(rb_debug[0], (char *)i2s_buff, audio_chunksize * nch * sizeof(int16_t), 0);
+            rb_write(rb_debug[0], (char *)i2s_buff, audio_chunksize * nch * sizeof(int16_t), 0);
+        }
     #endif
     }
     if (i2s_buff) {
@@ -80,11 +84,13 @@ void detect_Task(void *arg)
             memcpy(buff, res->data, afe_chunksize * sizeof(int16_t));
 
         #if DEBUG_SAVE_PCM
-            if (rb_bytes_available(rb_debug[1]) < afe_chunksize * 1 * sizeof(int16_t)) {
-                printf("ERROR! rb_debug[1] slow!!!\n");
-            }
+            if (pcm_save_enable) {
+                if (rb_bytes_available(rb_debug[1]) < afe_chunksize * 1 * sizeof(int16_t)) {
+                    printf("ERROR! rb_debug[1] slow!!!\n");
+                }
 
-            rb_write(rb_debug[1], (char *)buff, afe_chunksize * 1 * sizeof(int16_t), 0);
+                rb_write(rb_debug[1], (char *)buff, afe_chunksize * 1 * sizeof(int16_t), 0);
+            }
         #endif
         }
     }
@@ -125,10 +131,12 @@ void debug_pcm_save_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
-    //esp_board_init(16000, 1, 16);
+    ESP_ERROR_CHECK(esp_board_init());
 #if DEBUG_SAVE_PCM
-    ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
+    pcm_save_enable = (esp_sdcard_init("/sdcard", 10) == ESP_OK);
+    if (!pcm_save_enable) {
+        printf("SD card is not available, PCM dump is disabled\n");
+    }
 #endif
 
     srmodel_list_t *models = esp_srmodel_init("model");
@@ -138,15 +146,17 @@ void app_main()
     afe_config_free(afe_config);
 
 #if DEBUG_SAVE_PCM
-    rb_debug[0] = rb_create(afe_handle->get_feed_channel_num(afe_data) * 4 * 16000 * 2, 1);   // 4s ringbuf
-    file_save[0] = fopen("/sdcard/feed.pcm", "w");
-    if (file_save[0] == NULL) printf("can not open file\n");
+    if (pcm_save_enable) {
+        rb_debug[0] = rb_create(afe_handle->get_feed_channel_num(afe_data) * 4 * 16000 * 2, 1);   // 4s ringbuf
+        file_save[0] = fopen("/sdcard/feed.pcm", "w");
+        if (file_save[0] == NULL) printf("can not open file\n");
 
-    rb_debug[1] = rb_create(1 * 4 * 16000 * 2, 1);   // 4s ringbuf
-    file_save[1] = fopen("/sdcard/fetch.pcm", "w");
-    if (file_save[1] == NULL) printf("can not open file\n");
+        rb_debug[1] = rb_create(1 * 4 * 16000 * 2, 1);   // 4s ringbuf
+        file_save[1] = fopen("/sdcard/fetch.pcm", "w");
+        if (file_save[1] == NULL) printf("can not open file\n");
 
-    xTaskCreatePinnedToCore(&debug_pcm_save_Task, "debug_pcm_save", 2 * 1024, NULL, 5, NULL, 1);
+        xTaskCreatePinnedToCore(&debug_pcm_save_Task, "debug_pcm_save", 2 * 1024, NULL, 5, NULL, 1);
+    }
 #endif
 
     task_flag = 1;

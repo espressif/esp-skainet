@@ -5,7 +5,8 @@
 typedef void* player_handle;
 #define FATFS_PATH_LENGTH_MAX 256
 
-void *esp_skainet_player_create(int ringbuf_size, unsigned int core_num);
+void *esp_skainet_player_create(int ringbuf_size, unsigned int core_num,
+                                int codec_channels, int codec_bits_per_sample, int codec_sample_rate);
 void esp_skainet_player_play(void *handle, const char *path);
 void esp_skainet_player_pause(void *handle);
 void esp_skainet_player_continue(void *handle);

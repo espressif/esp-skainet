@@ -190,3 +190,9 @@ int wav_decoder_get_data_length(void* obj) {
 	struct wav_decoder* wr = (struct wav_decoder*) obj;
 	return wr->data_length;
 }
+
+int wav_decoder_get_bits_per_sample(void* obj) {
+
+	struct wav_decoder* wr = (struct wav_decoder*) obj;
+	return wr->bits_per_sample;
+}

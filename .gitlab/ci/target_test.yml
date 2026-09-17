@@ -1,0 +1,68 @@
+.target_test_examples_template:
+  stage: target_test
+  image: ${IMAGE}
+  rules:
+    # Temporarily disabled. Set RUN_TARGET_TEST to "1" to run the target tests again.
+    - if: '$RUN_TARGET_TEST != "1"'
+      when: never
+    - when: on_success
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  variables:
+    EXAMPLES_PATH: "examples"
+    # Tells conftest.py where the binaries built by the build stage are.
+    IDF_VERSION: "${IDF_VER}"
+  before_script:
+    # The pytest-embedded packages pull in their own esptool, which has to stay compatible
+    # with the ESP-IDF version of the image, otherwise idf.py and the flashing break.
+    - pip install -r tools/ci/requirements.txt -c "${IDF_TOOLS_PATH}/espidf.constraints.v${IDF_VER}.txt"
+  script:
+    - pytest "${EXAMPLES_PATH}"
+      --target "${TARGET}"
+      --env "${TEST_ENV}"
+      --config default
+      --junitxml "${CI_PROJECT_DIR}/pytest_log/report.xml"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - "pytest_log/"
+    reports:
+      junit: "pytest_log/report.xml"
+
+target_test_examples_esp32s3:
+  extends: .target_test_examples_template
+  tags:
+    - korvo-2
+  variables:
+    IMAGE: "espressif/idf:release-v6.0"
+    IDF_VER: "6.0"
+    TARGET: "esp32s3"
+    TEST_ENV: "korvo-2"
+  needs:
+    - job: build_examples
+      parallel:
+        matrix:
+          - IMAGE: "espressif/idf:release-v6.0"
+            IDF_VER: "6.0"
+            TARGET: "esp32s3"
+
+target_test_examples_esp32p4:
+  extends: .target_test_examples_template
+  tags:
+    - esp32p4
+  variables:
+    IMAGE: "espressif/idf:release-v6.0"
+    IDF_VER: "6.0"
+    TARGET: "esp32p4"
+    TEST_ENV: "esp32p4"
+  needs:
+    - job: build_examples
+      parallel:
+        matrix:
+          - IMAGE: "espressif/idf:release-v6.0"
+            IDF_VER: "6.0"
+            TARGET: "esp32p4"

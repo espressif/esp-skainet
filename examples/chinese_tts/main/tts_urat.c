@@ -11,7 +11,6 @@
 #include "ringbuf.h"
 #include "esp_log.h"
 #include "driver/uart.h"
-#include "soc/uart_periph.h"
 #include "esp_idf_version.h"
 #include "driver/uart_vfs.h"
 

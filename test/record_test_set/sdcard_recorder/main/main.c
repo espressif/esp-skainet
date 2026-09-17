@@ -125,6 +125,12 @@ void save_task(void *arg)
             if (wav_encoder != NULL) {
                 wav_encoder_close(wav_encoder);
                 wav_encoder = NULL;
+                struct stat file_stat;
+                if (stat(filename, &file_stat) == 0 && file_stat.st_size > 44) {
+                    printf("Recording saved: %s (%ld bytes)\n", filename, (long)file_stat.st_size);
+                } else {
+                    printf("ERROR: Recording file is missing or empty: %s\n", filename);
+                }
             }
         } else if (ctrl_flag == RECORDER_PAUSE) {
             continue;
@@ -137,8 +143,12 @@ void save_task(void *arg)
 
 recorder_ctrl_t parse_uart_text(char *text, char *filename)
 {
-    recorder_ctrl_t ctrl = RECORDER_END;
+    recorder_ctrl_t ctrl = ctrl_flag;
     char *token = strtok(text, ",");
+    if (token == NULL) {
+        return ctrl;
+    }
+
     if (strcmp(token, "start") == 0) {
         token = strtok(NULL, ",");
         if (token != NULL) {
@@ -146,6 +156,7 @@ recorder_ctrl_t parse_uart_text(char *text, char *filename)
             sprintf(filename, "/sdcard/%s", token);
         }
         printf("\nfilename:%s\n", filename);
+        fflush(stdout);
     } else if (strcmp(token, "end") == 0) {
         ctrl = RECORDER_END;
         play_flag = 0;
@@ -170,13 +181,17 @@ void uart_ctrl_task(void *arg)
     while (1) {
         rb_read(uart_rb, &in, 1, portMAX_DELAY);
 
-        if(in=='\n') {
-            // start to run tts
+        if (in == '\n') {
+            // strip trailing CR from CRLF (USB Serial/JTAG / Windows hosts)
+            if (buff_size > 0 && uart_buff[buff_size - 1] == '\r') {
+                buff_size--;
+            }
             uart_buff[buff_size] = '\0';
             ctrl_flag = parse_uart_text(uart_buff, filename);
             buff_size = 0;
-        } else if(buff_size<UART_BUF_LEN) {
-            // append urat buffer into data
+        } else if (in == '\r') {
+            continue;
+        } else if (buff_size < UART_BUF_LEN) {
             uart_buff[buff_size] = in;
             buff_size++;
         } else {
@@ -231,13 +246,12 @@ void play_task()
     int file_num = sdcard_scan("/sdcard/music/");
     if (file_num > 0) {
         printf("start play task\n");
-        //Adjust player volume
         int vol;
-        esp_audio_set_play_vol(100);
+        esp_audio_set_play_vol(90);
         esp_audio_get_play_vol(&vol);
         printf("player volume: %d\n", vol);
 
-        player = esp_skainet_player_create(4096 * 5, 1);
+        player = esp_skainet_player_create(4096 * 5, 1, 2, 32, 16000);
         esp_skainet_player_play(player, "/sdcard/music/");
         esp_skainet_player_pause(player);
     }
@@ -262,7 +276,7 @@ void play_task()
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init());
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     ringbuf_handle_t audio_rb = rb_create(1024*512, 1);
     ringbuf_handle_t uart_rb = rb_create(UART_BUF_LEN, 1);

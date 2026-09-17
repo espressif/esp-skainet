@@ -29,7 +29,7 @@ int app_main()
     return 0;
 #endif
 
-    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init());
 #ifdef SDCARD_OUTPUT_ENABLE
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
     FILE* fp=fopen("/sdcard/URAT.pcm", "w+");

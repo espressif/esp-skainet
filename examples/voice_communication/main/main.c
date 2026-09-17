@@ -125,8 +125,7 @@ void debug_pcm_save_Task(void *arg)
 
 void app_main()
 {
-    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
-    //esp_board_init(16000, 1, 16);
+    ESP_ERROR_CHECK(esp_board_init());
 #if DEBUG_SAVE_PCM
     ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 #endif

@@ -10,13 +10,28 @@ import sys
 from datetime import datetime
 from typing import Callable, List, Optional, Tuple
 
+import pexpect
 import pytest
 from pytest import Config, FixtureRequest, Function, Session
+from pytest_embedded import Dut
 from pytest_embedded.plugin import multi_dut_argument, multi_dut_fixture
 
 IDF_VERSION = os.environ.get('IDF_VERSION')
 PYTEST_ROOT_DIR = str(pathlib.Path(__file__).parent)
 logging.info(f'Pytest root dir: {PYTEST_ROOT_DIR}')
+
+# Anything the firmware prints when it panics, asserts or reboots unexpectedly.
+CRASH_PATTERN = re.compile(
+    rb'Guru Meditation Error'
+    rb'|abort\(\) was called'
+    rb'|assert failed'
+    rb'|CORRUPT HEAP'
+    rb'|Stack canary watchpoint triggered'
+    rb'|Stack smashing protect failure'
+    rb'|ESP_ERROR_CHECK failed'
+    rb'|Backtrace:'
+    rb'|rst:0x[0-9a-fA-F]+ \('
+)
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -52,7 +67,7 @@ def session_tempdir() -> str:
 @pytest.fixture
 @multi_dut_argument
 def config(request: FixtureRequest) -> str:
-    return request.config.getoption("--config")
+    return request.config.getoption("--config") or 'default'
 
 @pytest.fixture
 @multi_dut_argument
@@ -132,6 +147,28 @@ def build_dir(
     logging.error(
         f'no build dir. Please build the binary "python tools/build_apps.py {app_path}" and run pytest again')
     sys.exit(1)
+
+
+@pytest.fixture
+def assert_no_crash(dut: Dut) -> Callable[..., None]:
+    """
+    Return a callable that keeps reading the serial output for `duration` seconds and
+    fails the test as soon as the firmware panics, asserts or reboots.
+
+    It should be called after the expected start-up output has been matched, otherwise
+    the reset reason printed by the ROM bootloader is reported as a crash.
+    """
+
+    def _assert_no_crash(duration: float = 10) -> None:
+        try:
+            match = dut.expect(CRASH_PATTERN, timeout=duration)
+        except pexpect.TIMEOUT:
+            return
+        raise AssertionError(
+            'the app crashed after start-up: {}'.format(match.group(0).decode(errors='replace'))
+        )
+
+    return _assert_no_crash
 
 
 @pytest.fixture(autouse=True)

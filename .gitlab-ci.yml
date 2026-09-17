@@ -4,274 +4,33 @@ stages:
   - target_test
   - deploy
 
+workflow:
+  rules:
+    # Development branch pushes are covered by merge request pipelines.
+    - if: '$CI_COMMIT_REF_NAME != "master" && $CI_COMMIT_BRANCH !~ /^release\/v/ && $CI_COMMIT_TAG !~ /^v\d+\.\d+(\.\d+)?($|-)/ && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+    # The branch pipeline for a release commit has already run the same checks.
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?($|-)/'
+      when: never
+    - if: $CI_OPEN_MERGE_REQUESTS != null
+      variables:
+        PIPELINE_COMMIT_SHA: $CI_MERGE_REQUEST_SOURCE_BRANCH_SHA
+    - if: $CI_OPEN_MERGE_REQUESTS == null
+      variables:
+        PIPELINE_COMMIT_SHA: $CI_COMMIT_SHA
+    - when: always
+
 variables:
   SKAINET_PATH: "$CI_PROJECT_DIR"
   BATCH_BUILD: "1"
   V: "0"
   IDF_CI_BUILD: "1"
-  DOCKER_TARGET_TEST_v5_3_ENV_IMAGE: "espressif/idf:release-v5.3"
-
-before_script:
-  # add gitlab ssh key
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  - echo -n $GITLAB_KEY > ~/.ssh/id_rsa_base64
-  - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
-  - chmod 600 ~/.ssh/id_rsa
-  - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - git --version
-  - git submodule update --init --recursive --force
-  - pip install idf_build_apps
-  - pip install -r tools/ci/requirements.txt
-
-.build_all_examples_script: &build_all_examples_script
-  - python -m idf_build_apps build -p $EXAMPLES_PATH --recursive --manifest-file $EXAMPLES_PATH/$MANIFEST_FILE -t all
-
-.build_test_script: &build_test_script
-  - python ./tools/ci/build_apps.py $EXAMPLES_PATH -t all
-
-.build_examples_template:
-  stage: build
-  tags:
-    - build
-  variables:
-    EXAMPLES_PATH: "examples"
-    MANIFEST_FILE: ".build-test-rules.yml"
-  script:
-    - *build_all_examples_script
-
-.build_test_template:
-  stage: build
-  tags:
-    - build
-  artifacts:
-    when: always
-    paths:
-      - "**/build*/*.bin"
-      # upload to s3 server to save the artifacts size
-      - "**/build*/*.map"
-      - "**/build*/*.elf"
-      - "**/build*/flasher_args.json"
-      - "**/build*/flash_project_args"
-      - "**/build*/config/sdkconfig.json"
-      - "**/build*/bootloader/*.bin"
-      - "**/build*/bootloader/*.elf"
-      - "**/build*/partition_table/*.bin"
-      - "**/build*/srmodels/*.bin"
-    expire_in: 1 week
-  variables:
-    EXAMPLES_PATH: "test"
-  script:
-    - *build_test_script
-
-.test_template: &test_template
-  image: DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
-  stage: target_test
-  timeout: 10 hour
-  variables:
-    GIT_DEPTH: 1
-    SUBMODULES_TO_FETCH: "none"
-  cache:
-    # Usually do not need submodule-cache in target_test
-    - key: pip-cache
-      paths:
-        - .cache/pip
-      policy: pull
-
-.pytest_template:
-  <<: *test_template
-  artifacts:
-    when: always
-    paths:
-      - XUNIT_RESULT.xml
-      - pytest_log/
-    reports:
-      junit: XUNIT_RESULT.xml
-    expire_in: 4 days
-  variables:
-    TEST_TARGET: 'esp32s3'
-    TEST_FOLDER: './test'
-    TEST_ENV: 'korvo-2'
-  script:
-    - pytest ${TEST_FOLDER} --target ${TEST_TARGET} --env ${TEST_ENV} --config ${MODEL} --noise ${NOISE} --snr ${SNR} --junitxml=XUNIT_RESULT.xml
-
-.if-protected: &if-protected
-  if: '($CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_BRANCH =~ /^release\/v/ || $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?($|-)/)'
-
-.if-wakenet_test: &if-wakenet_test
-  if: '($CI_COMMIT_BRANCH =~ /^test\/wn/)'
-
-.patterns-test_wakenet: &patterns-test_wakenet
-  - "components/esp-sr/lib/**/*"
-  - "components/esp-sr/include/**/*"
-  - "components/esp-sr/src/**/*"
-  - "components/esp-sr/model/wakenet_model/**/*"
-  - "test/wakenet/**/*"
-
-build_idf_v5.3:
-  extends: .build_examples_template
-  image: espressif/idf:release-v5.3
-
-build_idf_v5.4:
-  extends: .build_examples_template
-  image: espressif/idf:release-v5.4
-
-build_idf_v5.5:
-  extends: .build_examples_template
-  image: espressif/idf:release-v5.5
-
-# build_idf_v5.4:
-#   extends: .build_examples_template
-#   image: espressif/idf:release-v5.4
-
-# Rules to trigger wakenet test
-.rules:test:test_wakenet:
-  rules:
-    - <<: *if-protected
-      changes: *patterns-test_wakenet
-    - <<: *if-wakenet_test
-
-build_wakenet_test:
-  extends:
-    - .build_test_template
-    - .rules:test:test_wakenet
-  image: espressif/idf:release-v5.3
-  variables:
-    EXAMPLES_PATH: "test/wakenet"
-
-# test_wakenet:
-#   extends:
-#     - .pytest_template
-#     - .rules:test:test_wakenet
-#   needs:
-#     - job: "build_wakenet_test"
-#       artifacts: true
-#       optional: true
-#   tags:
-#     - 'korvo-2'
-#   image: $DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
-#   variables:
-#     TEST_TARGET: 'esp32s3'
-#     TEST_FOLDER: './test/wakenet'
-#     TEST_ENV: 'korvo-2'
-#     IDF_VERSION: "5.3"
-#   parallel:
-#     matrix:
-#       - MODEL: ["hilexin", "hiesp"]
-#         NOISE: ["pink", "pub"]
-#         SNR: ["0", "5"]
-
-.patterns-test_multinet6: &patterns-test_multinet6
-  - "components/esp-sr/lib/**/*"
-  - "components/esp-sr/include/**/*"
-  - "components/esp-sr/src/**/*"
-  - "components/esp-sr/model/multinet_model/mn6*/*"
-  - "test/multinet/main/*"
-  - "test/multinet/pytest_multinet6.py"
-  - "test/multinet/*mn6*"
-
-.patterns-test_multinet7: &patterns-test_multinet7
-  - "components/esp-sr/lib/**/*"
-  - "components/esp-sr/include/**/*"
-  - "components/esp-sr/src/**/*"
-  - "components/esp-sr/model/multinet_model/mn7*/*"
-  - "test/multinet/main/*"
-  - "test/multinet/pytest_multinet7.py"
-  - "test/multinet/*mn7*"
-
-.if-multinet_test6: &if-multinet_test6
-  if: '($CI_COMMIT_BRANCH =~ /^test\/mn6/)'
-
-.if-multinet_test7: &if-multinet_test7
-  if: '($CI_COMMIT_BRANCH =~ /^test\/mn7/)'
-
-# Rules to trigger multinet6 test
-.rules:test:test_multinet6:
-  rules:
-    - <<: *if-protected
-      changes: *patterns-test_multinet6
-    - <<: *if-multinet_test6
-
-# Rules to trigger multinet7 test
-.rules:test:test_multinet7:
-  rules:
-    - <<: *if-protected
-      changes: *patterns-test_multinet7
-    - <<: *if-multinet_test7
-
-build_multinet_test:
-  extends:
-    - .build_test_template
-  rules:
-    - !reference [.rules:test:test_multinet6, rules]
-    - !reference [.rules:test:test_multinet7, rules]
-
-  image: espressif/idf:release-v5.0
-  variables:
-    EXAMPLES_PATH: "test/multinet"
-
-.pytest_multinet_template:
-  needs:
-    - job: "build_multinet_test"
-      artifacts: true
-      optional: true
-  tags:
-    - 'korvo-2'
-  image: $DOCKER_TARGET_TEST_v5_3_ENV_IMAGE
-  variables:
-    TEST_TARGET: 'esp32s3'
-    TEST_ENV: 'korvo-2'
-    IDF_VERSION: "5.0"
-
-test_multinet6:
-  extends:
-    - .pytest_template
-    - .pytest_multinet_template
-    - .rules:test:test_multinet6
-  variables:
-    TEST_FOLDER: './test/multinet/pytest_multinet6.py'
-  parallel:
-    matrix:
-      - MODEL: ["hiesp_mn6_en", "hilexin_mn6_cn", "hilexin_mn6_cn_ac"]
-        NOISE: ["pink", "pub", "none"]
-        SNR: ["5", "10"]
-
-test_multinet7:
-  extends:
-    - .pytest_template
-    - .pytest_multinet_template
-    - .rules:test:test_multinet7
-  variables:
-    TEST_FOLDER: './test/multinet/pytest_multinet7.py'
-  parallel:
-    matrix:
-      - MODEL: ["hiesp_mn7_en"]
-        NOISE: ["pink", "pub", "none"]
-        SNR: ["5", "10"]
-
-push_to_github:
-  stage: deploy
-  image: $CI_DOCKER_REGISTRY/esp32-ci-env
-  tags:
-    - deploy
-  when: on_success
-  only:
-    - master
-    - /^release\/v/
-  variables:
-    GIT_STRATEGY: clone
-  before_script:
-    - echo "skip default before_script"
-  script:
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo -n $GH_PUSH_KEY > ~/.ssh/id_rsa_base64
-    - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-    - git remote remove github &>/dev/null || true
-    - git remote add github git@github.com:espressif/esp-skainet.git
-    - ${SKAINET_PATH}/tools/ci/push_to_github.sh
+  # The target_test stage is temporarily disabled. Set this to "1", either here or when
+  # starting a pipeline manually, to run the tests on the runner boards again.
+  RUN_TARGET_TEST: "0"
 
 include:
-  - '.gitlab/ci/pre_commit.yml'
+  - ".gitlab/ci/pre_commit.yml"
+  - ".gitlab/ci/build.yml"
+  - ".gitlab/ci/target_test.yml"
+  - ".gitlab/ci/deploy.yml"

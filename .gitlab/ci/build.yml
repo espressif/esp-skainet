@@ -1,0 +1,64 @@
+.build_examples_template:
+  stage: build
+  tags:
+    - build
+  image: ${IMAGE}
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  needs:
+    - job: check_pre_commit
+      artifacts: false
+      optional: true
+  variables:
+    EXAMPLES_PATH: "examples"
+    MANIFEST_FILE: ".build-test-rules.yml"
+    IDF_CCACHE_ENABLE: "1"
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -n "$GITLAB_KEY" > ~/.ssh/id_rsa_base64
+    - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+    - git --version
+    - git submodule update --init --recursive --force
+    - pip install idf_build_apps
+  script:
+    # The binaries are consumed by the target_test stage, so they are built for the boards
+    # the runners are equipped with, and into a build directory the pytest cases can find.
+    - python -m idf_build_apps build
+      -p "${EXAMPLES_PATH}"
+      --recursive
+      --manifest-file "${EXAMPLES_PATH}/${MANIFEST_FILE}"
+      -t "${TARGET}"
+      --build-dir "${IDF_VER}/build_@t_@w"
+      --config-rules "=default"
+      --override-sdkconfig-files "tools/ci/sdkconfig.ci.${TARGET}"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/bootloader/bootloader.bin"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/partition_table/partition-table.bin"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/srmodels/srmodels.bin"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/*.bin"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/*.elf"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/flasher_args.json"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/flash_project_args"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/config/sdkconfig.json"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/project_description.json"
+      - "${EXAMPLES_PATH}/**/${IDF_VER}/build_*/build_log.txt"
+
+build_examples:
+  extends: .build_examples_template
+  parallel:
+    matrix:
+      - IMAGE: ["espressif/idf:release-v5.5"]
+        IDF_VER: ["5.5"]
+        TARGET: ["esp32s3", "esp32p4"]
+      - IMAGE: ["espressif/idf:release-v6.0"]
+        IDF_VER: ["6.0"]
+        TARGET: ["esp32s3", "esp32p4"]

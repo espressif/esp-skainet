@@ -121,7 +121,7 @@ void detect_Task(void *arg)
 void app_main()
 {
     models = esp_srmodel_init("model");
-    ESP_ERROR_CHECK(esp_board_init(16000, 1, 16));
+    ESP_ERROR_CHECK(esp_board_init());
 
     afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
     afe_handle = esp_afe_handle_from_config(afe_config);

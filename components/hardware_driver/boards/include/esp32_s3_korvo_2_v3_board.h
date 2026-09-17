@@ -85,7 +85,7 @@
  * @brief player configurations
  *
  */
-#define PLAYER_VOLUME   (50)
+#define PLAYER_VOLUME   (70)
 
 /**
  * @brief ESP32-S3-HMI-DevKit power control IO

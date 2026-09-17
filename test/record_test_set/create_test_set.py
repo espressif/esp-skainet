@@ -5,30 +5,15 @@
 import argparse
 import os
 import shutil
+import subprocess
 import time
 
 import pandas
-import serial
 import yaml
-from playsound import playsound
 from pydub import AudioSegment
 from pydub.generators import Sine
-from serial.tools import list_ports
 
-
-def get_serial_port_name(): 	# Get the name of the serial port the computer is using.
-    plist = list(list_ports.comports())
-    out = []
-
-    if len(plist) <= 0:
-        print("Can not find any port!")
-        return out
-    else:
-        for plist_item in plist: 	# Print the port name and description.
-            for port in list(plist_item): 	# Get the port name.
-                if "/dev/ttyUSB" in port: 	# Filter the port name.
-                    out.append(port)
-    return out
+from board_serial import open_board_serials, wait_for_markers
 
 
 class AudioTools(object):
@@ -161,50 +146,79 @@ class AudioTools(object):
 
     #read and play audio file from input path one by one
     @classmethod
-    def audio_play(cls, path):
-        file_list = os.listdir(path)
-        play_list = []   # list for playing files one by one
-        ports = get_serial_port_name()
-        print(ports)
-        port_handles = []  # list for port handles
-        for port in ports:
-            handle = serial.Serial(port, 115200, timeout=50)
-            if (handle.isOpen()==True):
-                port_handles.append(handle) # add port handles to port_handles list for serial port comms.
+    def audio_play(cls, path, monitor_mode=False):
+        audio_files = []
+        for root, _, files in os.walk(path):
+            for filename in files:
+                if os.path.splitext(filename)[1].lower() in [".wav", ".mp3"]:
+                    audio_files.append(os.path.join(root, filename))
 
-        for filename in file_list:
-            filepath = os.path.join(path, filename)
-            if os.path.isdir(filepath):
-                cls.audio_play(config, filepath)
-            else:
-                if os.path.splitext(filename)[1] == '.wav':
-                    audio_format = "wav"
-                elif os.path.splitext(filename)[1] == '.mp3':
-                    audio_format = "mp3"
-                else:
-                    continue
+        play_list = []   # list for playing files one by one
+        port_handles = open_board_serials(boot_wait=2.0)
+        print([handle.port for handle in port_handles])
+
+        if not port_handles:
+            print("ERROR: no serial port opened, board will not receive start/end commands.")
+            return
+
+        try:
+            for filepath in audio_files:
+                filename = os.path.basename(filepath)
                 if "playback_" in filename:
                     # 通知设备播放音乐
-                    for handle in port_handles:  # write port_handle to port_handles list for serial port comms.
+                    for handle in port_handles:
                         handle.write(b'play\n')
+                        handle.flush()
                     print("==> Device start to play: %s" % time.ctime())
                     time.sleep(5)
 
-                string = f'start,{filename}\n'
+                command = f'start,{filename}'
                 print("==> Start to play: %s,  %s" % (filename, time.ctime()))
-                for handle in port_handles:  # write port_handle to port_handles list for serial port comms.
-                    handle.write(bytes(string, 'utf-8'))
+                for index, handle in enumerate(port_handles):
+                    handle.write(f"{command}\n".encode("utf-8"))
+                    handle.flush()
+                    if not monitor_mode:
+                        handle, _ = wait_for_markers(
+                            handle,
+                            f"filename:/sdcard/{filename}".encode(),
+                            timeout=10,
+                        )
+                        port_handles[index] = handle
 
                 start_time = time.time()            # start time of playing
                 time.sleep(5)
-                playsound(filepath)
-                time.sleep(5)
+                try:
+                    subprocess.run(
+                        [
+                            "ffplay",
+                            "-nodisp",
+                            "-autoexit",
+                            "-loglevel",
+                            "error",
+                            filepath,
+                        ],
+                        check=True,
+                    )
+                    time.sleep(5)
+                finally:
+                    for index, handle in enumerate(port_handles):
+                        handle.write(b'end\n')
+                        handle.flush()
+                        if not monitor_mode:
+                            handle, _ = wait_for_markers(
+                                handle,
+                                f"Recording saved: /sdcard/{filename}".encode(),
+                                timeout=10,
+                            )
+                            port_handles[index] = handle
+
                 end_time = time.time()            # end time of playing
                 play_list.append((filepath, start_time, end_time))
                 print("==> End play : %s" % time.ctime())
-                for handle in port_handles:  # write port_handle to port_handles list for serial port comms.
-                    handle.write(b'end\n')
                 time.sleep(5)
+        finally:
+            for handle in port_handles:
+                handle.close()
 
 
         basedir = os.path.dirname(path) # get base directory of the path
@@ -225,10 +239,15 @@ class AudioTools(object):
 
 if __name__ == '__main__':
     description = 'Usage: \n' \
-                  'python create_test_set.py your_yaml_file \n' \
+                  'python create_test_set.py your_yaml_file \n'
 
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('yaml')
+    parser.add_argument(
+        '--monitor-mode',
+        action='store_true',
+        help='only write serial commands; leave firmware output for idf.py monitor',
+    )
     args = parser.parse_args()
 
     with open(args.yaml, 'r') as f:
@@ -281,9 +300,7 @@ if __name__ == '__main__':
         player = config["player"]
 
         if player["play_output"]:
-            AudioTools.audio_play(output_set["path"])
+            AudioTools.audio_play(output_set["path"], monitor_mode=args.monitor_mode)
         elif "path" in player:
-            AudioTools.audio_play(player["path"])
-
-
+            AudioTools.audio_play(player["path"], monitor_mode=args.monitor_mode)
 

@@ -30,6 +30,7 @@ int wav_decoder_run(void* obj, unsigned char* data, unsigned int length);
 int wav_decoder_get_sample_rate(void* obj);
 int wav_decoder_get_channel(void* obj);
 int wav_decoder_get_data_length(void* obj);
+int wav_decoder_get_bits_per_sample(void* obj);
 
 #ifdef __cplusplus
 }

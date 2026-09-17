@@ -120,7 +120,7 @@ void detect_Task(void *arg)
 void app_main()
 {
     models = esp_srmodel_init("model"); // partition label defined in partitions.csv
-    ESP_ERROR_CHECK(esp_board_init(16000, 2, 16));
+    ESP_ERROR_CHECK(esp_board_init());
     // ESP_ERROR_CHECK(esp_sdcard_init("/sdcard", 10));
 
 #if CONFIG_IDF_TARGET_ESP32

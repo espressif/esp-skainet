@@ -1,2 +1,2 @@
 dependencies:
-  espressif/esp-sr: "^2.0.0-rc.2"
+  espressif/esp-sr: "~2.4.7"
