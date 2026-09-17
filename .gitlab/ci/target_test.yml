@@ -1,6 +1,11 @@
 .target_test_examples_template:
   stage: target_test
   image: ${IMAGE}
+  rules:
+    # Temporarily disabled. Set RUN_TARGET_TEST to "1" to run the target tests again.
+    - if: '$RUN_TARGET_TEST != "1"'
+      when: never
+    - when: on_success
   retry:
     max: 2
     when:

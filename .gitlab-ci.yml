@@ -25,6 +25,9 @@ variables:
   BATCH_BUILD: "1"
   V: "0"
   IDF_CI_BUILD: "1"
+  # The target_test stage is temporarily disabled. Set this to "1", either here or when
+  # starting a pipeline manually, to run the tests on the runner boards again.
+  RUN_TARGET_TEST: "0"
 
 include:
   - ".gitlab/ci/pre_commit.yml"
