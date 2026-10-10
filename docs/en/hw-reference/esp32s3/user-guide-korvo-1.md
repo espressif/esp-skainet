@@ -2,6 +2,10 @@
 
 [中文](../../../zh_CN/hw-reference/esp32s3/user-guide-korvo-1.md)
 
+> **Note**
+>
+> ESP32-S3-Korvo-1 has reached End of Life (EOL). This guide is kept for reference only. For new designs, please consider other Espressif AI development boards.
+
 - [1. Getting Started](#1-getting-started)
   - [1.1 Overview](#11-overview)
   - [1.2 Block Diagram](#12-block-diagram)
